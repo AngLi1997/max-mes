@@ -1,0 +1,1 @@
+alter table bm_procedure_task_instance drop column flow_enable;

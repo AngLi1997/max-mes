@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.weigh.centre.config.mapper.IWeighCentreMapper">
+    <select id="queryPage" resultType="com.bmos.mes.service.weigh.centre.config.model.WeighCentre">
+        select distinct bm_weigh_centre.*
+        from bm_weigh_centre
+        left join bm_resource_permission on bm_weigh_centre.id = bm_resource_permission.resource_id
+        <where>
+            bm_weigh_centre.is_deleted = 0
+            <if test="pageQuery.name != null and pageQuery.name != ''">
+                and bm_weigh_centre.name like concat('%', #{pageQuery.name}, '%')
+            </if>
+            <if test="pageQuery.code != null and pageQuery.code != ''">
+                and bm_weigh_centre.code like concat('%', #{pageQuery.code}, '%')
+            </if>
+            <if test="weighCentreIds != null and weighCentreIds.size() != 0">
+                and bm_weigh_centre.category_id in
+                <foreach collection="weighCentreIds" item="id" separator="," open="(" close=")">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="weighCentreIds == null or weighCentreIds.size() == 0">
+                and 1 = 0
+            </if>
+            <if test="deptIds != null and deptIds.size() > 0">
+                and bm_resource_permission.dept_id in
+                <foreach collection="deptIds" open="(" separator="," close=")" item="deptId">
+                    #{deptId}
+                </foreach>
+            </if>
+            <if test="deptIds == null or deptIds.size() == 0">
+                and 1 = 0
+            </if>
+        </where>
+        order by code
+    </select>
+
+    <select id="listAllByDeptIds" resultType="com.bmos.mes.service.weigh.centre.config.model.WeighCentre">
+        select distinct bm_weigh_centre.*
+        from bm_weigh_centre
+                 left join bm_resource_permission on bm_weigh_centre.id = bm_resource_permission.resource_id
+        <where>
+         bm_weigh_centre.is_deleted = 0
+            <if test="deptIds != null and deptIds.size() > 0">
+                and bm_resource_permission.dept_id in
+                <foreach collection="deptIds" open="(" separator="," close=")" item="deptId">
+                    #{deptId}
+                </foreach>
+            </if>
+            <if test="deptIds == null or deptIds.size() == 0">
+                and 1 = 0
+            </if>
+        </where>
+    </select>
+    <select id="selectNamePathWithCategoryById" resultType="java.lang.String">
+        select concat(c.name_path, '/', bm_weigh_centre.name)
+        from bm_weigh_centre
+                 left join (select b1.id,
+                                   b1.name,
+                                   b1.id_path,
+                                   group_concat(b2.name order by b2.id separator '/') as name_path
+                            from bm_weigh_centre_category b1
+                                     left join bm_weigh_centre_category b2 on find_in_set(b2.id, b1.id_path) and b2.is_deleted = 0
+                            where b1.is_deleted = 0
+                            group by b1.id) c on bm_weigh_centre.category_id = c.id
+        where bm_weigh_centre.id = #{weighCentreId}
+    </select>
+</mapper>

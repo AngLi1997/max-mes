@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.trace.material.mapper.IMaterialTraceTemplateMapper">
+    <select id="queryPage" resultType="com.bmos.mes.service.trace.material.vo.MaterialTraceTemplatePageVO">
+        select bm_material_trace_template.id,
+               bm_material_trace_template.template_name,
+               bm_material.name as product_name,
+               bm_material.merge_code,
+               bm_process.name  as process_name,
+               bm_material_trace_template.enabled
+        from bm_material_trace_template
+                 left join bm_material
+                           on bm_material_trace_template.product_id = bm_material.id and bm_material.is_deleted = 0
+                 left join bm_process
+                           on bm_material_trace_template.process_id = bm_process.id and bm_process.is_deleted = 0
+        <where>
+            bm_material_trace_template.is_deleted = 0
+            <if test="pageQuery.templateName != null and pageQuery.templateName != ''">
+                and bm_material_trace_template.template_name like concat('%', #{pageQuery.templateName}, '%')
+            </if>
+            <if test="pageQuery.processName != null and pageQuery.processName != ''">
+                and bm_process.name like concat('%', #{pageQuery.processName}, '%')
+            </if>
+            <if test="pageQuery.materialIds != null and pageQuery.materialIds.size() != 0">
+                and bm_material_trace_template.product_id in
+                <foreach collection="pageQuery.materialIds" item="materialId" open="(" separator="," close=")">
+                    #{materialId}
+                </foreach>
+            </if>
+            <if test="pageQuery.materialIds == null or pageQuery.materialIds.size() == 0">
+                and 1 = -1
+            </if>
+            <if test="pageQuery.processIds != null and pageQuery.processIds.size() != 0">
+                and bm_material_trace_template.process_id in
+                <foreach collection="pageQuery.processIds" item="processId" open="(" separator="," close=")">
+                    #{processId}
+                </foreach>
+            </if>
+            <if test="pageQuery.processIds == null or pageQuery.processIds.size() == 0">
+                and 1 = -1
+            </if>
+        </where>
+        order by bm_material_trace_template.create_time desc
+    </select>
+</mapper>

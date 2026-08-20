@@ -1,0 +1,220 @@
+{
+  "main": {
+    "id": "92ec4e5420211b0f",
+    "type": "split",
+    "children": [
+      {
+        "id": "431f23141092735f",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "6d81769bda9e41d4",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "raw/prd/001-生产管理.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "001-生产管理"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "03a641b703174464",
+    "type": "split",
+    "children": [
+      {
+        "id": "36cb102a1b2571a8",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "5027786a4abfca47",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "文件列表"
+            }
+          },
+          {
+            "id": "56a061105c4c47c5",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "搜索"
+            }
+          },
+          {
+            "id": "9f5034d493550075",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "书签"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "128d6c929881ec22",
+    "type": "split",
+    "children": [
+      {
+        "id": "f88ea3b47984b869",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "c949a6a63216a314",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "raw/prd/001-生产管理.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "001-生产管理 的反向链接列表"
+            }
+          },
+          {
+            "id": "d95d9efe0eb5756b",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "raw/prd/001-生产管理.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "001-生产管理 的出链列表"
+            }
+          },
+          {
+            "id": "d3cc4e61caf49dac",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "标签"
+            }
+          },
+          {
+            "id": "ff518354f3f778b8",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "添加笔记属性"
+            }
+          },
+          {
+            "id": "f55f91e47d9c9399",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "raw/prd/001-生产管理.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "001-生产管理 的大纲"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:打开快速切换": false,
+      "graph:查看关系图谱": false,
+      "canvas:新建白板": false,
+      "daily-notes:打开/创建今天的日记": false,
+      "templates:插入模板": false,
+      "command-palette:打开命令面板": false,
+      "bases:新建数据库": false
+    }
+  },
+  "active": "5027786a4abfca47",
+  "lastOpenFiles": [
+    "raw/prd/001_2_3_4-生产计划.md",
+    "flows/flow-material-flow.md",
+    "raw/prd/016-物料追溯配置.md",
+    "domains/domain-production-management.md",
+    "raw/prd/005-班组管理.md",
+    "raw/prd/称量工单执行.md",
+    "raw/prd/登录日志.md",
+    "raw/prd/批签发管理补充需求.md",
+    "raw/prd/批签发模板补充需求.md",
+    "raw/prd/业务组件.md",
+    "raw/prd/007-物料管理.md",
+    "raw/prd/006-清场日志.md",
+    "raw/prd/005-称量日志.md",
+    "raw/prd/001-生产历史.md",
+    "scripts/regen_links.py",
+    "raw/prd/011-操作规程.md",
+    "scripts/sync_raw.py",
+    "scripts",
+    "raw/prd/页面组件.md",
+    "raw/prd/通用模块规范.md",
+    "raw/prd/菜单功能.md",
+    "raw/prd/签名追溯.md",
+    "raw/prd/称量工单规划.md",
+    "raw/prd/物料称量.md",
+    "raw/prd/操作日志.md",
+    "raw/prd/审批流追溯.md",
+    "raw/prd/013-批次追溯.md",
+    "raw/prd/011-生产投料.md",
+    "raw/prd/009-编号规则.md",
+    "raw/prd",
+    "raw"
+  ]
+}

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.requisition.mapper.ReserveComponentMaterialMapper">
+
+    <select id="selectBatchListByInstanceId"
+            resultType="com.bmos.mes.service.record.business.model.StorageMaterialDetailInfo">
+        SELECT DISTINCT smb.id                            as materialBatchId,
+                        smb.material_id,
+                        COALESCE(br.reservation_sum, '0') as remainingQuantity,
+                        bo.operation_sum                  as operateQuantity,
+                        br.unit_id,
+                        smb.material_batch_no,
+                        smb.hydration,
+                        smb.no_hydration_content,
+                        smb.supplier,
+                        smb.producer,
+                        smb.expired_date,
+                        smb.factory_batch_no,
+                        smb.original_batch_no,
+                        smb.report_no,
+                        smb.licence_no,
+                        bo.min_id
+        FROM bm_storage_material_batch smb
+                 LEFT JOIN (SELECT sm.storage_material_batch_id,
+                                   SUM(CASE
+                                           WHEN rcm.cancel_reserve = 0 THEN rcm.quantity
+                                           WHEN rcm.cancel_reserve = 1 THEN CONCAT('-', rcm.quantity)
+                                           ELSE '0'
+                                       END)    as operation_sum,
+                                   MIN(rcm.id) as min_id
+                            FROM bm_reserve_component_material rcm
+                                     JOIN bm_storage_material sm ON rcm.storage_material_id = sm.id
+                            WHERE rcm.instance_id = #{instanceId}
+                            GROUP BY sm.storage_material_batch_id) bo ON smb.id = bo.storage_material_batch_id
+                 LEFT JOIN (SELECT sm.storage_material_batch_id,
+                                   SUM(sm.reserve_quantity) as reservation_sum,
+                                   sm.unit_id
+                            FROM bm_storage_material_reserve smr
+                                     JOIN bm_storage_material sm ON smr.storage_material_id = sm.id
+                            WHERE smr.is_deleted = 0
+                              AND smr.batch_id = #{productPlanId}
+                            AND (sm.sign_status is null or sm.sign_status = 1)
+                            GROUP BY sm.storage_material_batch_id) br
+                           ON smb.id = br.storage_material_batch_id
+        WHERE (bo.operation_sum IS NOT NULL OR br.reservation_sum IS NOT NULL);
+    </select>
+</mapper>

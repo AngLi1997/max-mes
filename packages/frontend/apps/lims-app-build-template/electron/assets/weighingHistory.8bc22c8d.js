@@ -1,0 +1,1 @@
+import{H as e}from"./index-eacb5835.js";const a=a=>e.get("/api/app/mes/weigh/centre/execute/queryHistoryTaskPage",a),s=a=>e.get("/api/app/mes/weigh/centre/execute/queryRecordResultByTaskId",a);export{s as a,a as r};

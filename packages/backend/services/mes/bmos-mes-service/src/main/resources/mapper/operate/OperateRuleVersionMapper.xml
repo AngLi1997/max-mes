@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.operate.mapper.OperateRuleVersionMapper">
+
+    <select id="getListByParentId" resultType="com.bmos.mes.service.operate.vo.OperateRuleVersionPageVO">
+        SELECT
+            id,
+            version,
+            remark,
+            state,
+            url,
+            upload_time,
+            instance_id,
+            audit_type,
+            effect_date,
+            file_effect_date
+        FROM
+            bm_operate_rule_version
+        where
+            is_deleted = 0
+        and operate_id =#{parentId}
+        order by create_time desc
+    </select>
+
+    <select id="getDetailsById" resultType="com.bmos.mes.service.operate.vo.OperateRuleVersionDetailsVO">
+        SELECT
+            rule.id as operateId,
+            rule.`code`,
+            rule.`name`,
+            version.id,
+            version.audit_type,
+            version.version,
+            version.upload_time,
+            version.remark,
+            version.state,
+            version.url,
+            version.instance_id,
+            version.effect_date,
+            version.file_effect_date,
+            rule.category_id AS categoryId
+        FROM
+            bm_operate_rule AS rule
+            JOIN bm_operate_rule_version AS version ON rule.id = version.operate_id
+        WHERE
+            rule.is_deleted = 0
+            AND version.is_deleted = 0
+            AND version.id = #{id}
+    </select>
+
+    <select id="selectByListByState" resultType="com.bmos.mes.service.operate.model.OperateRule">
+        SELECT
+            rule.*
+        FROM
+            bm_operate_rule AS rule
+            JOIN bm_resource_permission bm ON rule.id = bm.resource_id
+        WHERE
+            rule.is_deleted = 0
+        and bm.dept_id in
+        <foreach collection="deptIds" open="(" close=")" separator="," item="item">
+            #{item}
+        </foreach>
+        group by rule.id
+    </select>
+
+    <select id="selectStateByRuleId" resultType="com.bmos.mes.service.operate.model.OperateRuleVersion">
+        SELECT
+            version.*
+        FROM
+            bm_operate_rule AS rule
+            JOIN bm_operate_rule_version AS version
+            on rule.id = version.operate_id
+        where
+            rule.is_deleted = 0
+            and version.is_deleted = 0
+            and version.state = 'valid'
+            and rule.id =#{ruleId}
+    </select>
+
+    <select id="pageTodoFlow" resultType="com.bmos.mes.service.operate.vo.OperateRuleAuditVO">
+        SELECT
+        rule.`code`,
+        rule.`name`,
+        version.id as versionId,
+        version.audit_type,
+        version.version,
+        version.remark,
+        version.effect_date,
+        version.instance_id as processInstanceId,
+        version.id
+        FROM
+        bm_operate_rule AS rule
+        JOIN bm_operate_rule_version AS version ON rule.id = version.operate_id
+        WHERE
+        rule.is_deleted = 0
+        AND version.is_deleted = 0
+        and version.`state` = 'audit'
+        <if test="dto.versionIds != null and dto.versionIds.size() > 0">
+            and version.id in
+            <foreach collection="dto.versionIds" open="(" close=")" separator="," item="versionId">
+                #{versionId}
+            </foreach>
+        </if>
+        <if test="dto.name != null and dto.name != '' ">
+            and rule.`name` like concat('%',#{dto.name},'%')
+        </if>
+        <if test="dto.code != null and dto.code != '' ">
+            and rule.`code` like concat('%',#{dto.code},'%')
+        </if>
+    </select>
+</mapper>

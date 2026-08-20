@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.plan.template.mapper.PlanTemplateBatchMapper">
+
+    <resultMap id="procedureMap" type="com.bmos.mes.service.plan.template.vo.PlanTemplateProcedureVO">
+        <id property="procedureId" column="procedureId"/>
+        <result property="name" column="procedureName"/>
+        <result property="sort" column="procedureSort"/>
+    </resultMap>
+
+    <resultMap id="baseMap" type="com.bmos.mes.service.plan.template.vo.PlanTemplateDetailBatchVO">
+        <result property="templateBatchId" column="id"/>
+        <result property="planTemplateId" column="plan_template_id"/>
+        <result property="processId" column="process_id"/>
+        <result property="processName" column="process_name"/>
+        <result property="productName" column="product_name"/>
+        <result property="productMergeCode" column="product_merge_code"/>
+        <result property="productSpecification" column="product_specification"/>
+        <result property="packingSpecification" column="packing_specification"/>
+        <result property="innerPackingSpecification" column="inner_packing_specification"/>
+        <result property="productMark" column="product_mark"/>
+        <result property="processVersion" column="process_version"/>
+        <result property="intervalDuration" column="interval_duration"/>
+        <result property="executionDuration" column="execution_duration"/>
+        <result property="productionLineId" column="production_line_id"/>
+        <result property="batchQuantity" column="batch_quantity"/>
+        <result property="followBatchSort" column="follow_batch_sort"/>
+        <result property="relationBatchSortList" column="relation_batch_sort_list" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
+        <result property="procedureConfig" column="procedure_config"/>
+        <result property="sort" column="sort"/>
+        <result property="activeVersion" column="active_version"/>
+        <result property="unitId" column="unit_id"/>
+        <result property="relationProcessesList" column="relation_processes_list"/>
+        <result property="processName" column="process_name"/>
+        <result property="productionLineCode" column="production_line_code"/>
+        <result property="productionLineName" column="production_line_name"/>
+        <result property="reuseBatchNumber" column="reuse_batch_number"/>
+        <result property="processKey" column="process_key"/>
+        <collection property="procedureList" resultMap="procedureMap"/>
+    </resultMap>
+
+
+    <select id="selectDetailByPlanTemplateId"
+            resultMap="baseMap">
+        SELECT t1.id,
+               t1.plan_template_id,
+               t1.process_id,
+               t1.process_version,
+               t1.interval_duration,
+               t1.execution_duration,
+               t1.production_line_id,
+               t1.batch_quantity,
+               t1.follow_batch_sort,
+               t1.relation_batch_sort_list,
+               t1.procedure_config,
+               t1.sort,
+               t2.active_version,
+               t3.name as procedureName,
+               t3.procedure_id as procedureId,
+               t3.sort as procedureSort,
+               t1.process_name,
+               t1.product_name,
+               t1.product_merge_code,
+               t1.product_specification,
+               t1.product_id,
+               t1.inner_packing_specification,
+               t1.packing_specification,
+               t1.product_mark,
+               t1.unit_id,
+               t1.relation_processes_list,
+               t1.production_line_name,
+               t1.production_line_code,
+               t1.reuse_batch_number,
+               t1.process_key
+        FROM bm_plan_template_batch t1
+        left join bm_process t2 on t1.process_id = t2.id
+        left join bm_procedure_model t3 on t3.process_id = t2.id and t3.process_version = t2.active_version and t3.is_deleted = 0
+        where t1.is_deleted = 0
+        and t2.is_deleted = 0
+        and t1.plan_template_id = #{planTemplateId}
+    </select>
+</mapper>

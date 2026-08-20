@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.lotsummary.mapper.ILotSummaryMapper">
+
+    <select id="queryPage" resultType="com.bmos.mes.service.lotsummary.vo.LotSummaryPageVO">
+        select bm_lot_summary.id,
+               bm_lot_summary.name,
+               bm_material.name as product_name,
+               bm_material.merge_code as product_merge_code,
+               bm_material.specification as product_specification,
+               bm_lot_summary.process_name
+        from bm_lot_summary
+                 left join bm_material on bm_lot_summary.product_id = bm_material.id and bm_material.is_deleted = 0
+        where bm_lot_summary.is_deleted = 0
+        <if test="productIds != null">
+            and bm_lot_summary.product_id in
+            <foreach collection="productIds" item="productId" open="(" separator="," close=")">
+                #{productId}
+            </foreach>
+        </if>
+        <if test="pageQuery.name != null and pageQuery.name != ''">
+            and bm_lot_summary.name like concat('%',#{pageQuery.name},'%')
+        </if>
+        order by bm_lot_summary.create_time desc
+    </select>
+</mapper>

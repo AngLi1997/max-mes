@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.stability.scheme.mapper.StabilitySchemeItemMapper">
+
+    <select id="selectByVersionId" resultType="com.bmos.lims2.server.stability.scheme.entity.StabilitySchemeItem">
+        SELECT * FROM lm_stability_scheme_item
+        WHERE version_id = #{versionId} AND is_deleted = 0
+        ORDER BY id ASC
+    </select>
+
+    <select id="selectByVersionIdWithNames" resultType="com.bmos.lims2.server.stability.scheme.dto.response.StabilitySchemeItemDTO">
+        SELECT
+            si.id,
+            si.scheme_id AS schemeId,
+            si.version_id AS versionId,
+            si.inspect_item_id AS inspectItemId,
+            si.duration,
+            si.time_unit AS timeUnit,
+            ii.name AS inspectItemName,
+            ii.code AS inspectItemCode
+        FROM lm_stability_scheme_item si
+        LEFT JOIN lm_inspect_item ii ON si.inspect_item_id = ii.id AND ii.is_deleted = 0
+        WHERE si.version_id = #{versionId} AND si.is_deleted = 0
+        ORDER BY si.id ASC
+    </select>
+
+    <delete id="deleteByVersionId">
+        DELETE FROM lm_stability_scheme_item WHERE version_id = #{versionId}
+    </delete>
+
+</mapper>

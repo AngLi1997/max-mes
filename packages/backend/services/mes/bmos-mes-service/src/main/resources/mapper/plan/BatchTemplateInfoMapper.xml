@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.plan.document.mapper.BatchTemplateInfoMapper">
+
+    <sql id="BASE_COLUM">
+        `id`,
+        `name`,
+        `category_id`,
+        `create_by`,
+        `create_time`,
+        `update_by`,
+        `update_time`,
+        `is_deleted`
+    </sql>
+
+    <select id="selectByParam"
+            resultType="com.bmos.mes.service.plan.document.model.BatchTemplateInfo">
+        SELECT
+            DISTINCT
+            bm_batch_template_info.id,
+            bm_batch_template_info.category_id,
+            bm_batch_template_info.name,
+            bm_batch_template_info.create_time,
+            bm_batch_template_info.update_time,
+            bm_batch_template_info.is_deleted
+        FROM
+            bm_batch_template_info
+            LEFT JOIN bm_resource_permission ON bm_resource_permission.resource_id = bm_batch_template_info.id
+        <where>
+            bm_batch_template_info.is_deleted = 0
+            <if test="param.categoryIdList != null and param.categoryIdList.size() > 0">
+                AND bm_batch_template_info.category_id IN
+                <foreach collection="param.categoryIdList" open="(" separator="," close=")" item="categoryId">
+                    #{categoryId}
+                </foreach>
+            </if>
+            <if test="param.deptIds != null and param.deptIds.size() > 0">
+                AND bm_resource_permission.dept_id in
+                <foreach collection="param.deptIds" open="(" separator="," close=")" item="deptId">
+                    #{deptId}
+                </foreach>
+            </if>
+            <if test="param.name != null and param.name != ''">
+                AND bm_batch_template_info.name like CONCAT('%', #{param.name}, '%')
+            </if>
+        </where>
+    </select>
+    <select id="selectAuthByIdList" resultType="com.bmos.mes.service.plan.document.model.BatchTemplateInfo">
+            SELECT
+                DISTINCT
+                <include refid="BASE_COLUM" />
+            FROM
+                bm_batch_template_info
+            LEFT JOIN
+                    bm_resource_permission ON bm_resource_permission.resource_id = bm_batch_template_info.id
+            <where>
+                <if test="templateInfoIdList != null and templateInfoIdList.size() > 0">
+                    id IN
+                    <foreach collection="templateInfoIdList" item="templateInfoId" open="(" separator="," close=")">
+                        #{templateInfoId}
+                    </foreach>
+                </if>
+                <if test="deptIds != null and deptIds.size() > 0">
+                    AND bm_resource_permission.dept_id IN
+                    <foreach collection="deptIds" item="deptId" open="(" separator="," close=")">
+                        #{deptId}
+                    </foreach>
+                </if>
+                AND is_deleted = 0
+            </where>
+
+
+    </select>
+</mapper>

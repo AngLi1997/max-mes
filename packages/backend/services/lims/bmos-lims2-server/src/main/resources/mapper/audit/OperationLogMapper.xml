@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.audit.operationlog.mapper.AuditOperationLogMapper">
+
+
+    <select id="selectPageList" resultType="com.bmos.lims2.server.audit.operationlog.vo.OperationLogPageVO">
+        select
+            id,
+            module,
+            operation_type,
+            remark,
+            create_by,
+            create_time
+        from bm_log_operation
+        where is_deleted = 0
+        <if test="module != null and module != ''">
+            and module = #{module}
+        </if>
+        <if test="businessId != null">
+            and business_id = #{businessId}
+        </if>
+    </select>
+
+    <select id="listRecordLog" resultType="com.bmos.lims2.server.audit.operationlog.vo.ListLogVO">
+        select
+            id,
+            module,
+            operation_type,
+            remark,
+            create_by,
+            create_time,
+            node_name,
+            comment,
+            detail
+        from bm_log_operation
+        where
+            is_deleted = 0
+        and business_id = #{versionId}
+        order by create_time desc
+    </select>
+
+    <select id="listLogByBusinessIdAndModule" resultType="com.bmos.lims2.server.audit.operationlog.vo.ListLogVO">
+        select
+            id,
+            module,
+            operation_type,
+            remark,
+            create_by,
+            create_time,
+            node_name,
+            comment,
+            detail
+        from bm_log_operation
+        where
+            is_deleted = 0
+            and business_id = #{businessId}
+            and module = #{module}
+        order by create_time desc
+    </select>
+</mapper>

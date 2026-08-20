@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.lotsummary.mapper.ILotSummaryItemMapper">
+
+    <select id="selectVOByLotSummaryId" resultType="com.bmos.mes.service.lotsummary.vo.LotSummaryDetailItemVO">
+        select bm_lot_summary_item.id,
+               bm_lot_summary_item.label_name,
+               bm_dataset.id         as dataset_id,
+               bm_dataset.name       as dataset_name,
+               bm_dataset_point.id   as dataset_point_id,
+               bm_dataset_point.name as dataset_point_name
+        from bm_lot_summary_item
+                 left join bm_dataset_point
+                           on bm_lot_summary_item.dataset_point_id = bm_dataset_point.id and bm_dataset_point.is_deleted = 0
+                 left join bm_dataset
+                           on bm_dataset.id = bm_dataset_point.dataset_id and bm_dataset.is_deleted = 0
+        where bm_lot_summary_item.is_deleted = 0
+        and bm_lot_summary_item.lot_summary_id = #{lotSummaryId}
+        order by bm_lot_summary_item.id
+    </select>
+</mapper>

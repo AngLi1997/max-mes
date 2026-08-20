@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.stability.statistics.mapper.StabilityStatisticsMapper">
+
+    <!-- 稳定性统计查询：检项信息 -->
+    <select id="selectStatisticsItems"
+            resultType="com.bmos.lims2.server.stability.statistics.dto.StabilityStatisticsItemDTO">
+        SELECT
+            sip.code               AS planCode,
+            io.batch_no            AS batchNo,
+            io.order_no            AS orderNo,
+            io.create_time         AS requestTime,
+            tpTask.experiment_type AS experimentType,
+            tpTask.storage_condition AS storageCondition,
+            tpTask.time_value      AS timeValue,
+            tpTask.time_unit       AS timeUnit,
+            t.inspect_item_id      AS inspectItemId,
+            ii.code                AS inspectItemCode,
+            ii.name                AS inspectItemName,
+            ip.id                  AS parameterId,
+            ssdp.version_id        AS schemeVersionId,
+            ip.code                AS parameterCode,
+            ip.name                AS parameterName,
+            ssdp.id                AS dataPointId,
+            ssdp.name              AS dataPointName,
+            ssdp.point_type        AS pointType,
+            ier.value_text         AS valueText,
+            ier.value_number       AS valueNumber,
+            ier.test_time          AS testTime
+        FROM lm_inspection_entry_record ier
+        INNER JOIN lm_task t
+            ON ier.task_id = t.id AND t.is_deleted = 0
+        INNER JOIN lm_inspection_order io
+            ON t.inspection_order_id = io.id AND io.is_deleted = 0
+        INNER JOIN lm_stability_scheme_version ssv
+            ON io.scheme_version_id = ssv.id AND ssv.is_deleted = 0
+        INNER JOIN lm_stability_plan_timepoint_task tpTask
+            ON tpTask.inspection_order_id = io.id AND tpTask.is_deleted = 0
+        INNER JOIN lm_stability_inspect_plan sip
+            ON tpTask.plan_id = sip.id AND sip.is_deleted = 0
+        INNER JOIN lm_stability_scheme_data_point ssdp
+            ON ier.data_point_config_id = ssdp.id AND ssdp.is_deleted = 0
+        LEFT JOIN lm_inspect_item ii
+            ON t.inspect_item_id = ii.id AND ii.is_deleted = 0
+        LEFT JOIN lm_inspect_parameter ip
+            ON ssdp.parameter_id = ip.id AND ip.is_deleted = 0
+        WHERE ier.is_deleted = 0
+          AND io.order_status IN ('CONFIRMED', 'SAMPLE_AUDIT_PENDING', 'SAMPLE_AUDIT_REJECTED', 'COMPLETED')
+          AND sip.id = #{query.planId}
+          AND tpTask.experiment_type = #{query.experimentType}
+          AND tpTask.storage_condition = #{query.storageCondition}
+        ORDER BY tpTask.time_value, tpTask.time_unit, ii.code, ip.code, ssdp.name
+    </select>
+
+    <!-- 指定检品下的稳定性考察计划下拉 -->
+    <select id="selectPlanOptions"
+            resultType="com.bmos.lims2.server.stability.statistics.dto.StabilityPlanOptionDTO">
+        SELECT id, code, status
+        FROM lm_stability_inspect_plan
+        WHERE is_deleted = 0
+          AND material_id = #{materialId}
+          AND status != 'PENDING'
+        ORDER BY code
+    </select>
+
+    <!-- 指定计划下的试验类型下拉（去重） -->
+    <select id="selectExperimentTypeOptions"
+            resultType="com.bmos.lims2.server.stability.statistics.dto.StabilityExperimentTypeOptionDTO">
+        SELECT DISTINCT experiment_type AS experimentType, storage_condition AS storageCondition
+        FROM lm_stability_plan_timepoint_task
+        WHERE is_deleted = 0
+          AND plan_id = #{planId}
+        ORDER BY experiment_type, storage_condition
+    </select>
+
+    <!-- 查询基本信息 -->
+    <select id="selectBasicInfo"
+            resultType="com.bmos.lims2.server.stability.statistics.dto.StabilityStatisticsBasicInfoDTO">
+        SELECT
+            m.name AS materialName,
+            m.code AS materialCode,
+            m.specification AS materialSpec,
+            ss.id AS schemeId,
+            ss.name AS schemeName
+        FROM lm_stability_inspect_plan sip
+        INNER JOIN lm_inspect_material m
+            ON sip.material_id = m.id AND m.is_deleted = 0
+        INNER JOIN lm_stability_scheme_version ssv
+            ON sip.scheme_version_id = ssv.id AND ssv.is_deleted = 0
+        INNER JOIN lm_stability_scheme ss
+            ON ssv.scheme_id = ss.id AND ss.is_deleted = 0
+        WHERE sip.id = #{query.planId}
+          AND sip.is_deleted = 0
+        LIMIT 1
+    </select>
+
+</mapper>

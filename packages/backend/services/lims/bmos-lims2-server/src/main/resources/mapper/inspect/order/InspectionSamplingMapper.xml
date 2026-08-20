@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.inspect.order.mapper.InspectionSamplingMapper">
+
+    <!-- 根据检验单ID查询取样信息（包含关联信息） -->
+    <select id="selectByInspectionOrderIdWithRelation" resultType="com.bmos.lims2.server.inspect.order.dto.InspectionSamplingDTO">
+        SELECT 
+            s.id,
+            s.inspection_order_id,
+            s.inspect_item_id,
+            ii.name as inspect_item_name,
+            s.planned_quantity,
+            s.unit_id,
+            s.sample_count,
+            s.sampling_method,
+            s.sampling_location,
+            s.sampling_description,
+            s.remark,
+            s.sample_id,
+            s.sample_no,
+            s.create_time,
+            s.update_time
+        FROM lm_inspection_sampling s
+        LEFT JOIN lm_inspect_item ii ON s.inspect_item_id = ii.id
+        WHERE s.inspection_order_id = #{inspectionOrderId}
+        AND s.is_deleted = 0
+        ORDER BY s.create_time ASC
+    </select>
+
+</mapper>

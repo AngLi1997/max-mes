@@ -1,0 +1,60 @@
+databaseName: bmos_mes
+dataSources:
+  ds_0:
+    dataSourceClassName: com.zaxxer.hikari.HikariDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    jdbcUrl: $${SHARDING_JDBC_JDBC_URL::}
+    username: $${SHARDING_JDBC_USERNAME::}
+    password: $${SHARDING_JDBC_PASSWORD::}
+rules:
+  - !SINGLE
+    tables:
+      - "*.*"
+  - !SHARDING
+    tables:
+      bm_execute_form_data:
+        actualDataNodes: ds_0.bm_execute_form_data_$->{0..99}
+        tableStrategy:
+          standard:
+            shardingColumn: product_plan_id
+            shardingAlgorithmName: bm_execute_form_data_hash
+      bm_operation_log:
+        actualDataNodes: ds_0.bm_operation_log_${0..4}_0${1..9}, ds_0.bm_operation_log_${0..4}_${10..12}
+        tableStrategy:
+          standard:
+            shardingColumn: create_time
+            shardingAlgorithmName: bm_operation_log_date
+      bm_material_log:
+        actualDataNodes: ds_0.bm_material_log_${0..4}_0${1..9}, ds_0.bm_material_log_${0..4}_${10..12}
+        tableStrategy:
+          standard:
+            shardingColumn: operation_time
+            shardingAlgorithmName: bm_material_log_date
+      bm_storage_material_position_log:
+        actualDataNodes: ds_0.bm_storage_material_position_log_${0..4}_0${1..9}, ds_0.bm_storage_material_position_log_${0..4}_${10..12}
+        tableStrategy:
+          standard:
+            shardingColumn: operate_time
+            shardingAlgorithmName: bm_storage_material_position_log_date
+    shardingAlgorithms:
+      bm_execute_form_data_hash:
+        type: INLINE
+        props:
+          algorithm-expression: bm_execute_form_data_$->{product_plan_id % 100}
+      bm_operation_log_date:
+        type: CLASS_BASED
+        props:
+          strategy: STANDARD
+          algorithmClassName: com.bmos.mes.service.config.sharding.OperationLogDivideShadingAlgorithm
+      bm_material_log_date:
+        type: CLASS_BASED
+        props:
+          strategy: STANDARD
+          algorithmClassName: com.bmos.mes.service.config.sharding.MaterialLogDivideShadingAlgorithm
+      bm_storage_material_position_log_date:
+        type: CLASS_BASED
+        props:
+          strategy: STANDARD
+          algorithmClassName: com.bmos.mes.service.config.sharding.PositionLogDivideShadingAlgorithm
+props:
+  sql-show: true

@@ -1,0 +1,121 @@
+truncate table lm_flow_audit;
+
+truncate table lm_flow_audit_category;
+
+truncate table lm_flow_audit_message;
+
+truncate table lm_flow_audit_operation_log;
+
+truncate table lm_flow_audit_process;
+
+truncate table lm_flow_audit_user;
+
+truncate table lm_flow_audit_version;
+
+
+
+truncate table audit_de_message;
+
+truncate table audit_deployment;
+
+truncate table audit_execution_instance;
+
+truncate table audit_hi_execution;
+
+truncate table audit_hi_process_instance;
+
+truncate table audit_hi_task_instance;
+
+truncate table audit_hi_variable;
+
+truncate table audit_hi_variable_execution;
+
+truncate table audit_job_instance;
+
+truncate table audit_process_instance;
+
+truncate table audit_re_variable_execution;
+
+truncate table audit_ru_variable;
+
+truncate table audit_task_instance;
+
+
+
+
+insert into bmos_lims2.audit_deployment (id, rev, version, name, business_key, category, deployment_id,
+                                         deployment_version_id, remark, meta_info, element_info, deploy_by, deploy_time,
+                                         deploy_status, create_by, create_time, update_by, update_time)
+values (19, null, 1, '方法审批内置流程', null, '120020030', 'c06aae06-f2d3-4690-af8f-bb3450cf133c',
+        'c06aae06-f2d3-4690-af8f-bb3450cf133c:1', '3',
+        '[{\"key\":\"9b70f18f-8eb7-465b-ad23-2e6e30133af6\",\"name\":\"开始\",\"type\":\"START_EVENT\",\"outgoing\":[],\"incoming\":[],\"metaInfo\":{\"position\":{\"x\":500,\"y\":60},\"size\":{\"width\":120,\"height\":44},\"view\":\"vue-shape-view\",\"shape\":\"custom-vue-start-node\",\"id\":\"9b70f18f-8eb7-465b-ad23-2e6e30133af6\",\"data\":{\"label\":\"开始\"},\"ports\":{\"groups\":{\"top\":{\"position\":\"top\",\"attrs\":{\"circle\":{\"r\":6,\"magnet\":true,\"stroke\":\"#108ee9\",\"strokeWidth\":1,\"fill\":\"transparent\",\"style\":{\"visibility\":\"hidden\"}}}},\"right\":{\"position\":\"right\",\"attrs\":{\"circle\":{\"r\":6,\"magnet\":true,\"stroke\":\"#108ee9\",\"strokeWidth\":1,\"fill\":\"transparent\",\"style\":{\"visibility\":\"hidden\"}}}},\"bottom\":{\"position\":\"bottom\",\"attrs\":{\"circle\":{\"r\":6,\"magnet\":true,\"stroke\":\"#108ee9\",\"strokeWidth\":1,\"fill\":\"transparent\",\"style\":{\"visibility\":\"hidden\"}}}},\"left\":{\"position\":\"left\",\"attrs\":{\"circle\":{\"r\":6,\"magnet\":true,\"stroke\":\"#108ee9\",\"strokeWidth\":1,\"fill\":\"transparent\",\"style\":{\"visibility\":\"hidden\"}}}}},\"items\":[{\"id\":\"start-top-port\",\"group\":\"top\"},{\"id\":\"start-right-port\",\"group\":\"right\"},{\"id\":\"start-left-port\",\"group\":\"left\"},{\"id\":\"start-bottom-port\",\"group\":\"bottom\"}]},\"zIndex\":1},\"payload\":{\"settings\":\"{\\\"name\\\":\\\"开始\\\"}\"}},{\"key\":\"44b3ed97-96b7-4a5c-bd8d-8afdbbc8d7fb\",\"name\":\"结束\",\"type\":\"END_EVENT\",\"outgoing\":[],\"incoming\":[],\"metaInfo\":{\"position\":{\"x\":500,\"y\":500},\"size\":{\"width\":120,\"height\":44},\"view\":\"vue-shape-view\",\"shape\":\"custom-vue-end-node\",\"id\":\"44b3ed97-96b7-4a5c-bd8d-8afdbbc8d7fb\",\"data\":{\"label\":\"结束\"},\"ports\":{\"groups\":{\"top\":{\"position\":\"top\",\"attrs\":{\"circle\":{\"r\":6,\"magnet\":true,\"stroke\":\"#108ee9\",\"strokeWidth\":1,\"fill\":\"transparent\",\"style\":{\"visibility\":\"hidden\"}}}},\"right\":{\"position\":\"right\",\"attrs\":{\"circle\":{\"r\":6,\"magnet\":true,\"stroke\":\"#108ee9\",\"strokeWidth\":1,\"fill\":\"transparent\",\"style\":{\"visibility\":\"hidden\"}}}},\"bottom\":{\"position\":\"bottom\",\"attrs\":{\"circle\":{\"r\":6,\"magnet\":true,\"stroke\":\"#108ee9\",\"strokeWidth\":1,\"fill\":\"transparent\",\"style\":{\"visibility\":\"hidden\"}}}},\"left\":{\"position\":\"left\",\"attrs\":{\"circle\":{\"r\":6,\"magnet\":true,\"stroke\":\"#108ee9\",\"strokeWidth\":1,\"fill\":\"transparent\",\"style\":{\"visibility\":\"hidden\"}}}}},\"items\":[{\"id\":\"end-top-port\",\"group\":\"top\"},{\"id\":\"end-right-port\",\"group\":\"right\"},{\"id\":\"end-left-port\",\"group\":\"left\"},{\"id\":\"end-bottom-port\",\"group\":\"bottom\"}]},\"zIndex\":1},\"payload\":{\"settings\":\"{\\\"name\\\":\\\"结束\\\"}\"}}]',
+        '{\"9b70f18f-8eb7-465b-ad23-2e6e30133af6\":{\"key\":\"9b70f18f-8eb7-465b-ad23-2e6e30133af6\",\"name\":\"开始\",\"type\":\"START_EVENT\",\"outgoing\":[],\"incoming\":[],\"payload\":{\"settings\":\"{\\\"name\\\":\\\"开始\\\"}\"},\"startEvent\":true,\"endEvent\":false},\"44b3ed97-96b7-4a5c-bd8d-8afdbbc8d7fb\":{\"key\":\"44b3ed97-96b7-4a5c-bd8d-8afdbbc8d7fb\",\"name\":\"结束\",\"type\":\"END_EVENT\",\"outgoing\":[],\"incoming\":[],\"payload\":{\"settings\":\"{\\\"name\\\":\\\"结束\\\"}\"},\"endEvent\":true,\"startEvent\":false}}',
+        null, '2025-08-19 14:04:41', 0, '1', '2025-08-19 11:59:23', '1', '2025-08-19 11:59:23')
+;
+
+insert into bmos_lims2.lm_flow_audit (id, code, name, category_code, create_time, update_time, create_by, update_by,
+                                      is_deleted)
+values (1957653594689900545, '120020030', '方法审批内置流程', '120020030', '2025-08-19 11:59:23', '2025-08-19 11:59:23', '1',
+        '1', 0);
+
+
+insert into bmos_lims2.lm_flow_audit_category (id, name, code, parent_id, create_by, update_by, create_time,
+                                               update_time, is_deleted, tree_code, tree_name)
+values (120020030, '方法审批', '120020030', 12002002, '1', '1', '2024-04-09 10:48:26', '2024-03-08 18:18:10', 0,
+        '120020030', '检验配置/方法审批');
+
+
+insert into bmos_lims2.lm_flow_audit_version (id, flow_audit_id, history_version, version, state, remark, deployment_id,
+                                              create_time, update_time, create_by, update_by, is_deleted)
+values (1957653594761203713, 1957653594689900545, null, '1', 1, null, 'c06aae06-f2d3-4690-af8f-bb3450cf133c',
+        '2025-08-19 11:59:23', '2025-08-19 11:59:23', '1', '1', 0);
+
+
+
+-- 操作规程流程内置数据
+INSERT INTO `bmos_lims2`.`lm_flow_audit_category` (`id`, `name`, `code`, `parent_id`, `create_by`, `update_by`, `create_time`, `update_time`, `is_deleted`, `tree_code`, `tree_name`) VALUES (1200200040, '操作规程审批', '1200200040', 12002002, '1', '1', '2024-04-09 10:48:26', '2024-03-08 18:18:10', 0, '1200200040', '检验配置/操作规程审批');
+
+INSERT INTO `bmos_lims2`.`lm_flow_audit` (`id`, `code`, `name`, `category_code`, `create_time`, `update_time`, `create_by`, `update_by`, `is_deleted`) VALUES (1740318445775486977, '1200200040', '操作规程审批内置流程', '1200200040', '2023-12-28 18:27:05', '2024-06-19 09:59:17', '1', '888888888888888880', 0);
+
+INSERT INTO `bmos_lims2`.`lm_flow_audit_version` (`id`, `flow_audit_id`, `history_version`, `version`, `state`, `remark`, `deployment_id`, `create_time`, `update_time`, `create_by`, `update_by`, `is_deleted`) VALUES (1740318446748598277, 1740318445775486977, NULL, 1, 1, null, '8066d103-1822-4e0d-8460-2ad03366fb66', '2023-12-28 18:27:05', '2024-06-19 09:59:17', '1', '888888888888888880', 0);
+
+INSERT INTO `bmos_lims2`.`audit_deployment` (`id`, `rev`, `version`, `name`, `business_key`, `category`, `deployment_id`, `deployment_version_id`, `remark`, `meta_info`, `element_info`, `deploy_by`, `deploy_time`, `deploy_status`, `create_by`, `create_time`, `update_by`, `update_time`) VALUES (5, NULL, 1, '操作规程启用审核内置流程', NULL, '1200200040', '8066d103-1822-4e0d-8460-2ad03366fb66', '8066d103-1822-4e0d-8460-2ad03366fb66:1', null , '[{\"key\":\"9b70f18f-8eb7-465b-ad23-2e6e30133af6\",\"name\":\"开始\",\"type\":\"START_EVENT\",\"outgoing\":[],\"incoming\":[],\"metaInfo\":{\"position\":{\"x\":500,\"y\":60},\"size\":{\"width\":120,\"height\":44},\"view\":\"vue-shape-view\",\"shape\":\"custom-vue-start-node\",\"id\":\"9b70f18f-8eb7-465b-ad23-2e6e30133af6\",\"data\":{\"label\":\"开始\"},\"ports\":{\"groups\":{\"top\":{\"position\":\"top\",\"attrs\":{\"circle\":{\"r\":6,\"magnet\":true,\"stroke\":\"#108ee9\",\"strokeWidth\":1,\"fill\":\"transparent\",\"style\":{\"visibility\":\"hidden\"}}}},\"right\":{\"position\":\"right\",\"attrs\":{\"circle\":{\"r\":6,\"magnet\":true,\"stroke\":\"#108ee9\",\"strokeWidth\":1,\"fill\":\"transparent\",\"style\":{\"visibility\":\"hidden\"}}}},\"bottom\":{\"position\":\"bottom\",\"attrs\":{\"circle\":{\"r\":6,\"magnet\":true,\"stroke\":\"#108ee9\",\"strokeWidth\":1,\"fill\":\"transparent\",\"style\":{\"visibility\":\"hidden\"}}}},\"left\":{\"position\":\"left\",\"attrs\":{\"circle\":{\"r\":6,\"magnet\":true,\"stroke\":\"#108ee9\",\"strokeWidth\":1,\"fill\":\"transparent\",\"style\":{\"visibility\":\"hidden\"}}}}},\"items\":[{\"id\":\"start-top-port\",\"group\":\"top\"},{\"id\":\"start-right-port\",\"group\":\"right\"},{\"id\":\"start-left-port\",\"group\":\"left\"},{\"id\":\"start-bottom-port\",\"group\":\"bottom\"}]},\"zIndex\":1},\"payload\":{\"settings\":\"{\\\"name\\\":\\\"开始\\\"}\"}},{\"key\":\"44b3ed97-96b7-4a5c-bd8d-8afdbbc8d7fb\",\"name\":\"结束\",\"type\":\"END_EVENT\",\"outgoing\":[],\"incoming\":[],\"metaInfo\":{\"position\":{\"x\":500,\"y\":500},\"size\":{\"width\":120,\"height\":44},\"view\":\"vue-shape-view\",\"shape\":\"custom-vue-end-node\",\"id\":\"44b3ed97-96b7-4a5c-bd8d-8afdbbc8d7fb\",\"data\":{\"label\":\"结束\"},\"ports\":{\"groups\":{\"top\":{\"position\":\"top\",\"attrs\":{\"circle\":{\"r\":6,\"magnet\":true,\"stroke\":\"#108ee9\",\"strokeWidth\":1,\"fill\":\"transparent\",\"style\":{\"visibility\":\"hidden\"}}}},\"right\":{\"position\":\"right\",\"attrs\":{\"circle\":{\"r\":6,\"magnet\":true,\"stroke\":\"#108ee9\",\"strokeWidth\":1,\"fill\":\"transparent\",\"style\":{\"visibility\":\"hidden\"}}}},\"bottom\":{\"position\":\"bottom\",\"attrs\":{\"circle\":{\"r\":6,\"magnet\":true,\"stroke\":\"#108ee9\",\"strokeWidth\":1,\"fill\":\"transparent\",\"style\":{\"visibility\":\"hidden\"}}}},\"left\":{\"position\":\"left\",\"attrs\":{\"circle\":{\"r\":6,\"magnet\":true,\"stroke\":\"#108ee9\",\"strokeWidth\":1,\"fill\":\"transparent\",\"style\":{\"visibility\":\"hidden\"}}}}},\"items\":[{\"id\":\"end-top-port\",\"group\":\"top\"},{\"id\":\"end-right-port\",\"group\":\"right\"},{\"id\":\"end-left-port\",\"group\":\"left\"},{\"id\":\"end-bottom-port\",\"group\":\"bottom\"}]},\"zIndex\":1},\"payload\":{\"settings\":\"{\\\"name\\\":\\\"结束\\\"}\"}}]', '{\"9b70f18f-8eb7-465b-ad23-2e6e30133af6\":{\"key\":\"9b70f18f-8eb7-465b-ad23-2e6e30133af6\",\"name\":\"开始\",\"type\":\"START_EVENT\",\"outgoing\":[],\"incoming\":[],\"payload\":{\"settings\":\"{\\\"name\\\":\\\"开始\\\"}\"},\"startEvent\":true,\"endEvent\":false},\"44b3ed97-96b7-4a5c-bd8d-8afdbbc8d7fb\":{\"key\":\"44b3ed97-96b7-4a5c-bd8d-8afdbbc8d7fb\",\"name\":\"结束\",\"type\":\"END_EVENT\",\"outgoing\":[],\"incoming\":[],\"payload\":{\"settings\":\"{\\\"name\\\":\\\"结束\\\"}\"},\"endEvent\":true,\"startEvent\":false}}', NULL, NULL, 0, '1', '2023-12-28 18:27:05', '1', '2023-12-28 18:27:05');
+
+
+insert into bmos_lims2.audit_deployment (id, rev, version, name, business_key, category, deployment_id,
+                                         deployment_version_id, remark, meta_info, element_info, deploy_by, deploy_time,
+                                         deploy_status, create_by, create_time, update_by, update_time)
+values (7, null, 1, '方案审批内置流程', null, '120020002', 'c06aae06-f2d3-4690-af8f-bb3450cf142b',
+        'c06aae06-f2d3-4690-af8f-bb3450cf142b:1', '3',
+        '[{\"key\":\"9b70f18f-8eb7-465b-ad23-2e6e30133af6\",\"name\":\"开始\",\"type\":\"START_EVENT\",\"outgoing\":[],\"incoming\":[],\"metaInfo\":{\"position\":{\"x\":500,\"y\":60},\"size\":{\"width\":120,\"height\":44},\"view\":\"vue-shape-view\",\"shape\":\"custom-vue-start-node\",\"id\":\"9b70f18f-8eb7-465b-ad23-2e6e30133af6\",\"data\":{\"label\":\"开始\"},\"ports\":{\"groups\":{\"top\":{\"position\":\"top\",\"attrs\":{\"circle\":{\"r\":6,\"magnet\":true,\"stroke\":\"#108ee9\",\"strokeWidth\":1,\"fill\":\"transparent\",\"style\":{\"visibility\":\"hidden\"}}}},\"right\":{\"position\":\"right\",\"attrs\":{\"circle\":{\"r\":6,\"magnet\":true,\"stroke\":\"#108ee9\",\"strokeWidth\":1,\"fill\":\"transparent\",\"style\":{\"visibility\":\"hidden\"}}}},\"bottom\":{\"position\":\"bottom\",\"attrs\":{\"circle\":{\"r\":6,\"magnet\":true,\"stroke\":\"#108ee9\",\"strokeWidth\":1,\"fill\":\"transparent\",\"style\":{\"visibility\":\"hidden\"}}}},\"left\":{\"position\":\"left\",\"attrs\":{\"circle\":{\"r\":6,\"magnet\":true,\"stroke\":\"#108ee9\",\"strokeWidth\":1,\"fill\":\"transparent\",\"style\":{\"visibility\":\"hidden\"}}}}},\"items\":[{\"id\":\"start-top-port\",\"group\":\"top\"},{\"id\":\"start-right-port\",\"group\":\"right\"},{\"id\":\"start-left-port\",\"group\":\"left\"},{\"id\":\"start-bottom-port\",\"group\":\"bottom\"}]},\"zIndex\":1},\"payload\":{\"settings\":\"{\\\"name\\\":\\\"开始\\\"}\"}},{\"key\":\"44b3ed97-96b7-4a5c-bd8d-8afdbbc8d7fb\",\"name\":\"结束\",\"type\":\"END_EVENT\",\"outgoing\":[],\"incoming\":[],\"metaInfo\":{\"position\":{\"x\":500,\"y\":500},\"size\":{\"width\":120,\"height\":44},\"view\":\"vue-shape-view\",\"shape\":\"custom-vue-end-node\",\"id\":\"44b3ed97-96b7-4a5c-bd8d-8afdbbc8d7fb\",\"data\":{\"label\":\"结束\"},\"ports\":{\"groups\":{\"top\":{\"position\":\"top\",\"attrs\":{\"circle\":{\"r\":6,\"magnet\":true,\"stroke\":\"#108ee9\",\"strokeWidth\":1,\"fill\":\"transparent\",\"style\":{\"visibility\":\"hidden\"}}}},\"right\":{\"position\":\"right\",\"attrs\":{\"circle\":{\"r\":6,\"magnet\":true,\"stroke\":\"#108ee9\",\"strokeWidth\":1,\"fill\":\"transparent\",\"style\":{\"visibility\":\"hidden\"}}}},\"bottom\":{\"position\":\"bottom\",\"attrs\":{\"circle\":{\"r\":6,\"magnet\":true,\"stroke\":\"#108ee9\",\"strokeWidth\":1,\"fill\":\"transparent\",\"style\":{\"visibility\":\"hidden\"}}}},\"left\":{\"position\":\"left\",\"attrs\":{\"circle\":{\"r\":6,\"magnet\":true,\"stroke\":\"#108ee9\",\"strokeWidth\":1,\"fill\":\"transparent\",\"style\":{\"visibility\":\"hidden\"}}}}},\"items\":[{\"id\":\"end-top-port\",\"group\":\"top\"},{\"id\":\"end-right-port\",\"group\":\"right\"},{\"id\":\"end-left-port\",\"group\":\"left\"},{\"id\":\"end-bottom-port\",\"group\":\"bottom\"}]},\"zIndex\":1},\"payload\":{\"settings\":\"{\\\"name\\\":\\\"结束\\\"}\"}}]',
+        '{\"9b70f18f-8eb7-465b-ad23-2e6e30133af6\":{\"key\":\"9b70f18f-8eb7-465b-ad23-2e6e30133af6\",\"name\":\"开始\",\"type\":\"START_EVENT\",\"outgoing\":[],\"incoming\":[],\"payload\":{\"settings\":\"{\\\"name\\\":\\\"开始\\\"}\"},\"startEvent\":true,\"endEvent\":false},\"44b3ed97-96b7-4a5c-bd8d-8afdbbc8d7fb\":{\"key\":\"44b3ed97-96b7-4a5c-bd8d-8afdbbc8d7fb\",\"name\":\"结束\",\"type\":\"END_EVENT\",\"outgoing\":[],\"incoming\":[],\"payload\":{\"settings\":\"{\\\"name\\\":\\\"结束\\\"}\"},\"endEvent\":true,\"startEvent\":false}}',
+        null, '2025-08-19 14:04:41', 0, '1', '2025-08-19 11:59:23', '1', '2025-08-19 11:59:23'),
+       (9, null, 1, '样品审核内置流程', null, '120020010', 'd2303caa-0ba0-4e59-8772-2bf8ea3e9679',
+        'd2303caa-0ba0-4e59-8772-2bf8ea3e9679:1', null,
+
+        '[{\"key\":\"9b70f18f-8eb7-465b-ad23-2e6e30133af6\",\"name\":\"开始\",\"type\":\"START_EVENT\",\"outgoing\":[],\"incoming\":[],\"metaInfo\":{\"position\":{\"x\":500,\"y\":60},\"size\":{\"width\":120,\"height\":44},\"view\":\"vue-shape-view\",\"shape\":\"custom-vue-start-node\",\"id\":\"9b70f18f-8eb7-465b-ad23-2e6e30133af6\",\"data\":{\"label\":\"开始\"},\"ports\":{\"groups\":{\"top\":{\"position\":\"top\",\"attrs\":{\"circle\":{\"r\":6,\"magnet\":true,\"stroke\":\"#108ee9\",\"strokeWidth\":1,\"fill\":\"transparent\",\"style\":{\"visibility\":\"hidden\"}}}},\"right\":{\"position\":\"right\",\"attrs\":{\"circle\":{\"r\":6,\"magnet\":true,\"stroke\":\"#108ee9\",\"strokeWidth\":1,\"fill\":\"transparent\",\"style\":{\"visibility\":\"hidden\"}}}},\"bottom\":{\"position\":\"bottom\",\"attrs\":{\"circle\":{\"r\":6,\"magnet\":true,\"stroke\":\"#108ee9\",\"strokeWidth\":1,\"fill\":\"transparent\",\"style\":{\"visibility\":\"hidden\"}}}},\"left\":{\"position\":\"left\",\"attrs\":{\"circle\":{\"r\":6,\"magnet\":true,\"stroke\":\"#108ee9\",\"strokeWidth\":1,\"fill\":\"transparent\",\"style\":{\"visibility\":\"hidden\"}}}}},\"items\":[{\"id\":\"start-top-port\",\"group\":\"top\"},{\"id\":\"start-right-port\",\"group\":\"right\"},{\"id\":\"start-left-port\",\"group\":\"left\"},{\"id\":\"start-bottom-port\",\"group\":\"bottom\"}]},\"zIndex\":1},\"payload\":{\"settings\":\"{\\\"name\\\":\\\"开始\\\"}\"}},{\"key\":\"44b3ed97-96b7-4a5c-bd8d-8afdbbc8d7fb\",\"name\":\"结束\",\"type\":\"END_EVENT\",\"outgoing\":[],\"incoming\":[],\"metaInfo\":{\"position\":{\"x\":500,\"y\":500},\"size\":{\"width\":120,\"height\":44},\"view\":\"vue-shape-view\",\"shape\":\"custom-vue-end-node\",\"id\":\"44b3ed97-96b7-4a5c-bd8d-8afdbbc8d7fb\",\"data\":{\"label\":\"结束\"},\"ports\":{\"groups\":{\"top\":{\"position\":\"top\",\"attrs\":{\"circle\":{\"r\":6,\"magnet\":true,\"stroke\":\"#108ee9\",\"strokeWidth\":1,\"fill\":\"transparent\",\"style\":{\"visibility\":\"hidden\"}}}},\"right\":{\"position\":\"right\",\"attrs\":{\"circle\":{\"r\":6,\"magnet\":true,\"stroke\":\"#108ee9\",\"strokeWidth\":1,\"fill\":\"transparent\",\"style\":{\"visibility\":\"hidden\"}}}},\"bottom\":{\"position\":\"bottom\",\"attrs\":{\"circle\":{\"r\":6,\"magnet\":true,\"stroke\":\"#108ee9\",\"strokeWidth\":1,\"fill\":\"transparent\",\"style\":{\"visibility\":\"hidden\"}}}},\"left\":{\"position\":\"left\",\"attrs\":{\"circle\":{\"r\":6,\"magnet\":true,\"stroke\":\"#108ee9\",\"strokeWidth\":1,\"fill\":\"transparent\",\"style\":{\"visibility\":\"hidden\"}}}}},\"items\":[{\"id\":\"end-top-port\",\"group\":\"top\"},{\"id\":\"end-right-port\",\"group\":\"right\"},{\"id\":\"end-left-port\",\"group\":\"left\"},{\"id\":\"end-bottom-port\",\"group\":\"bottom\"}]},\"zIndex\":1},\"payload\":{\"settings\":\"{\\\"name\\\":\\\"结束\\\"}\"}}]',
+        '{\"9b70f18f-8eb7-465b-ad23-2e6e30133af6\":{\"key\":\"9b70f18f-8eb7-465b-ad23-2e6e30133af6\",\"name\":\"开始\",\"type\":\"START_EVENT\",\"outgoing\":[],\"incoming\":[],\"payload\":{\"settings\":\"{\\\"name\\\":\\\"开始\\\"}\"},\"startEvent\":true,\"endEvent\":false},\"44b3ed97-96b7-4a5c-bd8d-8afdbbc8d7fb\":{\"key\":\"44b3ed97-96b7-4a5c-bd8d-8afdbbc8d7fb\",\"name\":\"结束\",\"type\":\"END_EVENT\",\"outgoing\":[],\"incoming\":[],\"payload\":{\"settings\":\"{\\\"name\\\":\\\"结束\\\"}\"},\"endEvent\":true,\"startEvent\":false}}',
+        null, '2025-09-03 15:26:27', 0, '1', '2025-09-03 15:26:22', '1', '2025-09-03 15:26:22'),
+       (10, null, 1, '报告审批内置流程', null, '120020020', 'b19c0449-4a87-4680-b778-45dce36a0afd',
+        'b19c0449-4a87-4680-b778-45dce36a0afd:1', '12',
+        '[{\"key\":\"9b70f18f-8eb7-465b-ad23-2e6e30133af6\",\"name\":\"开始\",\"type\":\"START_EVENT\",\"outgoing\":[],\"incoming\":[],\"metaInfo\":{\"position\":{\"x\":500,\"y\":60},\"size\":{\"width\":120,\"height\":44},\"view\":\"vue-shape-view\",\"shape\":\"custom-vue-start-node\",\"id\":\"9b70f18f-8eb7-465b-ad23-2e6e30133af6\",\"data\":{\"label\":\"开始\"},\"ports\":{\"groups\":{\"top\":{\"position\":\"top\",\"attrs\":{\"circle\":{\"r\":6,\"magnet\":true,\"stroke\":\"#108ee9\",\"strokeWidth\":1,\"fill\":\"transparent\",\"style\":{\"visibility\":\"hidden\"}}}},\"right\":{\"position\":\"right\",\"attrs\":{\"circle\":{\"r\":6,\"magnet\":true,\"stroke\":\"#108ee9\",\"strokeWidth\":1,\"fill\":\"transparent\",\"style\":{\"visibility\":\"hidden\"}}}},\"bottom\":{\"position\":\"bottom\",\"attrs\":{\"circle\":{\"r\":6,\"magnet\":true,\"stroke\":\"#108ee9\",\"strokeWidth\":1,\"fill\":\"transparent\",\"style\":{\"visibility\":\"hidden\"}}}},\"left\":{\"position\":\"left\",\"attrs\":{\"circle\":{\"r\":6,\"magnet\":true,\"stroke\":\"#108ee9\",\"strokeWidth\":1,\"fill\":\"transparent\",\"style\":{\"visibility\":\"hidden\"}}}}},\"items\":[{\"id\":\"start-top-port\",\"group\":\"top\"},{\"id\":\"start-right-port\",\"group\":\"right\"},{\"id\":\"start-left-port\",\"group\":\"left\"},{\"id\":\"start-bottom-port\",\"group\":\"bottom\"}]},\"zIndex\":1},\"payload\":{\"settings\":\"{\\\"name\\\":\\\"开始\\\"}\"}},{\"key\":\"44b3ed97-96b7-4a5c-bd8d-8afdbbc8d7fb\",\"name\":\"结束\",\"type\":\"END_EVENT\",\"outgoing\":[],\"incoming\":[],\"metaInfo\":{\"position\":{\"x\":500,\"y\":500},\"size\":{\"width\":120,\"height\":44},\"view\":\"vue-shape-view\",\"shape\":\"custom-vue-end-node\",\"id\":\"44b3ed97-96b7-4a5c-bd8d-8afdbbc8d7fb\",\"data\":{\"label\":\"结束\"},\"ports\":{\"groups\":{\"top\":{\"position\":\"top\",\"attrs\":{\"circle\":{\"r\":6,\"magnet\":true,\"stroke\":\"#108ee9\",\"strokeWidth\":1,\"fill\":\"transparent\",\"style\":{\"visibility\":\"hidden\"}}}},\"right\":{\"position\":\"right\",\"attrs\":{\"circle\":{\"r\":6,\"magnet\":true,\"stroke\":\"#108ee9\",\"strokeWidth\":1,\"fill\":\"transparent\",\"style\":{\"visibility\":\"hidden\"}}}},\"bottom\":{\"position\":\"bottom\",\"attrs\":{\"circle\":{\"r\":6,\"magnet\":true,\"stroke\":\"#108ee9\",\"strokeWidth\":1,\"fill\":\"transparent\",\"style\":{\"visibility\":\"hidden\"}}}},\"left\":{\"position\":\"left\",\"attrs\":{\"circle\":{\"r\":6,\"magnet\":true,\"stroke\":\"#108ee9\",\"strokeWidth\":1,\"fill\":\"transparent\",\"style\":{\"visibility\":\"hidden\"}}}}},\"items\":[{\"id\":\"end-top-port\",\"group\":\"top\"},{\"id\":\"end-right-port\",\"group\":\"right\"},{\"id\":\"end-left-port\",\"group\":\"left\"},{\"id\":\"end-bottom-port\",\"group\":\"bottom\"}]},\"zIndex\":1},\"payload\":{\"settings\":\"{\\\"name\\\":\\\"结束\\\"}\"}}]',
+        '{\"9b70f18f-8eb7-465b-ad23-2e6e30133af6\":{\"key\":\"9b70f18f-8eb7-465b-ad23-2e6e30133af6\",\"name\":\"开始\",\"type\":\"START_EVENT\",\"outgoing\":[],\"incoming\":[],\"payload\":{\"settings\":\"{\\\"name\\\":\\\"开始\\\"}\"},\"startEvent\":true,\"endEvent\":false},\"44b3ed97-96b7-4a5c-bd8d-8afdbbc8d7fb\":{\"key\":\"44b3ed97-96b7-4a5c-bd8d-8afdbbc8d7fb\",\"name\":\"结束\",\"type\":\"END_EVENT\",\"outgoing\":[],\"incoming\":[],\"payload\":{\"settings\":\"{\\\"name\\\":\\\"结束\\\"}\"},\"endEvent\":true,\"startEvent\":false}}',
+        null, '2025-09-08 18:23:59', 0, '1', '2025-09-08 18:23:48', '1', '2025-09-08 18:23:48');
+
+insert into bmos_lims2.lm_flow_audit (id, code, name, category_code, create_time, update_time, create_by, update_by, is_deleted)
+values  (1957653594689900544, '120020002', '方案审批内置流程', '120020002', '2025-08-19 11:59:23', '2025-08-19 11:59:23', '1', '1', 0),
+        (1963141502557360128, '120020010', '样品审核内置流程', '120020010', '2025-09-03 15:26:22', '2025-09-03 15:26:22', '1', '1', 0),
+        (1964998093053235200, '120020020', '报告审批内置流程', '120020020', '2025-09-08 18:23:48', '2025-09-08 18:23:48', '1', '1', 0);
+
+
+insert into bmos_lims2.lm_flow_audit_category (id, name, code, parent_id, create_by, update_by, create_time, update_time, is_deleted, tree_code, tree_name)
+values  (12002002, '检验配置', '12002002', 0, '1', '1', '2024-04-09 10:48:26', '2024-03-08 18:18:10', 0, '12002002,120020002,120020010,120020020,120020030,1200200040,1200200050', '检验配置'),
+        (120020002, '方案审批', '120020002', 12002002, '1', '1', '2024-04-09 10:48:26', '2024-03-08 18:18:10', 0, '120020002', '检验配置/检验方案审批'),
+        (120020010, '样品审核', '120020010', 12002002, '1', '1', '2024-04-09 10:48:26', '2024-03-08 18:18:10', 0, '120020010', '检验配置/样品审批'),
+        (120020020, '报告审批', '120020020', 12002002, '1', '1', '2024-04-09 10:48:26', '2024-03-08 18:18:10', 0, '120020020', '检验配置/报告审批');
+
+
+insert into bmos_lims2.lm_flow_audit_version (id, flow_audit_id, history_version, version, state, remark, deployment_id, create_time, update_time, create_by, update_by, is_deleted)
+values  (1957653594761203712, 1957653594689900544, null, '1', 1, null, 'c06aae06-f2d3-4690-af8f-bb3450cf142b', '2025-08-19 11:59:23', '2025-08-19 11:59:23', '1', '1', 0),
+        (1963141502704160768, 1963141502557360128, null, '1', 1, null, 'd2303caa-0ba0-4e59-8772-2bf8ea3e9679', '2025-09-03 15:26:22', '2025-09-03 15:26:22', '1', '1', 0),
+        (1964998093707546624, 1964998093053235200, null, '1', 1, null, 'b19c0449-4a87-4680-b778-45dce36a0afd', '2025-09-08 18:23:48', '2025-09-08 18:23:48', '1', '1', 0);

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.plan.document.mapper.BatchRecordArchiveMapper">
+
+    <select id="queryBatchArchivePage"
+            resultType="com.bmos.mes.service.plan.document.controller.vo.RecordArchiveTemplateVersionVO">
+        select distinct
+            bm_batch_record_archive.plan_id,
+            bm_batch_template_info.id as template_info_id,
+            bm_batch_template_info.name as template_name,
+            bm_batch_record_archive.id as effective_archive_record_id,
+            bm_batch_record_archive.archive_no as effective_no,
+            bm_batch_record_archive.template_version as version,
+            bm_batch_record_archive.path,
+            bm_batch_record_archive.operator_name,
+            bm_batch_record_archive.archive_time,
+            bm_batch_record_archive.effective_time,
+            bm_batch_record_archive.id as archive_id
+        from bm_batch_template_info_process
+        left join bm_batch_template_info
+            on bm_batch_template_info_process.batch_template_info_id = bm_batch_template_info.id
+            and bm_batch_template_info.is_deleted = 0
+        left join bm_batch_record_archive
+            on bm_batch_record_archive.batch_template_info_id = bm_batch_template_info.id
+            and bm_batch_record_archive.plan_id = #{planId} and bm_batch_record_archive.status = #{statusValue}
+        where
+            bm_batch_template_info_process.process_id = #{processId}
+        and bm_batch_template_info_process.batch_template_info_id in
+        <foreach collection="templateIdList" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </select>
+</mapper>

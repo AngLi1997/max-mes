@@ -1,0 +1,513 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.plan.info.mapper.PlanMapper">
+
+    <sql id="BASE_COLUM">
+        id,
+        plan_no,
+        batch_no,
+        product_date,
+        type,
+        product_id,
+        product_name,
+        product_merge_code,
+        product_specification,
+        inner_packing_specification,
+        packing_specification,
+        process_id,
+        process_name,
+        process_num,
+        process_version,
+        status,
+        instruct_status,
+        is_relation,
+        process_instance_id,
+        is_start,
+        start_time,
+        end_time,
+        execute_process_instance_id,
+        confirm_time,
+        batch_quantity,
+        unit_id,
+        execute_paused,
+        production_line_id,
+        create_time,
+        update_time,
+        create_by,
+        update_by,
+        is_deleted,
+        archive_status,
+        modify_count
+    </sql>
+
+    <select id="page" resultType="com.bmos.mes.service.plan.info.vo.PlanPageVO">
+        select
+        t1.id,
+        t1.plan_no,
+        t1.batch_no,
+        t1.product_date,
+        t1.type,
+        t1.product_id,
+        t1.product_name,
+        t1.product_merge_code,
+        t1.product_specification,
+        t1.process_id,
+        t1.process_name,
+        t1.process_version,
+        t1.status,
+        t1.instruct_status,
+        t1.process_instance_id,
+        t1.unit_id,
+        t1.batch_quantity batchQuantityDecimal,
+        t1.production_line_id,
+        t1.create_time,
+        t1.execute_paused paused,
+        t1.is_start as start,
+        t1.production_plan_item_id
+        from bm_product_plan t1
+        where t1.is_deleted = 0
+        <if test="planIds != null and planIds.size() > 0">
+            and t1.id in
+            <foreach collection="planIds" open="(" separator="," close=")" item="planId">
+                #{planId}
+            </foreach>
+        </if>
+        <if test="planNo != null and planNo != '' ">
+            and t1.plan_no like concat('%',#{planNo},'%')
+        </if>
+        <if test="batchNo != null and batchNo != '' ">
+            and t1.batch_no like concat('%',#{batchNo},'%')
+        </if>
+        <if test="productName != null and productName != '' ">
+            and t1.product_name like concat('%',#{productName},'%')
+        </if>
+        <if test="processName != null and processName != '' ">
+            and t1.process_name like concat('%',#{processName},'%')
+        </if>
+        <if test="type != null and type != '' ">
+            and t1.type = #{type}
+        </if>
+        <if test="status != null and status != '' ">
+            and t1.status = #{status}
+        </if>
+        <if test="instructStatus != null and instructStatus.size() != 0 ">
+            and t1.instruct_status in
+            <foreach collection="instructStatus" item="insStatus" open="(" separator="," close=")">
+                #{insStatus}
+            </foreach>
+        </if>
+        <if test="isStart != null and isStart != ''">
+            and t1.is_start = #{isStart}
+        </if>
+        <if test="paused != null">
+            and t1.execute_paused = #{paused}
+        </if>
+        <if test="!(orderBy != null and orderBy != '')">
+            order by t1.create_time desc,t1.id desc
+        </if>
+    </select>
+
+    <select id="startPage" resultType="com.bmos.mes.service.plan.info.vo.PlanStartPageVO">
+        select
+        t1.id,
+        t1.batch_no
+        from bm_product_plan t1
+        where t1.instruct_status = 'SEND'
+        <if test="processId != null">
+            and t1.process_id = #{processId}
+        </if>
+        <if test="batchNo != null and batchNo != '' ">
+            and t1.batch_no like concat('%', #{batchNo},'%')
+        </if>
+        <if test="relation != null">
+            and t1.is_relation = #{relation}
+        </if>
+        order by t1.create_time asc
+    </select>
+
+    <select id="productManagePage" resultType="com.bmos.mes.service.plan.info.model.Plan">
+        select
+        t1.id,
+        t1.plan_no,
+        t1.batch_no,
+        t1.product_date,
+        t1.type,
+        t1.product_id,
+        t1.product_name,
+        t1.product_merge_code,
+        t1.product_specification,
+        t1.execute_process_instance_id,
+        t1.process_id,
+        t1.process_name,
+        t1.process_version,
+        t1.execute_paused,
+        t1.start_time,
+        t1.production_line_id,
+        t2.process_model_id,
+        t2.id as processVersionId,
+        count(t3.id) as exceptionCount
+        from bm_product_plan t1
+        left join bm_process_version t2 on t1.process_id = t2.process_id and t1.process_version = t2.version
+        left join bm_execute_exception t3 on t3.product_plan_id = t1.id
+        where t1.is_deleted = 0 and t1.is_start = 'STARTING'
+        <if test="teamPlanIdList != null and teamPlanIdList.size() > 0">
+            and t1.id in
+            <foreach collection="teamPlanIdList" open="(" separator="," close=")" item="planId">
+                #{planId}
+            </foreach>
+        </if>
+        <if test="batchNo != null and batchNo != '' ">
+            and t1.batch_no like concat('%',#{batchNo},'%')
+        </if>
+        <if test="productId != null">
+            and t1.product_id = #{productId}
+        </if>
+        <if test="lineIdList != null and lineIdList.size() > 0">
+            and t1.production_line_id in
+            <foreach collection="lineIdList" open="(" separator="," close=")" item="lineId">
+                #{lineId}
+            </foreach>
+        </if>
+        <if test="ids != null and ids.size() > 0">
+            and t1.id in
+            <foreach collection="ids" open="(" separator="," close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
+        <if test="productIds != null and productIds.size() > 0">
+            and t1.product_id in
+            <foreach collection="productIds" open="(" separator="," close=")" item="pId">
+                #{pId}
+            </foreach>
+        </if>
+        <if test="startTime != null and endTime != null and startTime != '' and endTime != ''">
+            and t1.start_time between concat(#{startTime}, ' 00:00:00') and concat(#{endTime}, ' 23:59:59')
+        </if>
+        <if test="productName != null and productName != ''">
+            and t1.product_name like concat('%',#{productName},'%')
+        </if>
+        group by t1.id
+        <if test="orderBy != null and orderBy != ''">
+            order by ${orderBy}
+        </if>
+        <if test="orderBy == null || orderBy == ''">
+            order by t1.start_time desc
+        </if>
+    </select>
+
+
+    <select id="selectAudit" resultType="java.lang.Long">
+        select
+        t1.id
+        from bm_product_plan t1
+        where t1.is_deleted = 0
+        <if test="planNo != null and planNo != '' ">
+            and t1.plan_no like concat('%',#{planNo},'%')
+        </if>
+        <if test="batchNo != null and batchNo != '' ">
+            and t1.batch_no like concat('%',#{batchNo},'%')
+        </if>
+        <if test="processName != null and processName != '' ">
+            and t1.process_name like concat('%',#{processName},'%')
+        </if>
+        <if test="productName != null and productName != '' ">
+            and t1.product_name like concat('%',#{productName},'%')
+        </if>
+        <if test="type != null and type != '' ">
+            and t1.type = #{type}
+        </if>
+    </select>
+
+    <select id="pageTraceable" resultType="com.bmos.mes.service.plan.info.vo.PlanPageVO">
+        select
+        t1.id,
+        t1.plan_no,
+        t1.batch_no,
+        t1.product_date,
+        t1.type,
+        t1.product_id,
+        t1.product_name,
+        t1.product_merge_code,
+        t1.product_specification,
+        t1.execute_process_instance_id,
+        t1.process_id,
+        t1.process_name,
+        t1.process_version,
+        t1.start_time,
+        t1.end_time,
+        t1.is_start as `start`,
+        t1.instruct_status,
+        t1.archive_status,
+        t1.production_line_id,
+        count(t2.id) as `exception_count`
+        from bm_product_plan t1
+        left join bm_execute_exception t2 on t2.product_plan_id = t1.id
+        where t1.is_deleted = 0
+        and t1.is_start in ('END','TERMINATION')
+        <if test="deptIds != null and deptIds.size() > 0">
+            and t1.process_id in (
+            select resource_id from bm_resource_permission where dept_id in
+            <foreach collection="deptIds" open="(" separator="," close=")" item="item">
+                #{item}
+            </foreach>
+            )
+        </if>
+        <if test="batchNo != null and batchNo != '' ">
+            and t1.batch_no like concat('%',#{batchNo},'%')
+        </if>
+        <if test="processName != null and processName != '' ">
+            and t1.process_name like concat('%',#{processName},'%')
+        </if>
+        <if test="startTime != null and endTime != null and startTime != '' and endTime != ''">
+            and t1.start_time between concat(#{startTime}, ' 00:00:00') and concat(#{endTime}, ' 23:59:59')
+        </if>
+        <if test="productIds != null and productIds.size() > 0">
+            and t1.product_id in
+            <foreach collection="productIds" open="(" separator="," close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
+        group by t1.id
+        order by t1.start_time desc
+    </select>
+
+    <select id="getAuditBusinessKey" resultType="com.bmos.mes.service.plan.info.model.Plan">
+        SELECT DISTINCT
+            t3.id,
+            t3.status
+        FROM
+            bm_process t1
+        JOIN bm_resource_permission t2 ON t1.id = t2.resource_id
+        JOIN bm_product_plan AS t3 ON t1.id = t3.process_id
+        WHERE
+        t1.is_deleted = 0
+        AND t3.is_deleted = 0
+        <if test="deptIdList != null and deptIdList.size() >0 ">
+            AND t2.dept_id IN
+            <foreach collection="deptIdList" open="(" close=")" separator="," item="item">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+    <select id="selectPlanFormulaVersionId" resultType="java.lang.Long">
+        select bm_process_version.product_formula_version_id
+        from bm_product_plan
+        left join bm_process_version on bm_product_plan.process_id = bm_process_version.process_id and bm_product_plan.process_version = bm_process_version.version
+        where bm_product_plan.id = #{productPlanId}
+    </select>
+    <select id="productManagePageHistory" resultType="com.bmos.mes.service.plan.info.model.Plan">
+        select
+        t1.id,
+        t1.plan_no,
+        t1.batch_no,
+        t1.product_date,
+        t1.type,
+        t1.product_id,
+        t1.product_name,
+        t1.product_merge_code,
+        t1.product_specification,
+        t1.execute_process_instance_id,
+        t1.process_id,
+        t1.process_name,
+        t1.process_version,
+        t1.execute_paused,
+        t1.start_time,
+        t2.process_model_id,
+        t2.id as processVersionId,
+        t1.production_line_id as productionLineId
+        from bm_product_plan t1
+        left join bm_process_version t2 on t1.process_id = t2.process_id and t1.process_version = t2.version
+        where t1.is_deleted = 0
+        and (t1.is_start = 'END' OR t1.is_start = 'TERMINATION')
+        <if test="teamPlanIdList != null and teamPlanIdList.size() > 0">
+            and t1.id in
+            <foreach collection="teamPlanIdList" open="(" separator="," close=")" item="planId">
+                #{planId}
+            </foreach>
+        </if>
+        <if test="batchNo != null and batchNo != '' ">
+            and t1.batch_no like concat('%',#{batchNo},'%')
+        </if>
+        <if test="productIdList != null and productIdList.size() > 0">
+            and t1.product_id in
+            <foreach collection="productIdList" open="(" separator="," close=")" item="pId">
+                #{pId}
+            </foreach>
+        </if>
+        <if test="lineIdList != null and lineIdList.size() > 0">
+            and t1.production_line_id
+            in
+            <foreach collection="lineIdList" open="(" separator="," close=")" item="lineId">
+                #{lineId}
+            </foreach>
+        </if>
+        <if test="orderBy != null and orderBy != ''">
+            order by ${orderBy}
+        </if>
+        <if test="orderBy == null || orderBy == ''">
+            order by t1.start_time desc
+        </if>
+    </select>
+    <select id="selectConfirmableByIds" resultType="com.bmos.mes.service.plan.info.model.Plan">
+        SELECT bm_product_plan.*
+        FROM bm_product_plan
+        LEFT JOIN bm_product_instruction ON bm_product_plan.id = bm_product_instruction.product_plan_id
+        WHERE bm_product_plan.is_deleted = 0
+        and
+        bm_product_plan.id IN
+        <foreach collection="productPlanIds" open="(" separator="," close=")" item="pId">
+            #{pId}
+        </foreach>
+        GROUP BY bm_product_plan.id
+        HAVING SUM(bm_product_instruction.status = 'RESOLVE') = 0;
+    </select>
+    <select id="selectProductionAuditProgressPage"
+            resultType="com.bmos.mes.service.plan.info.vo.ProductionAuditProgressPageVO">
+        select
+        t1.id,
+        t1.plan_no,
+        t1.batch_no,
+        t1.product_date,
+        t1.type,
+        t1.product_id,
+        t1.product_name,
+        t1.product_merge_code,
+        t1.product_specification,
+        t1.execute_process_instance_id,
+        t1.process_id,
+        t1.process_name,
+        t1.process_version,
+        t1.start_time,
+        t1.end_time,
+        t1.is_start as `start`,
+        t1.archive_status
+        from bm_product_plan t1
+        where t1.is_deleted = 0
+        and t1.is_start in ('END','STARTING','TERMINATION')
+        <if test="deptIds != null and deptIds.size() > 0">
+            and t1.process_id in (
+            select resource_id from bm_resource_permission where dept_id in
+            <foreach collection="deptIds" open="(" separator="," close=")" item="item">
+                #{item}
+            </foreach>
+            )
+        </if>
+        <if test="batchNo != null and batchNo != '' ">
+            and t1.batch_no like concat('%',#{batchNo},'%')
+        </if>
+        <if test="processName != null and processName != '' ">
+            and t1.process_name like concat('%',#{processName},'%')
+        </if>
+        and t1.product_id in
+        <foreach collection="productIds" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+        group by t1.id
+        order by t1.start_time desc
+    </select>
+    <select id="selectPlanListByProcedureVersionList" resultType="com.bmos.mes.service.plan.info.model.Plan">
+        SELECT
+            <include refid="BASE_COLUM"/>
+        FROM bm_product_plan
+        WHERE is_deleted = 0
+            AND
+                <foreach collection="procedureVersionList" open="(" separator=" or " close=")" item="item">
+                    process_id = #{item.processId} AND process_version = #{item.version}
+                </foreach>
+        ORDER BY start_time DESC
+        LIMIT 0, #{n}
+    </select>
+    <select id="selectByFullBatchNos" resultType="com.bmos.mes.service.plan.info.model.Plan">
+        select * from bm_product_plan
+        where is_deleted = 0
+        and concat(process_id, '-', batch_no) in
+            <foreach collection="fullBatchNos" open="(" separator="," close=")" item="fullBatchNo">
+                #{fullBatchNo}
+             </foreach>
+    </select>
+
+    <select id="getTodoPlanStart" resultType="com.bmos.mes.service.plan.info.vo.PlanPageVO">
+        select
+            t1.id,
+            t1.plan_no,
+            t1.batch_no,
+            t1.product_id,
+            t1.product_date,
+            t1.type,
+            t1.product_name,
+            t1.product_merge_code,
+            t1.product_specification,
+            t1.process_id,
+            t1.process_name,
+            t1.process_version,
+            t1.production_line_id
+        from bm_product_plan t1
+        where t1.instruct_status = 'SEND' and t1.status = 'CONFIRM' and t1.is_start = 'WAIT'
+        <choose>
+            <when test="todoType != null and todoType != '' and todoType == 'future_todo' ">
+                and t1.product_date &gt; NOW()
+            </when>
+            <otherwise>
+                and t1.product_date &lt;= NOW()
+            </otherwise>
+        </choose>
+        <if test="processIds != null and processIds.size() > 0 ">
+            and t1.process_id in
+            <foreach collection="processIds" open="(" separator="," close=")" item="processId">
+                #{processId}
+            </foreach>
+        </if>
+        <if test="batchNo != null and batchNo != ''">
+            and t1.batch_no like concat('%',#{batchNo},'%')
+        </if>
+        <if test="productIds != null and productIds.size() > 0">
+            and t1.product_id in
+            <foreach collection="productIds" open="(" close=")" separator="," item="productId">
+                #{productId}
+            </foreach>
+        </if>
+        <if test="lineIds != null and lineIds.size() > 0">
+            and t1.production_line_id in
+            <foreach collection="lineIds" open="(" close=")" separator="," item="lineId">
+                #{lineId}
+            </foreach>
+        </if>
+        ORDER BY t1.product_date asc
+    </select>
+
+    <select id="productManagePageCount" resultType="java.lang.Long">
+        select
+            t1.id
+        from bm_product_plan t1
+        left join bm_process_version t2 on t1.process_id = t2.process_id and t1.process_version = t2.version
+        left join bm_execute_exception t3 on t3.product_plan_id = t1.id
+        where t1.is_deleted = 0
+        <if test="dto.isStart != null and dto.isStart != ''">
+            and t1.is_start =#{dto.isStart}
+        </if>
+        <if test="dto.batchNo != null and dto.batchNo != '' ">
+            and t1.batch_no like concat('%',#{dto.batchNo},'%')
+        </if>
+        <if test="dto.productId != null">
+            and t1.product_id = #{dto.productId}
+        </if>
+        <if test="dto.lineId != null">
+            and t1.production_line_id =#{dto.lineId}
+        </if>
+        <if test="dto.ids != null and dto.ids.size() > 0">
+            and t1.id in
+            <foreach collection="dto.ids" open="(" separator="," close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
+        <if test="dto.productIds != null and dto.productIds.size() > 0">
+            and t1.product_id in
+            <foreach collection="dto.productIds" open="(" separator="," close=")" item="pId">
+                #{pId}
+            </foreach>
+        </if>
+        group by t1.id
+    </select>
+</mapper>

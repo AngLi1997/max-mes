@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.inspect.scheme.mapper.InspectionSchemeReportMapper">
+
+    <select id="pageReportDataPoints" resultType="com.bmos.lims2.server.inspect.scheme.dto.response.ReportDataPointRespDTO">
+        SELECT
+            t.scheme_id AS scheme_id,
+            t.version_id AS version_id,
+            t.version_no AS version_no,
+            t.inspect_item_id AS inspect_item_id,
+            t.inspect_item_code AS inspect_item_code,
+            t.inspect_item_name AS inspect_item_name,
+            t.parameter_id AS parameter_id,
+            t.parameter_code AS parameter_code,
+            t.parameter_name AS parameter_name,
+            t.data_point_id AS data_point_id,
+            t.data_point_name AS data_point_name,
+            t.point_type AS point_type
+        FROM (
+            SELECT
+                v.scheme_id,
+                v.id AS version_id,
+                v.version_no,
+                item.id AS inspect_item_id,
+                item.code AS inspect_item_code,
+                item.name AS inspect_item_name,
+                param.id AS parameter_id,
+                param.code AS parameter_code,
+                param.name AS parameter_name,
+                dp.data_point_id,
+                dp.name AS data_point_name,
+                dp.point_type,
+                ROW_NUMBER() OVER (
+                    PARTITION BY v.scheme_id, sp.parameter_id, dp.name, dp.point_type
+                    ORDER BY v.id DESC
+                ) AS rn
+            FROM lm_inspection_scheme_version v
+            INNER JOIN lm_inspection_scheme_item si ON si.version_id = v.id AND si.is_deleted = 0
+            INNER JOIN lm_inspection_scheme_parameter sp ON sp.version_id = v.id AND sp.inspect_item_id = si.inspect_item_id AND sp.is_reportable = 1 AND sp.is_deleted = 0
+            INNER JOIN lm_inspection_scheme_data_point dp ON dp.version_id = v.id AND dp.parameter_config_id = sp.id AND dp.report_display = 1 AND dp.is_deleted = 0
+            INNER JOIN lm_inspect_item item ON item.id = si.inspect_item_id AND item.is_deleted = 0
+            INNER JOIN lm_inspect_parameter param ON param.id = sp.parameter_id AND param.is_deleted = 0
+            <where>
+                v.is_deleted = 0
+                <if test="schemeId != null">
+                    AND v.scheme_id = #{schemeId}
+                </if>
+                <if test="inspectItemId != null">
+                    AND si.inspect_item_id = #{inspectItemId}
+                </if>
+                <if test="parameterId != null">
+                    AND sp.parameter_id = #{parameterId}
+                </if>
+            </where>
+        ) t
+        WHERE t.rn = 1
+        ORDER BY t.inspect_item_name ASC, t.parameter_name ASC, t.data_point_name ASC
+    </select>
+
+</mapper>
+
+

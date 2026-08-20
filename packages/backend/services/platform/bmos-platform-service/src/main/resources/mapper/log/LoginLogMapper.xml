@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.platform.service.log.mapper.LoginLogMapper">
+
+    <select id="selectPageList" resultType="com.bmos.platform.service.log.vo.LoginLogVO">
+        SELECT
+        id,
+        login_name,
+        user_name,
+        description_code,
+        description_param,
+        operation_state,
+        operation_action,
+        ip,
+        create_time AS operationTime
+        FROM
+        bp_login_log
+        WHERE
+        is_deleted = 0
+        <if test="loginName != null and loginName != ''">
+            and login_name like concat('%',#{loginName},'%')
+        </if>
+        <if test="userName != null and userName != ''">
+            and user_name like concat('%',#{userName},'%')
+        </if>
+        <if test="startTimeDate != null and endTimeDate != null">
+            and create_time between #{startTimeDate} and #{endTimeDate}
+        </if>
+        order by create_time desc,operation_action desc
+    </select>
+    <select id="selectExportData" resultType="com.bmos.platform.service.log.model.LoginLogModel">
+        SELECT
+        id,
+        login_name,
+        user_name,
+        description_code,
+        description_param,
+        operation_state,
+        operation_action,
+        ip,
+        create_time
+        from bp_login_log
+        WHERE
+        is_deleted = 0
+        <if test="loginName != null and loginName != ''">
+            and login_name like concat('%',#{loginName},'%')
+        </if>
+        <if test="userName != null and userName != ''">
+            and user_name like concat('%',#{userName},'%')
+        </if>
+        <if test="startTime != null and endTime!= null">
+            and create_time between concat(#{startTime}, ' 00:00:00') and concat(#{endTime}, ' 23:59:59')
+        </if>
+        order by create_time desc
+    </select>
+</mapper>

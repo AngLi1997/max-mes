@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.process.mapper.task.ProcedureTaskInstanceMapper">
+
+    <select id="getTaskTodoPage" resultType="com.bmos.mes.service.process.model.task.ProcedureTaskInstance">
+        SELECT
+            instance.*
+        FROM
+            bm_procedure_task_instance AS instance
+            JOIN bm_procedure_step_model AS model ON instance.procedure_step_model_id = model.id
+        WHERE
+            (instance.flow_state = 'ENABLE' or instance.flow_state = 'ACTIVATED')
+            AND instance.is_deleted = 0
+            AND model.is_deleted = 0
+            <if test="planIds != null and planIds.size() > 0">
+                AND instance.plan_id IN
+                <foreach collection="planIds" separator="," open="(" close=")" item="planId">
+                    #{planId}
+                </foreach>
+            </if>
+        order by instance.start_time desc
+    </select>
+    <select id="selectAuditProgressDetailVO"
+            resultType="com.bmos.mes.service.plan.info.vo.PlanAuditProgressDetailVO">
+        SELECT * FROM (
+        SELECT
+        t1.name AS procedureStepName,
+        t1.active_time AS startTime,
+        t1.update_by AS auditUserId,
+        t1.complete_time,
+        t1.flow_state,
+        t2.node_function,
+        t3.name AS procedureName,
+        t1.process_change_number,
+        t1.procedure_change_number,
+        ROW_NUMBER() OVER (PARTITION BY t1.process_change_number, t1.procedure_change_number, t1.procedure_step_model_id ORDER BY t1.create_time DESC) AS rn
+        FROM
+        bm_procedure_task_instance t1
+        JOIN bm_procedure_step_model t2 ON t1.procedure_step_model_id = t2.id
+        JOIN bm_procedure_model t3 ON t2.procedure_model_id = t3.id
+        WHERE
+        t1.is_deleted = 0
+        AND t2.is_deleted = 0
+        AND (t2.node_function = '1' OR t2.node_function = '2')
+        AND t1.plan_id = #{productPlanId}
+        <if test="procedureName != null and procedureName != ''">
+            AND t3.name LIKE concat('%', #{procedureName}, '%')
+        </if>
+        <if test="procedureStepName != null and procedureStepName != ''">
+            AND t1.name LIKE concat('%', #{procedureStepName}, '%')
+        </if>
+        ) t
+        WHERE t.rn = 1
+        <if test="orderBy != null and orderBy != ''">
+            order by ${orderBy} ${dir}
+        </if>
+        <if test="!(orderBy != null and orderBy != '')">
+            ORDER BY startTime DESC;
+        </if>
+    </select>
+    <select id="selectAuditingCount" resultType="com.bmos.mes.service.plan.info.vo.PlanAuditingCountVO">
+        select count(t1.id) as auditingCount,t1.plan_id as id
+        from bm_procedure_task_instance t1
+        left join bm_procedure_step_model t2 on t1.procedure_step_model_id = t2.id
+        where
+        t1.is_deleted = 0
+        and t2.is_deleted = 0
+        and (t2.node_function = '1' or t2.node_function = '2')
+        and t1.flow_state != 'COMPLETE'
+        and
+        t1.plan_id in
+        <foreach collection="ids" open="(" separator="," close=")" item="planId">
+            #{planId}
+        </foreach>
+        GROUP BY t1.plan_id
+    </select>
+
+    <select id="listTaskProgress" resultType="com.bmos.mes.service.process.model.task.ProcedureTaskInstance">
+        SELECT
+            procedure_step_model_id,
+            complete_time,
+            update_by,
+            `name`,
+            flow_state
+        FROM
+            bm_procedure_task_instance
+        WHERE
+            is_deleted = 0
+            AND plan_id =#{dto.planId}
+            AND procedure_model_id =#{dto.procedureModelId}
+            <if test="dto.processChangeNumber != null and dto.processChangeNumber != '0'">
+                and process_change_number =#{dto.processChangeNumber}
+            </if>
+            <if test="dto.procedureChangeNumber != null and dto.procedureChangeNumber != '0'">
+                and procedure_change_number =#{dto.procedureChangeNumber}
+            </if>
+            ORDER BY
+                create_time DESC
+    </select>
+
+    <select id="queryCompleteTaskByPlanId" resultType="com.bmos.mes.service.process.model.task.ProcedureTaskInstance">
+        SELECT
+            t1.*,
+            t2.node_id AS nodeId,
+            t2.`name` AS procedureName
+        FROM
+            bm_procedure_task_instance AS t1
+            JOIN bm_procedure_model AS t2 ON t1.procedure_model_id = t2.id
+        WHERE
+            t1.is_deleted = 0
+            AND t2.is_deleted = 0
+            AND t1.plan_id =#{planId}
+            and t1.flow_state =#{flowState}
+            GROUP BY
+                t1.procedure_model_id,t1.process_change_number
+    </select>
+</mapper>

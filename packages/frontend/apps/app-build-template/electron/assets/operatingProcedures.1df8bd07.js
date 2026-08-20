@@ -1,0 +1,1 @@
+import{H as e,g as a,B as s}from"./index-eacb5835.js";const p=a=>e.get("/api/app/mes/operate/rule/version/app/detail",a),o=p=>e.get("/api/app/mes/operate/rule/version/download",p,{headers:{"content-type":"application/octet-stream","Bmos-Access-Token":a(s)},responseType:"arraybuffer"});export{p as a,o as g};

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.platform.service.material.mapper.MaterialMapper">
+    <update id="batchChangeDispenseRecord">
+        UPDATE bp_material
+        SET dispense_record = #{record}
+        WHERE
+        id IN
+        <foreach collection="ids" open="(" separator="," close=")" item="id">
+            #{id}
+        </foreach>
+    </update>
+    <update id="updateStatus">
+        UPDATE bp_material
+        SET STATUS = #{status}
+        WHERE ID = #{id}
+    </update>
+
+    <select id="selectPageList" resultType="com.bmos.platform.service.material.vo.MaterialPageVO">
+        SELECT
+        m.id,
+        m.NAME,
+        m.CODE,
+        m.specification,
+        m.material_category_id,
+        m.unit_id,
+        m.is_sub_material AS subMaterial,
+        m.STATUS,
+        m.merge_code,
+        m.dispense_record,
+        u.unit_name,
+        m.remark,
+        m.principal_material_id as principalMaterialId
+        FROM
+        bp_material m
+        LEFT JOIN bp_unit u
+        on m.unit_id = u.id
+        WHERE
+        m.is_deleted = 0
+        <if test="name != null and name != ''">
+            and m.name like concat('%',#{name},'%')
+        </if>
+        <if test="code != null and code != ''">
+            and m.code like concat('%',#{code},'%')
+        </if>
+        <if test="mergeCode != null and mergeCode != ''">
+            and m.merge_code like concat('%',#{mergeCode},'%')
+        </if>
+        <if test="materialCategoryIds != null and materialCategoryIds.size() > 0">
+            and m.material_category_id in
+            <foreach collection="materialCategoryIds" open="(" separator="," close=")" item="mId">
+                #{mId}
+            </foreach>
+        </if>
+        order by m.merge_code asc
+    </select>
+    <select id="selectPrincipalList" resultType="com.bmos.platform.service.material.model.Material">
+        select
+        id,
+        code,
+        name,
+        merge_code,
+        unit_id
+        from bp_material
+        where is_deleted = 0
+        and is_sub_material = false
+        and status = 1
+        <if test="materialCategoryId != null">
+            and material_category_id = #{materialCategoryId}
+        </if>
+        order by merge_code asc
+    </select>
+    <select id="selectEnabledByCategoryId" resultType="com.bmos.platform.service.material.model.Material">
+        SELECT
+        *
+        FROM
+        bp_material
+        WHERE
+        is_deleted = 0
+        AND STATUS = true
+        <if test="materialCategoryId != null">
+            and material_category_id = #{materialCategoryId}
+        </if>
+        order by merge_code asc
+    </select>
+    <select id="selectIssueTreeNodeVOByKeyword"
+            resultType="com.bmos.platform.service.material.vo.IssueTreeNodeVO">
+        SELECT
+            id,
+            NAME,
+            code,
+            merge_code,
+            material_category_id AS parentId
+        FROM
+            bp_material
+        WHERE
+            is_deleted = 0
+          AND STATUS = TRUE
+        <if test="keyword != null and keyword != ''">
+            AND
+            (NAME LIKE concat('%',#{keyword},'%') OR merge_code LIKE concat('%',#{keyword},'%'))
+        </if>
+    </select>
+</mapper>

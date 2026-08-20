@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.weigh.centre.input.mapper.IWeighInputRecordMapper">
+    <select id="getInputList" resultType="com.bmos.mes.service.weigh.centre.input.vo.WeighInputRecordVO">
+        select bm_weigh_input_record.id,
+               bm_material.name                            as material_name,
+               bm_material.merge_code                      as material_merge_code,
+               bm_storage_material_batch.material_batch_no as storage_material_batch_no,
+               bm_storage_material.no                      as storage_material_no,
+               bm_storage_material.available_quantity,
+               bm_storage_material.reserve_quantity,
+               bm_weigh_input_record.quantity,
+               bm_weigh_input_record.unit_id,
+               bm_weigh_input_record.input_user_name,
+               bm_weigh_input_record.input_time,
+               bm_weigh_input_record.device_name,
+               bm_weigh_input_record.device_code,
+               bm_weigh_input_record.input_component_instance_id
+        from bm_weigh_input_record
+                 left join bm_material
+                           on bm_weigh_input_record.material_id = bm_material.id and bm_material.is_deleted = 0
+                 left join bm_storage_material_batch
+                           on bm_weigh_input_record.storage_material_batch_id = bm_storage_material_batch.id and
+                              bm_storage_material_batch.is_deleted = 0
+                 left join bm_storage_material on bm_weigh_input_record.storage_material_id = bm_storage_material.id and
+                                                  bm_storage_material.is_deleted = 0
+        where bm_weigh_input_record.is_deleted = 0
+          and bm_weigh_input_record.product_plan_id = #{productPlanId}
+        <if test="requirementIds != null and requirementIds.size() > 0">
+            and bm_weigh_input_record.requirement_id in
+            <foreach collection="requirementIds" open="(" separator="," close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
+        <if test="requirementIds == null or requirementIds.size() == 0">
+            and 1 = 2
+        </if>
+    </select>
+
+    <select id="getComponentsViewList" resultType="com.bmos.mes.service.components.comps.MaterialInputComponentsFromDataOPT">
+        select bm_weigh_input_record.id,
+               bm_weigh_input_record.formula_material_id,
+               bm_material.name as material_name,
+               bm_material.merge_code,
+               bm_material.specification,
+               bm_storage_material_batch.material_batch_no as storage_material_batch_no,
+               bm_storage_material.no as storage_material_no,
+               bm_weigh_input_record.quantity,
+               bm_weigh_input_record.unit_id,
+               bm_weigh_input_record.input_user_name,
+               bm_weigh_input_record.input_time,
+               bm_weigh_input_record.device_name,
+               bm_weigh_input_record.device_code
+        from bm_weigh_input_record
+                 left join bm_material on  bm_material.id = bm_weigh_input_record.material_id and bm_material.is_deleted = 0
+                 left join bm_storage_material on  bm_storage_material.id = bm_weigh_input_record.storage_material_id and bm_storage_material.is_deleted = 0
+                 left join bm_storage_material_batch on  bm_storage_material_batch.id = bm_weigh_input_record.storage_material_batch_id and bm_storage_material_batch.is_deleted = 0
+        where bm_weigh_input_record.is_deleted = 0
+          and bm_weigh_input_record.input_component_instance_id is not null
+          and bm_weigh_input_record.product_plan_id = #{productPlanId}
+        <if test="requirementIds != null and requirementIds.size() > 0">
+            and bm_weigh_input_record.requirement_id in
+            <foreach collection="requirementIds" open="(" separator="," close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
+        <if test="requirementIds == null or requirementIds.size() == 0">
+            and 1 = 2
+        </if>
+        order by bm_weigh_input_record.input_time, id
+    </select>
+</mapper>

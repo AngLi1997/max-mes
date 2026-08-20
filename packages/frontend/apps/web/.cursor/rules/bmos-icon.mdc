@@ -1,0 +1,142 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# BMOS 图标库使用指南
+
+## 目录结构
+
+```
+packages/icon/
+├── src/
+│   ├── icon/           # 图标组件
+│   ├── types/          # 类型定义
+│   ├── index.vue       # 主组件
+│   └── index.ts        # 导出文件
+```
+
+## 核心功能
+
+### 1. 图标组件
+```vue
+<template>
+  <BMIcons icon="iconName" :size="24" :color="#000000" @click="() => {/** 点击事件 */}" />
+</template>
+
+<script setup lang="ts">
+import { BMIcons } from '@bmos/icons';
+</script>
+```
+
+### 2. 组件属性
+```typescript
+interface IconProps {
+  // 图标名称
+  icon: string;
+  // 图标大小，默认 16
+  size?: number | string;
+  // 图标颜色
+  color?: string;
+  // 自定义类名
+  class?: string;
+  // 自定义样式
+  style?: CSSProperties;
+  // 旋转角度
+  rotate?: number;
+  // 是否旋转
+  spin?: boolean;
+}
+```
+
+## 使用规范
+
+### 1. 基本使用
+```vue
+<!-- 基础图标 -->
+<BMIcons icon="user" />
+
+<!-- 自定义大小 -->
+<BMIcons icon="user" :size="32" />
+
+<!-- 自定义颜色 -->
+<BMIcons icon="user" color="#1890ff" />
+
+<!-- 旋转图标 -->
+<BMIcons icon="loading" spin />
+
+<!-- 自定义旋转角度 -->
+<BMIcons icon="arrow" :rotate="90" />
+```
+
+### 2. 图标类型
+- 系统图标
+- 业务图标
+- 自定义图标
+
+### 3. 样式定制
+```vue
+<BMIcons
+  icon="custom"
+  :style="{
+    fontSize: '24px',
+    color: 'red',
+    transform: 'rotate(45deg)'
+  }"
+/>
+```
+
+## 最佳实践
+
+1. 图标使用
+   - 语义化使用
+   - 保持风格统一
+   - 适当的大小
+
+2. 性能优化
+   - 按需加载
+   - 避免过度使用
+   - 合理缓存
+
+3. 无障碍访问
+   - 添加 aria 标签
+   - 提供替代文本
+   - 确保可聚焦
+
+## 注意事项
+
+1. 性能考虑
+   - 避免过多图标
+   - 使用适当大小
+   - 考虑加载时机
+
+2. 兼容性
+   - 浏览器支持
+   - 设备适配
+   - 分辨率适配
+
+3. 维护更新
+   - 及时更新图标
+
+## 常见问题
+
+1. 图标不显示
+   - 检查类型名称
+   - 确认导入正确
+   - 验证资源加载
+
+2. 样式问题
+   - 检查样式覆盖
+   - 确认优先级
+   - 验证主题设置
+
+3. 性能问题
+   - 检查图标大小
+   - 优化加载方式
+   - 减少不必要使用
+
+## 图标命名规范
+
+1. 命名原则
+   - 语义化命名
+   - 使用驼峰命名

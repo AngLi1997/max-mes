@@ -1,0 +1,101 @@
+-- 创建稳定性方案数据点配置表
+CREATE TABLE IF NOT EXISTS lm_stability_scheme_data_point (
+    id BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+    scheme_id BIGINT NOT NULL COMMENT '方案ID',
+    version_id BIGINT NOT NULL COMMENT '版本ID',
+    item_config_id BIGINT NOT NULL COMMENT '检验项目配置ID（lm_stability_scheme_item.id）',
+    parameter_config_id BIGINT NOT NULL COMMENT '分析项配置ID（lm_stability_scheme_parameter.id）',
+    parameter_id BIGINT COMMENT '原始分析项ID',
+    data_point_id BIGINT COMMENT '原始数据点ID',
+    name VARCHAR(200) COMMENT '数据点名称',
+    point_type VARCHAR(50) COMMENT '数据点类型',
+    trend_line_config TEXT COMMENT '趋势线配置(JSON)',
+    options TEXT COMMENT '选项配置(JSON)',
+    time_format VARCHAR(50) COMMENT '时间格式',
+    date_style VARCHAR(50) COMMENT '日期样式',
+    rounding_up TINYINT(1) DEFAULT 0 COMMENT '向上舍入',
+    report_display TINYINT(1) DEFAULT 1 COMMENT '是否报告显示（0-否，1-是）',
+    record_id BIGINT COMMENT '绑定记录ID（ELN）',
+    record_version_id BIGINT COMMENT '绑定记录版本ID',
+    component_id BIGINT COMMENT '绑定记录组件ID',
+    record_item_id BIGINT COMMENT '绑定记录项ID',
+    field_id BIGINT COMMENT '绑定字段ID',
+    create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    create_by VARCHAR(50) COMMENT '创建人',
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    update_by VARCHAR(50) COMMENT '更新人',
+    is_deleted TINYINT(1) DEFAULT 0 COMMENT '是否删除（0-未删除，1-已删除）',
+    tenant_id VARCHAR(50) COMMENT '租户ID',
+    PRIMARY KEY (id),
+    KEY idx_version_id (version_id),
+    KEY idx_parameter_config_id (parameter_config_id),
+    KEY idx_item_config_id (item_config_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='稳定性方案数据点配置表';
+
+-- 创建稳定性方案判定配置表
+CREATE TABLE IF NOT EXISTS lm_stability_scheme_judgment (
+    id BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+    scheme_id BIGINT NOT NULL COMMENT '方案ID',
+    version_id BIGINT NOT NULL COMMENT '版本ID',
+    item_config_id BIGINT NOT NULL COMMENT '检验项目配置ID（lm_stability_scheme_item.id）',
+    parameter_config_id BIGINT NOT NULL COMMENT '分析项配置ID（lm_stability_scheme_parameter.id）',
+    data_point_config_id BIGINT COMMENT '数据点配置ID（lm_stability_scheme_data_point.id）',
+    parameter_id BIGINT COMMENT '原始分析项ID',
+    data_point_id BIGINT COMMENT '原始数据点ID',
+    judgement_config_name VARCHAR(200) COMMENT '判定配置名称',
+    point_type VARCHAR(50) COMMENT '数据点类型',
+    judgment_type VARCHAR(50) COMMENT '判定类型',
+    default_result TINYINT(1) COMMENT '默认测试结果',
+    min_value DECIMAL(20,6) COMMENT '最小值',
+    min_operator VARCHAR(20) COMMENT '最小值比较运算符',
+    max_value DECIMAL(20,6) COMMENT '最大值',
+    max_operator VARCHAR(20) COMMENT '最大值比较运算符',
+    standard_value VARCHAR(500) COMMENT '标准值',
+    expression VARCHAR(1000) COMMENT '判定表达式',
+    min_time VARCHAR(50) COMMENT '最小时间（时间类型区间判定）',
+    max_time VARCHAR(50) COMMENT '最大时间（时间类型区间判定）',
+    create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    create_by VARCHAR(50) COMMENT '创建人',
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    update_by VARCHAR(50) COMMENT '更新人',
+    is_deleted TINYINT(1) DEFAULT 0 COMMENT '是否删除（0-未删除，1-已删除）',
+    tenant_id VARCHAR(50) COMMENT '租户ID',
+    PRIMARY KEY (id),
+    KEY idx_version_id (version_id),
+    KEY idx_parameter_config_id (parameter_config_id),
+    KEY idx_data_point_config_id (data_point_config_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='稳定性方案判定配置表';
+
+-- 稳定性方案分析项配置表：增加最终判定表达式和分析方法绑定字段
+ALTER TABLE lm_stability_scheme_parameter
+    ADD COLUMN final_expression VARCHAR(1000) COMMENT '最终判定表达式' AFTER sort,
+    ADD COLUMN record_id BIGINT COMMENT '分析方法记录ID（ELN执行时绑定）' AFTER final_expression,
+    ADD COLUMN record_code VARCHAR(100) COMMENT '分析方法编码' AFTER record_id,
+    ADD COLUMN record_version_id BIGINT COMMENT '分析方法版本ID' AFTER record_code,
+    ADD COLUMN record_item_id BIGINT COMMENT '分析方法记录项ID' AFTER record_version_id;
+
+-- 创建稳定性方案检验计划时间点分析项关联表
+-- 替代原 param_refs JSON 列，每条分析项引用存一行，冗余存储编码/名称方便连表查询
+CREATE TABLE IF NOT EXISTS lm_stability_scheme_plan_timepoint_param (
+    id BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+    timepoint_id BIGINT NOT NULL COMMENT '时间点ID（lm_stability_scheme_plan_timepoint.id）',
+    plan_id BIGINT NOT NULL COMMENT '计划ID（冗余，方便按计划查询）',
+    version_id BIGINT NOT NULL COMMENT '版本ID（冗余，方便按版本查询）',
+    parameter_config_id BIGINT NOT NULL COMMENT '分析项配置ID（lm_stability_scheme_parameter.id）',
+    parameter_id BIGINT COMMENT '原始分析项ID（冗余）',
+    parameter_code VARCHAR(100) COMMENT '分析项编码（冗余）',
+    item_config_id BIGINT COMMENT '检验项目配置ID（lm_stability_scheme_item.id）（冗余）',
+    inspect_item_id BIGINT COMMENT '检验项目ID（冗余）',
+    inspect_item_code VARCHAR(100) COMMENT '检验项目编码（冗余）',
+    create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    create_by VARCHAR(50) COMMENT '创建人',
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    update_by VARCHAR(50) COMMENT '更新人',
+    is_deleted TINYINT(1) DEFAULT 0 COMMENT '是否删除（0-未删除，1-已删除）',
+    tenant_id VARCHAR(50) COMMENT '租户ID',
+    PRIMARY KEY (id),
+    KEY idx_timepoint_id (timepoint_id),
+    KEY idx_plan_id (plan_id),
+    KEY idx_version_id (version_id),
+    KEY idx_parameter_config_id (parameter_config_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='稳定性方案检验计划时间点分析项关联表';

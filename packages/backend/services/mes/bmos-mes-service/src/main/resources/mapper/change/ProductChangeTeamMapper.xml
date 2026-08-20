@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.workflow.change.mapper.ProductChangeTeamMapper">
+
+    <select id="queryByPlanIdAndProcedureModelId"
+            resultType="com.bmos.mes.service.workflow.change.model.ProductChangeTeam">
+                SELECT
+                    max(product.change_team_number) as changeTeamNumber,
+	                product.change_team_type
+                FROM
+                    bm_product_instruction_team AS team
+                    JOIN bm_product_change_team AS product ON team.id = product.product_instruction_team_id
+                where
+                    team.is_deleted = 0
+                    and product.is_deleted = 0
+                    and team.product_plan_id = #{planId}
+                    and team.procedure_model_id = #{procedureModelId}
+                GROUP BY
+	                product.change_team_type
+        </select>
+
+    <select id="selectListByPlanId" resultType="com.bmos.mes.service.plan.instruction.vo.InstructionTeamVO">
+            SELECT
+                team.id as id,
+                team.instruction_id as instructionId,
+                team.product_plan_id as productPlanId,
+                team.procedure_step_model_id as procedureStepModelId,
+                team.procedure_step_model_name as procedureStepModelName,
+                team.procedure_step_time as procedureStepTime,
+                team.procedure_step_time_unit as procedureStepTimeUnit,
+                product.team_ids as teamIds,
+                product.change_team_number as productChangeNumber,
+                product.change_team_type as productChangeType,
+                team.sort as sort,
+                product.id as changeTeamId
+            FROM
+                bm_product_instruction_team AS team
+                JOIN bm_product_change_team AS product ON team.id = product.product_instruction_team_id
+            WHERE
+                team.is_deleted = 0
+                AND product.is_deleted = 0
+                AND team.product_plan_id =#{planId}
+                AND product.change_team_type =#{nodeFunction}
+                and product.change_team_number =#{changeNumber}
+            ORDER BY
+                product.change_team_type asc,product.change_team_number desc
+        </select>
+</mapper>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.inspect.scheme.mapper.InspectionSchemeParameterMapper">
+
+    <select id="listByItemConfigId" resultType="com.bmos.lims2.server.inspect.scheme.dto.InspectionSchemeParameterDTO">
+        SELECT isp.id,
+               isp.scheme_id,
+               isp.version_id,
+               isp.package_id,
+               isp.inspect_item_id,
+               isp.item_config_id,
+               isp.parameter_id,
+               isp.record_id AS recordId,
+               isp.record_version_id AS recordVersionId,
+               isp.record_item_id AS recordItemId,
+               im.code AS recordCode,
+               im.name AS recordName,
+               isp.standard_rule,
+               isp.is_reportable,
+               isp.is_executable,
+               isp.final_expression,
+               isp.execute_method,
+               ip.name AS parameter_name,
+               ip.code AS parameter_code
+        FROM lm_inspection_scheme_parameter isp
+        LEFT JOIN lm_inspect_parameter ip ON isp.parameter_id = ip.id
+        LEFT JOIN bm_batch_record im ON isp.record_id = im.id AND im.is_deleted = 0
+        LEFT JOIN bm_batch_record_version rv  ON isp.record_version_id = rv.id AND rv.is_deleted = 0
+        WHERE isp.item_config_id = #{itemConfigId}
+        AND isp.is_deleted = 0
+        ORDER BY isp.id ASC
+    </select>
+
+    <select id="getByParameterConfigId" resultType="com.bmos.lims2.server.inspect.scheme.dto.InspectionSchemeParameterDTO">
+        SELECT isp.id,
+               isp.scheme_id,
+               isp.version_id,
+               isp.package_id,
+               isp.inspect_item_id,
+               isp.item_config_id,
+               isp.parameter_id,
+               isp.record_id AS recordId,
+               isp.record_version_id AS recordVersionId,
+               isp.record_item_id AS recordItemId,
+               im.code AS recordCode,
+               im.name AS recordName,
+               rv.version AS recordVersion,
+               isp.standard_rule,
+               isp.is_reportable,
+               isp.is_executable,
+               isp.final_expression,
+               isp.execute_method,
+               ip.name AS parameter_name,
+               ip.code AS parameter_code
+        FROM lm_inspection_scheme_parameter isp
+        LEFT JOIN lm_inspect_parameter ip ON isp.parameter_id = ip.id
+        LEFT JOIN bm_batch_record im ON isp.record_id = im.id AND im.is_deleted = 0
+        LEFT JOIN bm_batch_record_version rv  ON isp.record_version_id = rv.id AND rv.is_deleted = 0
+        WHERE isp.id = #{parameterConfigId}
+        AND isp.is_deleted = 0
+    </select>
+
+    <select id="getFinalExpressionByParameterAndVersion" resultType="java.lang.String">
+        SELECT isp.final_expression
+        FROM lm_inspection_scheme_parameter isp
+        WHERE isp.parameter_id = #{parameterId}
+          AND isp.version_id = #{versionId}
+          AND isp.is_deleted = 0
+        LIMIT 1
+    </select>
+    <select id="getFieldsConfig" resultType="com.bmos.lims2.server.eln.entry.vo.FieldConfigVO">
+        select distinct
+            t1.parameter_id as parameterId,
+            t1.record_item_id as recordItemId,
+            t1.id as parameterConfigId,
+            t1.record_version_id,
+            t2.component_type,
+            t2.field_id
+        from lm_inspection_scheme_parameter t1
+                 join bm_batch_record_component t2 on t1.record_id = t2.record_id and t1.record_version_id = t2.record_version_id and t2.is_deleted = 0
+        where t1.is_deleted = 0
+          and t1.scheme_id = #{query.schemeId}
+          and t1.version_id = #{query.schemeVersionId}
+          and t2.field_id in
+        <foreach collection="fieldIds" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </select>
+
+</mapper>

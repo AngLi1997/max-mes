@@ -1,0 +1,1 @@
+import{H as s}from"./index-eacb5835.js";const a=a=>s.get("/api/app/mes/mobile/signature/info",{userId:a}),e=a=>s.post("/api/app/mes/mobile/signature/save",a),p=a=>s.post("/api/app/mes/mobile/signature/component/save",a);export{e as a,p as b,a as r};

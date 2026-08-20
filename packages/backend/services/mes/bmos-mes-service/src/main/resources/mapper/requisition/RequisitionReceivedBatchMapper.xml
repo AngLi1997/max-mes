@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.requisition.mapper.RequisitionReceivedBatchMapper">
+
+    <select id="selectByRequisitionId"
+            resultType="com.bmos.mes.service.requisition.vo.RequisitionMaterialBatchVO">
+        SELECT
+            batch.requisition_plan_id,
+            material.id as mid,
+            batch.id,
+            batch.cargo_merge_code AS material_merge_code,
+            batch.cargo_name AS materialName,
+            batch.inventory_batch_no AS materialBatchNo,
+            batch.unit_id AS unitId,
+            batch.quantity AS outboundQuantity,
+            case when (COUNT(DISTINCT material.cargo_position_id) = 1) then material.cargo_position_id else null end as cargoPositionId,
+            case when (SUM(ISNULL(material.cargo_position_id)) = 0) then true else false end as receiveCompleted
+        from bm_requisition_received_batch batch
+            left join bm_requisition_received_material material
+        on batch.id = material.received_batch_id
+        WHERE batch.requisition_plan_id = #{requisitionPlanId}
+        group by batch.id
+    </select>
+    <select id="selectReceivedBatchInfo"
+            resultType="com.bmos.mes.service.requisition.vo.RequisitionReceivedBatchInfo">
+        select t1.id,t1.requisition_plan_id,t1.inventory_batch_id,t1.inventory_batch_no,t1.inventory_batch_no,
+               t1.factory_batch_no,t1.expired_date,t1.hydration,t1.no_hydration_content,t1.report_no,t1.licence_no,
+               t1.cargo_merge_code,t1.formula_material_id,SUM(t2.quantity) as receivedQuantity,t2.unit_id,
+               MIN(t2.update_time) receive_time
+        from bm_requisition_received_batch t1
+        left join bm_requisition_received_material t2
+        on t1.id = t2.received_batch_id
+        WHERE t1.requisition_plan_id = #{requisitionPlanId} and t2.cargo_position_id IS NOT NULL
+        GROUP BY t1.id
+        ORDER BY receive_time ASC
+    </select>
+</mapper>

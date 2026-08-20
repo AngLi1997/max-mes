@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.weigh.centre.requirement.mapper.IWeighRequirementMapper">
+    <sql id="weighRequirementPageVOFields">
+        select distinct bm_weigh_requirement.id        as id,
+                        bm_product_formula_material.id as formula_material_id,
+                        bm_product_formula_material.material_name,
+                        bm_product_formula_material.material_merge_code,
+                        bm_product_formula_material.material_specification,
+                        bm_weigh_centre.name           as weigh_centre_name,
+                        bm_weigh_requirement.requirement_date,
+                        bm_weigh_requirement.requirement_quantity,
+                        bm_product_formula_material.unit_id,
+                        bm_product_plan.product_name,
+                        bm_product_plan.product_merge_code,
+                        bm_product_plan.process_name,
+                        bm_product_plan.batch_no
+        from bm_weigh_requirement
+                 left join bm_product_formula_material
+                           on bm_weigh_requirement.formula_material_id = bm_product_formula_material.id and
+                              bm_product_formula_material.is_deleted = 0
+                 left join bm_weigh_centre on bm_weigh_requirement.weigh_centre_id = bm_weigh_centre.id and
+                                              bm_weigh_centre.is_deleted = 0
+                 left join bm_product_plan on bm_weigh_requirement.product_plan_id = bm_product_plan.id and
+                                              bm_product_plan.is_deleted = 0
+    </sql>
+    <select id="queryList" resultType="com.bmos.mes.service.weigh.centre.requirement.vo.WeighRequirementVO">
+        <include refid="weighRequirementPageVOFields"/>
+        left join bm_resource_permission
+                  on bm_weigh_requirement.weigh_centre_id = bm_resource_permission.resource_id
+        <where>
+            bm_weigh_requirement.is_deleted = 0
+              and bm_weigh_requirement.expired_date &gt;= date(now())
+            <if test="deptIds != null and deptIds.size() > 0">
+                and bm_resource_permission.dept_id in
+                <foreach collection="deptIds" open="(" separator="," close=")" item="deptId">
+                    #{deptId}
+                </foreach>
+            </if>
+            <if test="deptIds == null or deptIds.size() == 0">
+                and 1 = 0
+            </if>
+            <if test="pageQuery.requirementStatus != null">
+                and bm_weigh_requirement.requirement_status = #{pageQuery.requirementStatus}
+            </if>
+            <if test="pageQuery.requirementDateStart != null">
+                and bm_weigh_requirement.requirement_date &gt;= #{pageQuery.requirementDateStart}
+            </if>
+            <if test="pageQuery.requirementDateEnd != null">
+                and bm_weigh_requirement.requirement_date &lt;= #{pageQuery.requirementDateEnd}
+            </if>
+            <if test="pageQuery.productId != null">
+                and bm_product_plan.product_id = #{pageQuery.productId}
+            </if>
+            <if test="pageQuery.batchNo != null and pageQuery.batchNo != ''">
+                and bm_product_plan.batch_no like concat('%', #{pageQuery.batchNo}, '%')
+            </if>
+            <if test="pageQuery.materialName != null and pageQuery.materialName != ''">
+                and bm_product_formula_material.material_name like concat('%', #{pageQuery.materialName}, '%')
+            </if>
+            <if test="pageQuery.materialMergeCode != null and pageQuery.materialMergeCode != ''">
+                and bm_product_formula_material.material_merge_code like
+                    concat('%', #{pageQuery.materialMergeCode}, '%')
+            </if>
+            <if test="pageQuery.weighCentreName != null and pageQuery.weighCentreName != ''">
+                and bm_weigh_centre.name like concat('%', #{pageQuery.weighCentreName}, '%')
+            </if>
+        </where>
+        order by bm_weigh_requirement.requirement_date
+    </select>
+
+    <select id="selectRequirementProgramListByIds"
+            resultType="com.bmos.mes.service.weigh.centre.requirement.vo.WeighRequirementProgram">
+        select bm_weigh_requirement.id,
+               bm_weigh_requirement.formula_material_id,
+               bm_product_formula_material.material_id,
+               bm_product_formula_material.unit_id as formula_unit_id,
+               bm_weigh_requirement.weigh_centre_id,
+               bm_weigh_requirement.requirement_date,
+               bm_weigh_requirement.requirement_quantity,
+               bm_weigh_requirement.product_plan_id,
+               bm_weigh_requirement.requirement_status
+        from bm_weigh_requirement
+                 left join bm_product_formula_material
+                           on bm_weigh_requirement.formula_material_id = bm_product_formula_material.id and
+                              bm_product_formula_material.is_deleted = 0
+        <where>
+            bm_weigh_requirement.is_deleted = 0
+            <if test="requirementIds != null and requirementIds.size() != 0">
+                and bm_weigh_requirement.id in
+                <foreach collection="requirementIds" open="(" separator="," close=")" item="requirementId">
+                    #{requirementId}
+                </foreach>
+            </if>
+        </where>
+        order by bm_weigh_requirement.id desc
+    </select>
+
+    <select id="queryListByTaskId" resultType="com.bmos.mes.service.weigh.centre.requirement.vo.WeighRequirementVO">
+        <include refid="weighRequirementPageVOFields"/>
+        <where>
+            bm_weigh_requirement.is_deleted = 0
+            <if test="taskId != null">
+                and bm_weigh_requirement.weigh_requirement_task_id = #{taskId}
+            </if>
+        </where>
+        order by bm_weigh_requirement.id desc
+    </select>
+
+    <select id="queryUnPlanedRequirementList"
+            resultType="com.bmos.mes.service.weigh.centre.requirement.vo.WeighRequirementVO">
+        <include refid="weighRequirementPageVOFields"/>
+        left join bm_resource_permission
+                  on bm_weigh_requirement.weigh_centre_id = bm_resource_permission.resource_id
+        <where>
+            bm_weigh_requirement.is_deleted = 0
+              and bm_weigh_requirement.expired_date &gt;= date(now())
+            <if test="materialId != null">
+                and bm_product_formula_material.material_id = #{materialId}
+            </if>
+            <if test="unitId != null">
+                and bm_product_formula_material.unit_id = #{unitId}
+            </if>
+            <if test="weighCentreId != null">
+                and bm_weigh_requirement.weigh_centre_id = #{weighCentreId}
+            </if>
+            <if test="deptIds != null and deptIds.size() > 0">
+                and bm_resource_permission.dept_id in
+                <foreach collection="deptIds" open="(" separator="," close=")" item="deptId">
+                    #{deptId}
+                </foreach>
+            </if>
+            <if test="deptIds == null or deptIds.size() == 0">
+                and 1 = 0
+            </if>
+            <if test="requirementStatus != null">
+                and bm_weigh_requirement.requirement_status = #{requirementStatus}
+            </if>
+        </where>
+        order by bm_weigh_requirement.id desc
+    </select>
+
+    <select id="selectWeighExecuteRequirementDetailById"
+            resultType="com.bmos.mes.service.weigh.centre.execute.vo.WeighExecuteRequirementDetailVO">
+        select bm_weigh_requirement.id,
+               bm_product_formula_material.material_id,
+               bm_weigh_requirement.formula_material_id,
+               bm_product_formula_material.material_name,
+               bm_product_formula_material.material_merge_code,
+               bm_product_formula_material.material_type   as category_type,
+               bm_storage_material_batch.id                as storage_material_batch_id,
+               bm_storage_material_batch.material_batch_no as storage_material_batch_no,
+               bm_weigh_requirement.product_plan_id,
+               bm_weigh_requirement.batch_no,
+               bm_weigh_requirement.product_name,
+               bm_weigh_requirement.requirement_quantity   as target_total_quantity,
+               bm_weigh_requirement.unit_id,
+               bm_weigh_requirement.weigh_process,
+               bm_weigh_requirement.weigher_id,
+               bm_weigh_task.id as task_id
+        from bm_weigh_requirement
+                 left join bm_product_formula_material
+                           on bm_weigh_requirement.formula_material_id = bm_product_formula_material.id and
+                              bm_product_formula_material.is_deleted = 0
+                 left join bm_storage_material_batch
+                           on bm_weigh_requirement.storage_material_batch_id = bm_storage_material_batch.id and
+                              bm_storage_material_batch.is_deleted = 0
+                 left join bm_weigh_task on bm_weigh_requirement.weigh_requirement_task_id = bm_weigh_task.id and bm_weigh_task.is_deleted = 0
+        where bm_weigh_requirement.is_deleted = 0
+          and bm_weigh_requirement.id = #{requirementId}
+    </select>
+
+    <select id="selectExecuteRequirementListByTaskId"
+            resultType="com.bmos.mes.service.weigh.centre.execute.vo.WeighExecuteRequirementVO">
+        select bm_weigh_requirement.id,
+               bm_weigh_requirement.product_plan_id,
+               bm_weigh_requirement.requirement_quantity,
+               bm_weigh_requirement.unit_id,
+               bm_product_plan.product_name,
+               bm_product_plan.product_merge_code,
+               bm_weigh_requirement.batch_no,
+               bm_product_plan.process_name,
+               bm_weigh_requirement.weigh_status,
+               bm_weigh_requirement.requirement_status,
+               bm_weigh_requirement.expired_date,
+               bm_weigh_requirement.storage_material_batch_id,
+               bm_weigh_requirement.weigh_process
+        from bm_weigh_requirement
+                 left join bm_product_plan on bm_product_plan.id = bm_weigh_requirement.product_plan_id and
+                                              bm_product_plan.is_deleted = 0
+        where bm_weigh_requirement.is_deleted = 0
+          and bm_weigh_requirement.weigh_requirement_task_id = #{taskId}
+    </select>
+</mapper>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.ingredient.plan.mapper.IngredientMaterialBatchMapper">
+
+    <select id="getByIngredientIdAndFormulaMaterialId"
+            resultType="com.bmos.mes.service.ingredient.plan.model.IngredientMaterialBatchDetailInfo">
+        select ipmb.*,
+               smb.material_batch_no,
+               smb.original_batch_no,
+               smb.expired_date,
+               smb.hydration,
+               smb.no_hydration_content,
+               smb.producer,
+               smb.supplier,
+               smb.report_no,
+               smb.licence_no,
+               smb.factory_batch_no,
+               smb.original_batch_no
+        from bm_ingredient_plan_material_batch ipmb
+                 left join bm_storage_material_batch smb on ipmb.material_batch_id = smb.id
+        where ipmb.is_deleted = 0
+          and ipmb.ingredient_plan_id = #{ingredientPlanId}
+          and ipmb.formula_material_id = #{formulaMaterialId}
+        order by smb.material_batch_no
+    </select>
+    <select id="getByIngredientId"
+            resultType="com.bmos.mes.service.ingredient.plan.model.IngredientMaterialBatchDetailInfo">
+        select ipmb.*,
+               smb.material_batch_no,
+               smb.original_batch_no,
+               smb.expired_date,
+               smb.hydration,
+               smb.no_hydration_content,
+               smb.producer,
+               smb.supplier,
+               smb.report_no,
+               smb.licence_no,
+               smb.factory_batch_no,
+               smb.original_batch_no
+        from bm_ingredient_plan_material_batch ipmb
+                 left join bm_storage_material_batch smb on ipmb.material_batch_id = smb.id
+        where ipmb.is_deleted = 0
+          and ipmb.ingredient_plan_id = #{ingredientPlanId}
+    </select>
+</mapper>

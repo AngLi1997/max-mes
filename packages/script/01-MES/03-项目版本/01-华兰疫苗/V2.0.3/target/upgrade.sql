@@ -1,0 +1,510 @@
+# 增加用户密码控制相关的配置 by yuxiaorong 240229
+INSERT INTO bmos_platform.bp_business_parameter (id, code, value, value_type, business_type, belong, description, sort, value_range, is_display, is_deleted) VALUES (100011, 'platform.user.pwd-rule.character', 'U#L#N', 'STRING', 'BUSINESS', '平台', '用户密码字符集（多选，分隔符#），大写字符：U，小写字符：L，数字：N，其他字符：E（!,#,$,%,*,(,),[,],{,},,,.,;,:,-,_,?,=,+,-,|）', 100110, '', 1, 0);
+INSERT INTO bmos_platform.bp_business_parameter (id, code, value, value_type, business_type, belong, description, sort, value_range, is_display, is_deleted) VALUES (100012, 'platform.user.pwd-rule.minLen', '6', 'STRING', 'BUSINESS', '平台', '用户密码最小密码长度，限制6-24内整数', 100120, '', 1, 0);
+INSERT INTO bmos_platform.bp_business_parameter (id, code, value, value_type, business_type, belong, description, sort, value_range, is_display, is_deleted) VALUES (100013, 'platform.user.pwd-rule.tryNum', '5', 'STRING', 'BUSINESS', '平台', '用户密码尝试次数，限制0-24内整数', 100130, '', 1, 0);
+INSERT INTO bmos_platform.bp_business_parameter (id, code, value, value_type, business_type, belong, description, sort, value_range, is_display, is_deleted) VALUES (100014, 'platform.user.pwd-rule.hisNum', '0', 'STRING', 'BUSINESS', '平台', '用户历史密码个数，限制0-6内整数', 100140, '', 1, 0);
+INSERT INTO bmos_platform.bp_business_parameter (id, code, value, value_type, business_type, belong, description, sort, value_range, is_display, is_deleted) VALUES (100015, 'platform.user.pwd-rule.validity', '365', 'STRING', 'BUSINESS', '平台', '用户密码有效期，单位为：天', 100150, '', 1, 0);
+
+# 增加外链的参数配置 by lilei 240312
+INSERT INTO bmos_platform.bp_business_parameter (id, code, value, value_type, business_type, belong, description, sort, value_range, is_display, create_by, update_by, create_time, update_time, is_deleted) VALUES (100016, 'platform.sys.outside_url', '{"999999999":"http://172.30.1.160"}', 'JSON', 'BUSINESS', '平台', '外链地址', 100160, '', 1, '1', '1', now(),now(), 0);
+
+# 增加消息轮询时间的参数配置 by lilei 240312
+INSERT INTO bmos_platform.bp_business_parameter (id, code, value, value_type, business_type, belong, description, sort, value_range, is_display, create_by, update_by, create_time, update_time, is_deleted) VALUES (100017, 'platform.sys.app-msg-polling-time', '30', 'NUMBER', 'BUSINESS', '平台', '移动端消息轮询时间，单位：秒', 100160, '', 1, '1', '1', now(),now(), 0);
+INSERT INTO bmos_platform.bp_business_parameter (id, code, value, value_type, business_type, belong, description, sort, value_range, is_display, create_by, update_by, create_time, update_time, is_deleted) VALUES (100018, 'platform.sys.web-msg-polling-time', '30', 'NUMBER', 'BUSINESS', '平台', '网页端消息轮询时间，单位：秒', 100170, '', 1, '1', '1', now(),now(), 0);
+
+# 增加项目配置的参数配置 by zhongjie 240312
+INSERT INTO bmos_platform.bp_business_parameter (id, code, value, value_type, business_type, belong, description, sort, value_range, is_display, create_by, update_by, create_time, update_time, is_deleted) VALUES (100019, 'platform.sys.project-config', '[{"label":"佰墨思","key":"bmos"},{"label":"白俄","key":"be"},{"label":"康盛科泰","key":"kskt"},{"label":"华兰生物","key":"hlsw"}]', 'JSON', 'BUSINESS', '平台', '系统项目配置', 100190, '', 1, '1', '1', now(),now(), 0);
+
+# 更新记录配置页边距 by pangzhiwei 240313
+UPDATE bmos_platform.bp_business_parameter SET value = '{"left":"10", "right":"10", "top":"10", "bottom":"10"}' WHERE id = 120001;
+
+# 删除外链测试的参数配置 by lilong 240312
+delete from bmos_platform.bp_business_parameter where id = 100016;
+
+# 批签发单元格空值 by lilong 240301
+INSERT INTO bmos_platform.bp_business_parameter (id, code, value, value_type, business_type, belong, description, sort, value_range, is_display, is_deleted) VALUES (120005, 'mes.release.over-level-data', '/', 'STRING', 'BUSINESS', '生产', '批签发单元格空值', 120050, '', 1, 0);
+# 补充流程配置分类层级信息 by renjinguang 240301
+UPDATE bmos_mes.bm_flow_audit_category SET name = '记录配置', code = '120020', parent_id = 0, create_by = '1', create_time = now(),  is_deleted = 0, tree_code = '120020,120020001,120020002', tree_name = '记录配置' WHERE id = 120020;
+UPDATE bmos_mes.bm_flow_audit_category SET name = '生产计划', code = '120030', parent_id = 0, create_by = '1', create_time = now(),  is_deleted = 0, tree_code = '120030,120030001', tree_name = '生产计划' WHERE id = 120030;
+UPDATE bmos_mes.bm_flow_audit_category SET name = '批签发', code = '120040', parent_id = 0, create_by = '1', create_time = now(),  is_deleted = 0, tree_code = '120040,120040001', tree_name = '批签发' WHERE id = 120040;
+UPDATE bmos_mes.bm_flow_audit_category SET name = '记录审批', code = '120020001', parent_id = 120020, create_by = '1', create_time = now(),  is_deleted = 0, tree_code = '120020001', tree_name = '记录配置-记录审批' WHERE id = 120020001;
+UPDATE bmos_mes.bm_flow_audit_category SET name = '工艺审批', code = '120020002', parent_id = 120020, create_by = '1', create_time = now(),  is_deleted = 0, tree_code = '120020002', tree_name = '记录配置-工艺审批' WHERE id = 120020002;
+UPDATE bmos_mes.bm_flow_audit_category SET name = '生产计划审批', code = '120030001', parent_id = 120030, create_by = '1', create_time = now(),  is_deleted = 0, tree_code = '120030001', tree_name = '生产计划-生产计划审批' WHERE id = 120030001;
+UPDATE bmos_mes.bm_flow_audit_category SET name = '批签发审核', code = '120040001', parent_id = 120040, create_by = '1', create_time = now(),  is_deleted = 0, tree_code = '120040001', tree_name = '批签发-批签发审核' WHERE id = 120040001;
+
+# 增加配方审批的审批流分类 by lilong 240307
+INSERT INTO bmos_mes.bm_flow_audit_category (id, name, code, parent_id, create_by, update_by, create_time, update_time, is_deleted, tree_code, tree_name) VALUES (120020003, '配方审批', '120020003', 120020, '1', null, now(), null, 0, '120020003', '生产配置-配方审批');
+UPDATE bmos_mes.bm_flow_audit_category SET name = '生产配置', tree_code = '12002,120020001,120020002,120020003', tree_name = '生产配置' WHERE id = 120020;
+UPDATE bmos_mes.bm_flow_audit_category SET tree_name = '生产配置-记录审批' WHERE id = 120020001;
+UPDATE bmos_mes.bm_flow_audit_category SET tree_name = '生产配置-工艺审批' WHERE id = 120020002;
+use bmos_platform;
+truncate table bmos_platform.bp_tag_define;
+truncate table bmos_platform.bp_tag_instance;
+truncate table bmos_platform.bp_tag_scene;
+truncate table bmos_platform.bp_tag_scene_field;
+truncate table bmos_platform.bp_tag_type;
+-- 标签场景表
+INSERT INTO bmos_platform.bp_tag_scene (id, tag_scene_name, tag_scene_desc, tag_type_id, data_source_service_name, data_source_interface, qr_code_field, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (1, '配料称量', '配料称量', 1, 'bmos-mes-service', '/api/app/mes/tag/print/getTagById', 'qrCode', 1, '2024-03-07 10:56:16', null, 'liang', null, 0);
+
+-- 标签类型表
+INSERT INTO bmos_platform.bp_tag_type (id, tag_type_name, tag_type_desc, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (1, '原辅包标签', '贴在原辅包上的标签', 1, '2024-03-07 10:05:10', null, 'liang', null, 0);
+INSERT INTO bmos_platform.bp_tag_type (id, tag_type_name, tag_type_desc, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (2, '中间品标签', '贴在中间品上的标签', 2, '2024-03-07 10:05:10', null, 'liang', null, 0);
+INSERT INTO bmos_platform.bp_tag_type (id, tag_type_name, tag_type_desc, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (3, '暂存货位标签', '贴在暂存货位上的标签', 3, '2024-03-07 10:05:10', null, 'liang', null, 0);
+INSERT INTO bmos_platform.bp_tag_type (id, tag_type_name, tag_type_desc, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (4, '检品标签', '贴在检品上的标签', 4, '2024-03-07 10:05:10', null, 'liang', null, 0);
+INSERT INTO bmos_platform.bp_tag_type (id, tag_type_name, tag_type_desc, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (5, '设备标签', '贴在设备上的标签', 5, '2024-03-07 10:05:10', null, 'liang', null, 0);
+
+-- 标签样式表
+INSERT INTO bmos_platform.bp_tag_define (id, tag_style, tag_width, tag_height, cmd, cmd_type, preview_html, create_time, update_time, create_by, update_by, is_deleted) VALUES (1, '默认样式', 400, 300, '^XA
+^CI28^FS
+^CW1,E:SIMSUN.FNT^FS
+^PW560^FS
+^LL320^FS
+^LH0,16^FS
+${logo_cmd}
+^FO20,0^XGR:LOGO.GRF,1,1^FS
+^IDR:LOGO.GRF
+^FO20,58^A1,24,24^FD${field1}^FS
+^FO20,85^A1,24,24^FD${field2}^FS
+^FO20,112^A1,24,24^FD${field3}^FS
+^FO20,139^A1,24,24^FD${field4}^FS
+^FO20,166^A1,24,24^FD${field5}^FS
+^FO20,193^A1,24,24^FD${field6}^FS
+^FO20,220^A1,24,24^FD${field7}^FS
+^FO20,247^A1,24,24^FD${field8}^FS
+^FO20,274^A1,24,24^FD${field9}^FS
+^FO320,50
+^BQN,2,5
+^FD${barcode}^FS
+^XZ', 'ZPL', '<div
+  style="
+    width: 400px;
+    height: 300px;
+    box-sizing: border-box;
+    padding: 15px 30px;
+    background-color: #f8f8f8;
+    border: 1px solid #e1e1e1;
+    border-radius: 10px;
+    overflow: hidden;
+  "
+>
+  <div
+    id="title"
+    style="font-size: 30px; font-weight: normal; width: 100%; height: 40px"
+  ></div>
+  <div style="width: 100%; height: calc(100% - 40px)">
+    <div
+      style="
+        float: left;
+        width: 60%;
+        display: grid;
+        grid-template-rows: repeat(6, 1fr);
+      "
+    >
+      <div id="materialName"></div>
+      <div id="materialMergeCode"></div>
+      <div id="materialBatchNo"></div>
+      <div id="materialNo"></div>
+      <div id="quantityWithUnit"></div>
+      <div id="expiredDate"></div>
+    </div>
+    <div style="float: right; width: 40%">
+      <img
+        width="100%"
+        height="100%"
+        src="data:image/png;base64,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"
+        alt=""
+      />
+    </div>
+  </div>
+</div>', '2024-03-07 14:15:36', null, 'liang', null, 0);
+-- 标签场景字段表
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (1, 1, 'materialName', '物料名称', 'String', '可口可乐', '2024-03-07 16:13:19', null, 'liang', null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (2, 1, 'materialMergeCode', '物料编码(合并)', 'String', 'cola', '2024-03-07 16:13:19', null, 'liang', null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (3, 1, 'materialBatchNo', '物料批次', 'String', 'cola001', '2024-03-07 16:13:19', null, 'liang', null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (4, 1, 'materialNo', '物料件号', 'String', 'cola001-001', '2024-03-07 16:13:19', null, 'liang', null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (5, 1, 'quantityWithUnit', '物料量(带单位)', 'String', '330ml', '2024-03-07 16:13:19', null, 'liang', null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (6, 1, 'expiredDate', '有效日期', 'String', '永不过期!', '2024-03-07 16:13:19', null, 'liang', null, 0);
+# 增加配方配置/审批菜单及默认权限 by lilong 240307
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020004, '配方配置', '120020004', 120020, 0, 1, 130120160, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020005, '配方审批', '120020005', 120020, 0, 1, 130120170, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020004000001, '默认权限', '120020004000001', 120020004, 0, 0, 130120160110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020005000001, '默认权限', '120020005000001', 120020005, 0, 0, 130120170110, now(), now(), '1', '1', 0);
+# 增加标签管理菜单及默认权限 by lilong 240307
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100020007, '标签管理', '100020007', 100020, 0, 1, 110120170, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100020007000001, '默认权限', '100020007000001', 100020007, 0, 0, 110120170110, now(), now(), '1', '1', 0);
+
+# 平台权限码梳理
+DELETE FROM bmos_platform.bp_menu WHERE id >999999999;
+# 参数配置
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100010002001001, '编辑参数', '100010002001001', 100010002, 0, 0, 0, null, 110110120110, now(), now(), '1', '1', 0);
+# 编号规则
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100020001001001, '新建编号规则', '100020001001001', 100020001, 0, 0, 0, null, 110110120110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100020001001002, '新增版本', '100020001001002', 100020001, 0, 0, 0, null, 110110120120, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100020001001003, '编辑', '100020001001003', 100020001, 0, 0, 0, null, 110110120130, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100020001001004, '查看', '100020001001004', 100020001, 0, 0, 0, null, 110110120140, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100020001001005, '确认', '100020001001005', 100020001, 0, 0, 0, null, 110110120150, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100020001001006, '删除', '100020001001006', 100020001, 0, 0, 0, null, 110110120160, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100020001001007, '启停', '100020001001007', 100020001, 0, 0, 0, null, 110110120170, now(), now(), '1', '1', 0);
+# 公式配置
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100020006000001, '新增分类', '100020006000001', 100020006, 0, 0, 0, null, 110120160110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100020006000002, '编辑分类', '100020006000002', 100020006, 0, 0, 0, null, 110120160120, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100020006000003, '删除分类', '100020006000003', 100020006, 0, 0, 0, null, 110120160130, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100020006000004, '新建公式', '100020006000004', 100020006, 0, 0, 0, null, 110120160140, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100020006000005, '编辑', '100020006000005', 100020006, 0, 0, 0, null, 110120160150, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100020006000006, '查看', '100020006000006', 100020006, 0, 0, 0, null, 110120160160, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100020006000007, '确认', '100020006000007', 100020006, 0, 0, 0, null, 110120160170, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100020006000008, '删除', '100020006000008', 100020006, 0, 0, 0, null, 110120160180, now(), now(), '1', '1', 0);
+# 标签配置
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100020007000001, '新增标签', '100020007000001', 100020007, 0, 0, 0, null, 110120170110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100020007000002, '编辑', '100020007000002', 100020007, 0, 0, 0, null, 110120170120, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100020007000003, '查看', '100020007000003', 100020007, 0, 0, 0, null, 110120170130, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100020007000004, '删除', '100020007000004', 100020007, 0, 0, 0, null, 110120170140, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100020007000005, '启停', '100020007000005', 100020007, 0, 0, 0, null, 110120170150, now(), now(), '1', '1', 0);
+# 字典管理
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100020009000001, '新建字典', '100020009000001', 100020009, 0, 0, 0, null, 110120190110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100020009000002, '查看字典', '100020009000002', 100020009, 0, 0, 0, null, 110120190120, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100020009000003, '新增数据', '100020009000003', 100020009, 0, 0, 0, null, 110120190130, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100020009000004, '编辑数据', '100020009000004', 100020009, 0, 0, 0, null, 110120190140, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100020009000005, '查看数据', '100020009000005', 100020009, 0, 0, 0, null, 110120190150, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100020009000006, '删除数据', '100020009000006', 100020009, 0, 0, 0, null, 110120190160, now(), now(), '1', '1', 0);
+# 用户管理
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100030001000001, '新增用户', '100030001000001', 100030001, 0, 0, 0, null, 110130110110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100030001000002, '导入用户', '100030001000002', 100030001, 0, 0, 0, null, 110130110120, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100030001000003, '导出用户', '100030001000003', 100030001, 0, 0, 0, null, 110130110130, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100030001000004, '查看', '100030001000004', 100030001, 0, 0, 0, null, 110130110140, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100030001000005, '绑定角色', '100030001000005', 100030001, 0, 0, 0, null, 110130110150, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100030001000006, '分配部门', '100030001000006', 100030001, 0, 0, 0, null, 110130110160, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100030001000007, '重置密码', '100030001000007', 100030001, 0, 0, 0, null, 110130110170, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100030001000008, '启停', '100030001000008', 100030001, 0, 0, 0, null, 110130110180, now(), now(), '1', '1', 0);
+# 部门管理
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100030002000001, '新增部门', '100030002000001', 100030002, 0, 0, 0, null, 110130120110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100030002000002, '编辑部门', '100030002000002', 100030002, 0, 0, 0, null, 110130120120, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100030002000003, '删除部门', '100030002000003', 100030002, 0, 0, 0, null, 110130120130, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100030002000004, '分配人员', '100030002000004', 100030002, 0, 0, 0, null, 110130120140, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100030002000005, '移除', '100030002000005', 100030002, 0, 0, 0, null, 110130120150, now(), now(), '1', '1', 0);
+# 角色管理
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100030003000001, '新增分类', '100030003000001', 100030003, 0, 0, 0, null, 110130130110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100030003000002, '编辑分类', '100030003000002', 100030003, 0, 0, 0, null, 110130130120, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100030003000003, '删除分类', '100030003000003', 100030003, 0, 0, 0, null, 110130130130, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100030003000004, '新增角色', '100030003000004', 100030003, 0, 0, 0, null, 110130130140, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100030003000005, '人员分配', '100030003000005', 100030003, 0, 0, 0, null, 110130130150, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100030003000006, '菜单分配', '100030003000006', 100030003, 0, 0, 0, null, 110130130160, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100030003000007, '编辑', '100030003000007', 100030003, 0, 0, 0, null, 110130130170, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100030003000008, '删除', '100030003000008', 100030003, 0, 0, 0, null, 110130130180, now(), now(), '1', '1', 0);
+# 权限授权
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100030004000001, '编辑', '100030004000001', 100030004, 0, 0, 0, null, 110130140110, now(), now(), '1', '1', 0);
+# 菜单权限
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100030005000001, '编辑', '100030005000001', 100030005, 0, 0, 0, null, 110130150110, now(), now(), '1', '1', 0);
+# 单位管理
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100040001000001, '新增标准单位', '100040001000001', 100040001, 0, 0, 0, null, 110140110110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100040001000002, '查看标准单位', '100040001000002', 100040001, 0, 0, 0, null, 110140110120, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100040001000003, '编辑标准单位', '100040001000003', 100040001, 0, 0, 0, null, 110140110130, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100040001000004, '删除标准单位', '100040001000004', 100040001, 0, 0, 0, null, 110140110140, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100040001000005, '启停标准单位', '100040001000005', 100040001, 0, 0, 0, null, 110140110150, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100040001000006, '新增扩展单位', '100040001000006', 100040001, 0, 0, 0, null, 110140110160, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100040001000007, '查看扩展单位', '100040001000007', 100040001, 0, 0, 0, null, 110140110170, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100040001000008, '编辑扩展单位', '100040001000008', 100040001, 0, 0, 0, null, 110140110180, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100040001000009, '删除扩展单位', '100040001000009', 100040001, 0, 0, 0, null, 110140110190, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100040001000010, '启停扩展单位', '100040001000010', 100040001, 0, 0, 0, null, 110140110210, now(), now(), '1', '1', 0);
+# 物料信息
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100040002000001, '新增物料', '100040002000001', 100040002, 0, 0, 0, null, 110140120110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100040002000002, '下发', '100040002000002', 100040002, 0, 0, 0, null, 110140120120, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100040002000003, '导入', '100040002000003', 100040002, 0, 0, 0, null, 110140120130, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100040002000004, '查看', '100040002000004', 100040002, 0, 0, 0, null, 110140120140, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100040002000005, '编辑', '100040002000005', 100040002, 0, 0, 0, null, 110140120150, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100040002000006, '单位配置', '100040002000006', 100040002, 0, 0, 0, null, 110140120160, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100040002000007, '删除', '100040002000007', 100040002, 0, 0, 0, null, 110140120170, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100040002000008, '启停', '100040002000008', 100040002, 0, 0, 0, null, 110140120180, now(), now(), '1', '1', 0);
+
+# 更新系统一级菜单别名 by lilong 240312
+UPDATE bmos_platform.bp_menu SET alias = 'BM-PMP' WHERE id = 100;
+UPDATE bmos_platform.bp_menu SET alias = 'BM-ATM' WHERE id = 111;
+UPDATE bmos_platform.bp_menu SET alias = 'BM-MES' WHERE id = 120;
+UPDATE bmos_platform.bp_menu SET alias = 'BM-LIMS' WHERE id = 130;
+
+# 增加项目配置菜单 by lilong 240312
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100010005, '项目配置', '100010005', 100010, 0, 1, 0, null, 110110150, now(), now(), '1', '1', 0);
+
+# 字典管理权限
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100020009000007, '编辑字典', '100020009000007', 100020009, 0, 0, 0, null, 110120190121, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100020009000008, '删除字典', '100020009000008', 100020009, 0, 0, 0, null, 110120190122, now(), now(), '1', '1', 0);
+
+# 用户管理权限
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100030001000009, '解锁', '100030001000009', 100030001, 0, 0, 0, null, 110130110190, now(), now(), '1', '1', 0);
+
+# 用户管理权限
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100030001000010, '编辑', '100030001000010', 100030001, 0, 0, 0, null, 110130110131, now(), now(), '1', '1', 0);
+
+# 物料管理
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100040002000009, '新增物料分类', '100040002000009', 100040002, 0, 0, 0, null, 110140120101, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100040002000010, '编辑物料分类', '100040002000010', 100040002, 0, 0, 0, null, 110140120102, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (100040002000011, '删除物料分类', '100040002000011', 100040002, 0, 0, 0, null, 110140120103, now(), now(), '1', '1', 0);
+
+# 新增移动端库存管理菜单 by lilong 240314
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted, alias) VALUES (121020, '物料管理', '121020', 121, 1, 1, 0, null, 140120, now(), now(), '1', '1', 0, null);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted, alias) VALUES (121020002, '库存管理', '121020002', 121020, 0, 1, 0, null, 140120120, now(), now(), '1', '1', 0, null);
+
+# lims菜单权限 by lilong 240223
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (130, '实验室信息管理系统', '130', 0, 1, 1, 150, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (130010, '基础数据', '130010', 130, 0, 1, 150110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (130020, '检验管理', '130020', 130, 0, 1, 150120, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (130010001, '检品管理', '130010001', 130010, 0, 1, 150110110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (130010002, '分析项管理', '130010002', 130010, 0, 1, 150110120, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (130010003, '检验项目管理', '130010003', 130010, 0, 1, 150110130, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (130010004, '实验包管理', '130010004', 130010, 0, 1, 150110140, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (130020001, '检验查询', '130020001', 130020, 0, 1, 150120110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (130020002, '请验确认', '130020002', 130020, 0, 1, 150120120, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (130020003, '取样', '130020003', 130020, 0, 1, 150120130, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (130020004, '检验录入', '130020004', 130020, 0, 1, 150120140, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (130020005, '报告生成', '130020005', 130020, 0, 1, 150120150, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (130020006, '报告审核', '130020006', 130020, 0, 1, 150120160, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (130020007, '报告签发', '130020007', 130020, 0, 1, 150120170, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (130010001000001, '默认权限', '130010001000001', 130010001, 0, 0, 150110110110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (130010002000001, '默认权限', '130010002000001', 130010002, 0, 0, 150110120110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (130010003000001, '默认权限', '130010003000001', 130010003, 0, 0, 150110130110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (130010004000001, '默认权限', '130010004000001', 130010004, 0, 0, 150110140110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (130020001000001, '默认权限', '130020001000001', 130020001, 0, 0, 150120110110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (130020002000001, '默认权限', '130020002000001', 130020002, 0, 0, 150120120110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (130020003000001, '默认权限', '130020003000001', 130020003, 0, 0, 150120130110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (130020004000001, '默认权限', '130020004000001', 130020004, 0, 0, 150120140110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (130020005000001, '默认权限', '130020005000001', 130020005, 0, 0, 150120150110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (130020006000001, '默认权限', '130020006000001', 130020006, 0, 0, 150120160110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (130020007000001, '默认权限', '130020007000001', 130020007, 0, 0, 150120170110, now(), now(), '1', '1', 0);
+
+# LIMS菜单终端类型修正 by lilong 240304
+UPDATE bmos_platform.bp_menu SET terminal_type = 0 WHERE id = 130;
+# LIMS系统别名 by lilong 240314
+UPDATE bmos_platform.bp_menu SET alias = 'BM-LIMS' WHERE id = 130;
+
+# 删除LIMS默认权限 by lilong 240314
+delete from bmos_platform.bp_menu where bmos_platform.bp_menu.id in (
+'130010001000001',
+'130010002000001',
+'130010003000001',
+'130010004000001',
+'130020001000001',
+'130020002000001',
+'130020003000001',
+'130020004000001',
+'130020005000001',
+'130020006000001',
+'130020007000001'
+    );
+
+# 修正库存管理菜单终端类型 by lilong 240314
+UPDATE bmos_platform.bp_menu SET terminal_type = 1 WHERE id = 121020002;
+
+# 登录日志
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (111010001000001, '导出', '111010001000001', 111010001, 0, 0, 0, null, 111010001110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (111010001000002, '查看', '111010001000002', 111010001, 0, 0, 0, null, 111010001120, now(), now(), '1', '1', 0);
+# 操作日志
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (111010002000001, '导出', '111010002000001', 111010002, 0, 0, 0, null, 111010002110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (111010002000002, '查看', '111010002000002', 111010002, 0, 0, 0, null, 111010002120, now(), now(), '1', '1', 0);
+# 审批流追溯
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (111020001000001, '导出', '111020001000001', 111020001, 0, 0, 0, null, 111020001110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (111020001000002, '查看', '111020001000002', 111020001, 0, 0, 0, null, 111020001130, now(), now(), '1', '1', 0);
+# 签名追溯
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (111020003000001, '导出', '111020003000001', 111020003, 0, 0, 0, null, 111020003110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (111020003000002, '查看', '111020003000002', 111020003, 0, 0, 0, null, 111020003120, now(), now(), '1', '1', 0);
+
+# 原辅包信息
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120010001000001, '新增', '120010001000001', 120010001, 0, 0, 0, null, 120010001110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120010001000002, '同步', '120010001000002', 120010001, 0, 0, 0, null, 120010001120, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120010001000003, '查看', '120010001000003', 120010001, 0, 0, 0, null, 120010001130, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120010001000004, '编辑', '120010001000004', 120010001, 0, 0, 0, null, 120010001140, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120010001000005, '删除', '120010001000005', 120010001, 0, 0, 0, null, 120010001150, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120010001000006, '启停', '120010001000006', 120010001, 0, 0, 0, null, 120010001160, now(), now(), '1', '1', 0);
+# 中间品信息
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120010002000001, '新增', '120010002000001', 120010002, 0, 0, 0, null, 120010002110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120010002000002, '同步', '120010002000002', 120010002, 0, 0, 0, null, 120010002120, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120010002000003, '查看', '120010002000003', 120010002, 0, 0, 0, null, 120010002130, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120010002000004, '编辑', '120010002000004', 120010002, 0, 0, 0, null, 120010002140, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120010002000005, '删除', '120010002000005', 120010002, 0, 0, 0, null, 120010002150, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120010002000006, '启停', '120010002000006', 120010002, 0, 0, 0, null, 120010002160, now(), now(), '1', '1', 0);
+# 产品信息
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120010003000001, '新增', '120010003000001', 120010003, 0, 0, 0, null, 120010003110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120010003000002, '同步', '120010003000002', 120010003, 0, 0, 0, null, 120010003120, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120010003000003, '查看', '120010003000003', 120010003, 0, 0, 0, null, 120010003130, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120010003000004, '编辑', '120010003000004', 120010003, 0, 0, 0, null, 120010003140, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120010003000005, '批记录', '120010003000005', 120010003, 0, 0, 0, null, 120010003150, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120010003000006, '删除', '120010003000006', 120010003, 0, 0, 0, null, 120010003160, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120010003000007, '启停', '120010003000007', 120010003, 0, 0, 0, null, 120010003170, now(), now(), '1', '1', 0);
+# 流程配置
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020008000001, '新建流程', '120020008000001', 120020008, 0, 0, 0, null, 120020008110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020008000002, '编辑', '120020008000002', 120020008, 0, 0, 0, null, 120020008120, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020008000003, '升级版本', '120020008000003', 120020008, 0, 0, 0, null, 120020008130, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020008000004, '详情', '120020008000004', 120020008, 0, 0, 0, null, 120020008140, now(), now(), '1', '1', 0);
+# 编号规则
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020009000001, '编辑', '120020009000001', 120020009, 0, 0, 0, null, 120020009110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020009000002, '批量配置', '120020009000002', 120020009, 0, 0, 0, null, 120020009120, now(), now(), '1', '1', 0);
+# 暂存间配置
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020010000001, '新增区域', '120020010000001', 120020010, 0, 0, 0, null, 120020010110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020010000002, '编辑区域', '120020010000002', 120020010, 0, 0, 0, null, 120020010120, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020010000003, '删除区域', '120020010000003', 120020010, 0, 0, 0, null, 120020010130, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020010000004, '新增货位', '120020010000004', 120020010, 0, 0, 0, null, 120020010140, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020010000005, '查看', '120020010000005', 120020010, 0, 0, 0, null, 120020010150, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020010000006, '编辑', '120020010000006', 120020010, 0, 0, 0, null, 120020010160, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020010000007, '数据权限', '120020010000007', 120020010, 0, 0, 0, null, 120020010170, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020010000008, '删除', '120020010000008', 120020010, 0, 0, 0, null, 120020010180, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020010000009, '启停', '120020010000009', 120020010, 0, 0, 0, null, 120020010190, now(), now(), '1', '1', 0);
+# 记录配置
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020001000001, '新增分类', '120020001000001', 120020001, 0, 0, 0, null, 120020001110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020001000002, '编辑分类', '120020001000002', 120020001, 0, 0, 0, null, 120020001120, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020001000003, '删除分类', '120020001000003', 120020001, 0, 0, 0, null, 120020001130, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020001000004, '新增记录', '120020001000004', 120020001, 0, 0, 0, null, 120020001140, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020001000005, '数据权限', '120020001000005', 120020001, 0, 0, 0, null, 120020001150, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020001000006, '绑定产品', '120020001000006', 120020001, 0, 0, 0, null, 120020001160, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020001000007, '新增版本', '120020001000007', 120020001, 0, 0, 0, null, 120020001170, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020001000008, '记录编辑', '120020001000008', 120020001, 0, 0, 0, null, 120020001180, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020001000009, '公式配置', '120020001000009', 120020001, 0, 0, 0, null, 120020001190, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020001000010, '查看', '120020001000010', 120020001, 0, 0, 0, null, 120020001200, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020001000011, '历史', '120020001000011', 120020001, 0, 0, 0, null, 120020001210, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020001000012, '审批', '120020001000012', 120020001, 0, 0, 0, null, 120020001220, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020001000013, '作废', '120020001000013', 120020001, 0, 0, 0, null, 120020001230, now(), now(), '1', '1', 0);
+# 记录审批
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020002000001, '处理', '120020002000001', 120020002, 0, 0, 0, null, 120020002110, now(), now(), '1', '1', 0);
+# 配方配置
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020004000001, '新增配方', '120020004000001', 120020004, 0, 0, 0, null, 120020004110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020004000002, '数据权限', '120020004000002', 120020004, 0, 0, 0, null, 120020004120, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020004000003, '新增版本', '120020004000003', 120020004, 0, 0, 0, null, 120020004130, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020004000004, '编辑', '120020004000004', 120020004, 0, 0, 0, null, 120020004140, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020004000005, '查看', '120020004000005', 120020004, 0, 0, 0, null, 120020004150, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020004000006, '审批', '120020004000006', 120020004, 0, 0, 0, null, 120020004160, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020004000007, '历史', '120020004000007', 120020004, 0, 0, 0, null, 120020004170, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020004000008, '启停', '120020004000008', 120020004, 0, 0, 0, null, 120020004180, now(), now(), '1', '1', 0);
+# 配方审批
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020005000001, '处理', '120020005000001', 120020005, 0, 0, 0, null, 120020005110, now(), now(), '1', '1', 0);
+# 工艺配置
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020006000001, '新增工艺', '120020006000001', 120020006, 0, 0, 0, null, 120020006110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020006000002, '关联工艺', '120020006000002', 120020006, 0, 0, 0, null, 120020006120, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020006000003, '数据权限', '120020006000003', 120020006, 0, 0, 0, null, 120020006130, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020006000004, '新增版本', '120020006000004', 120020006, 0, 0, 0, null, 120020006140, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020006000005, '复制工艺', '120020006000005', 120020006, 0, 0, 0, null, 120020006150, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020006000006, '归档顺序', '120020006000006', 120020006, 0, 0, 0, null, 120020006160, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020006000007, '编辑', '120020006000007', 120020006, 0, 0, 0, null, 120020006170, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020006000008, '查看', '120020006000008', 120020006, 0, 0, 0, null, 120020006180, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020006000009, '审批', '120020006000009', 120020006, 0, 0, 0, null, 120020006190, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020006000010, '历史', '120020006000010', 120020006, 0, 0, 0, null, 120020006200, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020006000011, '启停', '120020006000011', 120020006, 0, 0, 0, null, 120020006210, now(), now(), '1', '1', 0);
+# 工艺审批
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120020007000001, '处理', '120020007000001', 120020007, 0, 0, 0, null, 120020007110, now(), now(), '1', '1', 0);
+# 生产计划
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120030001000001, '新建计划', '120030001000001', 120030001, 0, 0, 0, null, 120030001110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120030001000002, '批量创建', '120030001000002', 120030001, 0, 0, 0, null, 120030001120, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120030001000003, '编辑', '120030001000003', 120030001, 0, 0, 0, null, 120030001130, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120030001000004, '查看', '120030001000004', 120030001, 0, 0, 0, null, 120030001140, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120030001000005, '提交审核', '120030001000005', 120030001, 0, 0, 0, null, 120030001150, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120030001000006, '作废', '120030001000006', 120030001, 0, 0, 0, null, 120030001160, now(), now(), '1', '1', 0);
+# 计划审批
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120030002000001, '处理', '120030002000001', 120030002, 0, 0, 0, null, 120030002110, now(), now(), '1', '1', 0);
+# 指令单分解
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120030003000001, '分解', '120030003000001', 120030003, 0, 0, 0, null, 120030003110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120030003000002, '查看', '120030003000002', 120030003, 0, 0, 0, null, 120030003120, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120030003000003, '下发', '120030003000003', 120030003, 0, 0, 0, null, 120030003130, now(), now(), '1', '1', 0);
+# 指令单确认
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120030004000001, '确认', '120030004000001', 120030004, 0, 0, 0, null, 120030004110, now(), now(), '1', '1', 0);
+# 班组管理
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120030005000001, '新建班组', '120030005000001', 120030005, 0, 0, 0, null, 120030005110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120030005000002, '编辑', '120030005000002', 120030005, 0, 0, 0, null, 120030005120, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120030005000003, '查看', '120030005000003', 120030005, 0, 0, 0, null, 120030005130, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120030005000004, '启停', '120030005000004', 120030005, 0, 0, 0, null, 120030005140, now(), now(), '1', '1', 0);
+# 暂存间管理
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120030008000001, '物料入库', '120030008000001', 120030008, 0, 0, 0, null, 120030008110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120030008000002, '物料退库', '120030008000002', 120030008, 0, 0, 0, null, 120030008120, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120030008000003, '批次查看', '120030008000003', 120030008, 0, 0, 0, null, 120030008130, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120030008000004, '物料出库', '120030008000004', 120030008, 0, 0, 0, null, 120030008140, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120030008000005, '物料移库', '120030008000005', 120030008, 0, 0, 0, null, 120030008150, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120030008000006, '物料件查看', '120030008000006', 120030008, 0, 0, 0, null, 120030008160, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120030008000007, '盘点', '120030008000007', 120030008, 0, 0, 0, null, 120030008170, now(), now(), '1', '1', 0);
+# 数据集管理
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120040001000001, '新增数据集', '120040001000001', 120040001, 0, 0, 0, null, 120040001110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120040001000002, '编辑', '120040001000002', 120040001, 0, 0, 0, null, 120040001120, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120040001000003, '确认', '120040001000003', 120040001, 0, 0, 0, null, 120040001130, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120040001000004, '升级版本', '120040001000004', 120040001, 0, 0, 0, null, 120040001140, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120040001000005, '详情', '120040001000005', 120040001, 0, 0, 0, null, 120040001150, now(), now(), '1', '1', 0);
+# 批签发模板
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120040002000001, '新增模板', '120040002000001', 120040002, 0, 0, 0, null, 120040002110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120040002000002, '编辑', '120040002000002', 120040002, 0, 0, 0, null, 120040002120, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120040002000003, '确定', '120040002000003', 120040002, 0, 0, 0, null, 120040002130, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120040002000004, '升级版本', '120040002000004', 120040002, 0, 0, 0, null, 120040002140, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120040002000005, '详情', '120040002000005', 120040002, 0, 0, 0, null, 120040002150, now(), now(), '1', '1', 0);
+# 批签发管理
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120040003000001, '批签发生成', '120040003000001', 120040003, 0, 0, 0, null, 120040003110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120040003000002, '批签发详情', '120040003000002', 120040003, 0, 0, 0, null, 120040003120, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120040003000003, '提交', '120040003000003', 120040003, 0, 0, 0, null, 120040003130, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120040003000004, '重新生成', '120040003000004', 120040003, 0, 0, 0, null, 120040003140, now(), now(), '1', '1', 0);
+# 批签发审核
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120040005000001, '处理', '120040005000001', 120040005, 0, 0, 0, null, 120040005110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120040005000002, '详情', '120040005000002', 120040005, 0, 0, 0, null, 120040005120, now(), now(), '1', '1', 0);
+# 批签发文件
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120040006000001, '查看报表', '120040006000001', 120040006, 0, 0, 0, null, 120040006110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120040006000002, '导出', '120040006000002', 120040006, 0, 0, 0, null, 120040006120, now(), now(), '1', '1', 0);
+# 生产历史
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120050001000001, '预览打印', '120050001000001', 120050001, 0, 0, 0, null, 120050001110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120050001000002, '操作历史', '120050001000002', 120050001, 0, 0, 0, null, 120050001120, now(), now(), '1', '1', 0);
+# 批记录打印
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120050002000001, '关联批次', '120050002000001', 120050002, 0, 0, 0, null, 120050002110, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120050002000002, '操作历史', '120050002000002', 120050002, 0, 0, 0, null, 120050002120, now(), now(), '1', '1', 0);
+# 物料日志
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120050003000001, '查看检验详情', '120050003000001', 120050003, 0, 0, 0, null, 120050003110, now(), now(), '1', '1', 0);
+
+# 增加系统信息菜单 by lilong 240319
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted, alias) VALUES (100020010, '系统信息', '100020010', 100020, 0, 1, 0, null, 110120101, now(), now(), '1', '1', 0, null);
+
+# 删除华兰疫苗用不到的菜单 by lilong 240304
+DELETE FROM bmos_platform.bp_menu WHERE bp_menu.parent_id NOT IN (
+'100030001',
+'100030002',
+'100030003',
+'100030004',
+'100030005',
+'100040001',
+'100040002',
+'120010001',
+'120010002',
+'120020010',
+'120030008',
+'120050003',
+'120050004',
+'111010001',
+'111010002',
+'111020003'               )and is_menu = 0;
+
+
+DELETE FROM bmos_platform.bp_menu WHERE id NOT IN (
+'100',
+'111',
+'120',
+'100030',
+'100030001',
+'100030002',
+'100030003',
+'100030004',
+'100030005',
+'100040',
+'100040001',
+'100040002',
+'120010',
+'120020',
+'120030',
+'120050',
+'120010001',
+'120010002',
+'120020010',
+'120030008',
+'120050003',
+'120050004',
+'111010',
+'111020',
+'111010001',
+'111010002',
+'111020003'               )and is_menu = 1;
+
+# 补充原辅包信息分类的权限
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120010001000007, '新增原辅包分类', '120010001000007', 120010001, 0, 0, 0, null, 120010001101, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120010001000008, '编辑原辅包分类', '120010001000008', 120010001, 0, 0, 0, null, 120010001102, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120010001000009, '删除原辅包分类', '120010001000009', 120010001, 0, 0, 0, null, 120010001103, now(), now(), '1', '1', 0);
+# 补充中间品信息分类的权限
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120010002000007, '新增中间品分类', '120010002000007', 120010002, 0, 0, 0, null, 120010002101, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120010002000008, '编辑中间品分类', '120010002000008', 120010002, 0, 0, 0, null, 120010002102, now(), now(), '1', '1', 0);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (120010002000009, '删除中间品分类', '120010002000009', 120010002, 0, 0, 0, null, 120010002103, now(), now(), '1', '1', 0);

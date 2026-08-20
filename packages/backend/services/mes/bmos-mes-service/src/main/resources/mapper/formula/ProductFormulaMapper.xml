@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.formula.mapper.ProductFormulaMapper">
+
+
+    <select id="selectPageList" resultType="com.bmos.mes.service.formula.vo.ProductFormulaPageVO">
+        SELECT
+        f.id,
+        f.name,
+        f.product_name,
+        f.product_merge_code,
+        f.product_specification,
+        COALESCE (MAX(CASE WHEN v.enable = 1 THEN v.version_no END), null ) AS enableVersion
+        FROM
+        bm_product_formula f
+        JOIN bm_resource_permission p ON p.resource_id = f.id
+        JOIN bm_product_formula_version v ON v.product_formula_id = f.id
+        WHERE
+        f.is_deleted = 0
+        <if test="deptIds != null and deptIds.size() > 0">
+            AND p.dept_id in
+            <foreach collection="deptIds" separator="," open="(" close=")" item="deptId">
+                #{deptId}
+            </foreach>
+        </if>
+        <if test="productId != null">
+            AND f.product_id = #{productId}
+        </if>
+        <if test="name != null and name != ''">
+            and f.name like concat('%',#{name},'%')
+        </if>
+        group by f.id
+        order by f.create_time desc
+    </select>
+    <select id="selectPageByProductIdList" resultType="com.bmos.mes.service.formula.vo.ProductFormulaPageVO">
+        SELECT
+        f.id,
+        f.name,
+        f.product_name,
+        f.product_merge_code,
+        f.product_specification,
+        COALESCE (MAX( CASE WHEN v.enable = 1 THEN v.version_no END), null ) AS enableVersion
+        FROM
+        bm_product_formula f
+        JOIN bm_resource_permission p ON p.resource_id = f.id
+        JOIN bm_product_formula_version v ON v.product_formula_id = f.id
+        WHERE
+        f.is_deleted = 0
+        <if test="deptIds != null and deptIds.size() > 0">
+            AND p.dept_id in
+            <foreach collection="deptIds" separator="," open="(" close=")" item="deptId">
+                #{deptId}
+            </foreach>
+        </if>
+        <if test="productIdList != null and productIdList.size() > 0">
+            and f.product_id in
+            <foreach collection="productIdList" item="productId" open="(" separator="," close=")">
+                #{productId}
+            </foreach>
+        </if>
+        <if test="name != null and name != ''">
+            and f.name like concat('%',#{name},'%')
+        </if>
+        group by f.id
+        order by f.create_time desc
+    </select>
+    <select id="selectEnableProductFormulaByProductId"
+            resultType="com.bmos.mes.service.formula.vo.ProductFormulaListVO">
+        SELECT DISTINCT
+            f.name AS productFormulaName,
+            v.id AS productFormulaVersionId,
+            v.version_no AS productFormulaVersionNo
+        FROM
+            bm_product_formula f
+            JOIN bm_resource_permission p ON p.resource_id = f.id
+            JOIN bm_product_formula_version v ON v.product_formula_id = f.id
+        WHERE
+            f.is_deleted = 0
+          AND f.product_id = #{productId}
+          AND v.ENABLE = TRUE
+        <if test="deptIds != null and deptIds.size() > 0">
+            AND p.dept_id in
+            <foreach collection="deptIds" separator="," open="(" close=")" item="deptId">
+                #{deptId}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="getAuditBusinessKey" resultType="java.lang.String">
+        SELECT DISTINCT
+            v.id
+        FROM
+            bm_product_formula f
+        JOIN bm_resource_permission p ON p.resource_id = f.id
+        JOIN bm_product_formula_version v ON v.product_formula_id = f.id
+        WHERE
+            f.is_deleted = 0
+        and v.is_deleted = 0
+        and v.`status` = '1'
+        <if test="deptIdList != null and deptIdList.size() > 0">
+            AND p.dept_id in
+            <foreach collection="deptIdList" separator="," open="(" close=")" item="deptId">
+                #{deptId}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="getFormulaByVersionId" resultType="com.bmos.mes.service.formula.vo.ProductFormulaListVO">
+        SELECT DISTINCT
+            f.name AS productFormulaName,
+            v.id AS productFormulaVersionId,
+            v.version_no AS productFormulaVersionNo,
+            v.enable as enable,
+            v.is_deleted as isDeleted
+        FROM
+            bm_product_formula f
+            JOIN bm_product_formula_version v ON v.product_formula_id = f.id
+        WHERE
+            v.id =#{versionId}
+    </select>
+</mapper>

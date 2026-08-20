@@ -1,0 +1,26 @@
+[
+    {
+        "merged": "C:\\Users\\bmos\\.gradle\\daemon\\8.0\\uni.UNIFD40210.Mes-merged_res-13:\\drawable_splash.png.flat",
+        "source": "C:\\Users\\bmos\\.gradle\\daemon\\8.0\\uni.UNIFD40210.Mes-main-14:\\drawable\\splash.png"
+    },
+    {
+        "merged": "C:\\Users\\bmos\\.gradle\\daemon\\8.0\\uni.UNIFD40210.Mes-merged_res-13:\\drawable_icon.png.flat",
+        "source": "C:\\Users\\bmos\\.gradle\\daemon\\8.0\\uni.UNIFD40210.Mes-main-14:\\drawable\\icon.png"
+    },
+    {
+        "merged": "uni.UNIFD40210.Mes-merged_res-13:/drawable_icon.png.flat",
+        "source": "uni.UNIFD40210.Mes-main-14:/drawable/icon.png"
+    },
+    {
+        "merged": "C:\\Users\\bmos\\.gradle\\daemon\\8.0\\uni.UNIFD40210.Mes-merged_res-13:\\drawable_push.png.flat",
+        "source": "C:\\Users\\bmos\\.gradle\\daemon\\8.0\\uni.UNIFD40210.Mes-main-14:\\drawable\\push.png"
+    },
+    {
+        "merged": "uni.UNIFD40210.Mes-merged_res-13:/drawable_splash.png.flat",
+        "source": "uni.UNIFD40210.Mes-main-14:/drawable/splash.png"
+    },
+    {
+        "merged": "uni.UNIFD40210.Mes-merged_res-13:/drawable_push.png.flat",
+        "source": "uni.UNIFD40210.Mes-main-14:/drawable/push.png"
+    }
+]

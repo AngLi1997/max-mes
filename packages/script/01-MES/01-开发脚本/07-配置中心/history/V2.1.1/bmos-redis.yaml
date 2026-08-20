@@ -1,0 +1,35 @@
+redission_config: '{
+  "singleServerConfig": {
+    "idleConnectionTimeout": 10000,
+    "connectTimeout": 100000,
+    "timeout": 10000,
+    "retryAttempts":3,
+    "retryInterval": 1500,
+    "password": "Isysc0re123",
+    "subscriptionsPerConnection": 5,
+    "address": "redis://127.0.0.1:6379",
+    "subscriptionConnectionMinimumIdleSize": 1,
+    "subscriptionConnectionPoolSize": 50,
+    "connectionMinimumIdleSize": 32,
+    "connectionPoolSize": 64,
+    "database": 0,
+    "dnsMonitoringInterval": 5000
+  },
+  "threads": 20,
+  "nettyThreads": 20,
+  "transportMode" : "NIO"
+}'
+spring:
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password: Isysc0re123
+    lettuce:
+      pool:
+        max-active: 8 # 连接池最大连接数（使用负值表示没有限制）
+        max-idle: 8 # 连接池中的最大空闲连接
+        min-idle: 0 # 连接池中的最小空闲连接
+        max-wait: 1000 # 连接池最大阻塞等待时间（使用负值表示没有限制）
+      shutdown-timeout: 100   # 关闭超时时间
+    redisson:
+      config: ${redission_config}

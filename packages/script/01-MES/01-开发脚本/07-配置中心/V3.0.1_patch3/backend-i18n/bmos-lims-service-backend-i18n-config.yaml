@@ -1,0 +1,20 @@
+i18n:
+  locations:
+    - data-id: exception_lims_zh_CN.properties
+      group: backend-i18n
+    - data-id: exception_lims_en_US.properties
+      group: backend-i18n
+    - data-id: exception_lims_ru_RU.properties
+      group: backend-i18n
+    - data-id: lims_custom_string_zh_CN.properties
+      group: backend-i18n
+    - data-id: lims_custom_string_en_US.properties
+      group: backend-i18n
+    - data-id: lims_custom_string_ru_RU.properties
+      group: backend-i18n
+    - data-id: lims_enum_zh_CN.properties
+      group: backend-i18n
+    - data-id: lims_enum_en_US.properties
+      group: backend-i18n
+    - data-id: lims_enum_ru_RU.properties
+      group: backend-i18n

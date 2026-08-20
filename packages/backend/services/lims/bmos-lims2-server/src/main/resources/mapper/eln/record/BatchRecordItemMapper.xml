@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.eln.record.mapper.BatchRecordItemMapper">
+
+    <select id="selectItemList" resultType="com.bmos.lims2.server.eln.record.vo.RecordItemListVO">
+        SELECT
+            t1.id as id,
+            t1.item_id AS itemId,
+            t1.record_version_id AS recordVersionId,
+            t1.NAME AS NAME,
+            t1.file_path,
+            t1.max_number AS maxNumber,
+            t1.sort AS sort,
+            t1.item_type as itemType,
+            t1.page_config as pageConfig,
+            t1.first_different,
+            t1.odd_and_even_different,
+            t1.page_starting_number,
+            t1.page_number_style
+        FROM
+            bm_batch_record_item as t1
+        WHERE
+            t1.is_deleted = 0
+            AND t1.record_version_id =#{recordId}
+            order by t1.sort ASC
+   </select>
+
+    <select id="queryByVersionIdS" resultType="com.bmos.lims2.server.eln.record.vo.RecordItemListVO">
+        SELECT
+            t1.item_id AS itemId,
+            t1.record_version_id AS recordVersionId,
+            t1.NAME AS NAME
+        FROM
+            bm_batch_record_item AS t1
+        WHERE
+        t1.is_deleted = 0
+        and t1.item_type = 0
+        AND t1.record_version_id in
+        <foreach collection="list" open="(" close=")" separator="," item="item">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="queryRecordByVersionIds" resultType="com.bmos.lims2.server.eln.record.vo.ProcessRecordItemVO">
+        SELECT
+            t2.id AS versionId,
+            t1.`name` AS recordName
+        FROM
+            bm_batch_record AS t1
+        JOIN bm_batch_record_version AS t2 ON t1.id = t2.record_id
+        WHERE
+            t1.is_deleted = 0
+        AND t2.is_deleted = 0
+        AND t2.id in
+        <foreach collection="list" open="(" close=")" separator="," item="item">
+            #{item}
+        </foreach>
+    </select>
+    <select id="selectHeaderFooterByRecordVersionIds"
+            resultType="com.bmos.lims2.server.eln.record.entity.BatchRecordItem">
+        select
+            *
+        from bm_batch_record_item
+        where record_version_id in
+        <foreach collection="recordVersionIds" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+        and (item_type = #{header} or item_type = #{footer})
+    </select>
+    <select id="existsRecordItem" resultType="java.lang.Boolean">
+        select true
+        from bm_batch_record_item
+        where record_version_id = #{recordVersionId}
+        and item_id = #{recordItemId}
+        limit 1
+    </select>
+</mapper>

@@ -1,0 +1,1 @@
+-- 此迁移已废弃，检品单位ID直接从物料表(lm_inspect_material.unit_id)查询，无需冗余存储

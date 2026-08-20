@@ -1,0 +1,11 @@
+xxl:
+  job:
+    accessToken: default_token
+    admin:
+      addresses: http://127.0.0.1:60700/bmos-scheduler-admin
+    executor:
+      ip: ''
+      port: ${xxlJobExecutorPort}
+      address: ''
+      logretentiondays: 30
+      logPath: scheduleLogs

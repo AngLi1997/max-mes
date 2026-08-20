@@ -1,0 +1,2 @@
+ALTER TABLE `bm_flow_audit_version` MODIFY COLUMN `version` varchar(100) COLLATE utf8mb4_general_ci NOT NULL COMMENT '版本号';
+ALTER TABLE `bm_flow_audit_version` MODIFY COLUMN `history_version` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '引用版本';

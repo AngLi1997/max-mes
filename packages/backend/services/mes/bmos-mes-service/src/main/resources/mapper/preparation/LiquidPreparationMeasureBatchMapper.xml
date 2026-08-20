@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.preparation.measure.mapper.LiquidPreparationMeasureBatchMapper">
+
+    <select id="selectMeasureBatchListDetailByInstanceId"
+            resultType="com.bmos.mes.service.preparation.measure.service.vo.MeasuredBatchDetailVO">
+        select measure_batch.*, plan_batch.formula_material_id
+        from bm_liquid_preparation_measure_batch measure_batch
+        join bm_liquid_preparation_plan_material_batch plan_batch on measure_batch.liquid_preparation_plan_batch_id = plan_batch.id
+        where measure_batch.is_deleted = 0
+        and measure_batch.measure_instance_id = #{instanceId}
+    </select>
+</mapper>

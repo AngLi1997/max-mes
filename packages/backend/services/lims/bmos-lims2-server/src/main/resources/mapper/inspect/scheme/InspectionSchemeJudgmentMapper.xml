@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.inspect.scheme.mapper.InspectionSchemeJudgmentMapper">
+    
+    <select id="listByParameterConfigId" resultType="com.bmos.lims2.server.inspect.scheme.dto.InspectionSchemeJudgmentDTO">
+        SELECT
+            id,
+            judgement_config_name,
+            scheme_id,
+            version_id,
+            package_id,
+            inspect_item_id,
+            parameter_id,
+            parameter_config_id,
+            data_point_config_id,
+            data_point_id,
+            point_type AS pointType,
+            judgment_type,
+            default_result,
+            min_value,
+            max_value,
+            max_operator,
+            min_operator,
+            standard_value,
+            expression,
+            min_time,
+            max_time
+        FROM lm_inspection_scheme_judgment
+        WHERE parameter_config_id = #{parameterConfigId}
+          AND is_deleted = 0
+        ORDER BY id ASC
+    </select>
+</mapper> 

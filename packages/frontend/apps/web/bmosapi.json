@@ -1,0 +1,12 @@
+{
+  "user": {
+    "account": "916926670@qq.com",
+    "password": "19950817KUANGPIN",
+    "loginType": "EmailPassword"
+  },
+  "deviceId": "AQGdkbHv-WL0S-wI7d-NG4U-nmeonADe8meJ",
+  "projectId": "3156480",
+  "path": "./apps/bmos-mes-web/src/services",
+  "filename": "types.d.ts",
+  "target": "http://127.0.0.1:4523/export/openapi?projectId=3471358&version=3.0"
+}

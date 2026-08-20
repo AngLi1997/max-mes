@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.platform.service.signature.mapper.SignatureMapper">
+
+    <select id="selectPageList" resultType="com.bmos.platform.service.signature.vo.SignaturePageVO">
+        SELECT
+        s.id,
+        s.system_code,
+        s.login_name,
+        s.user_name,
+        s.signature_action,
+        s.signature_data,
+        s.signature_type,
+        s.remark,
+        s.create_time,
+        m.name as systemName,
+        s.success
+        FROM
+        bp_signature_log s
+        LEFT JOIN bp_menu m ON m.id = s.system_code
+        WHERE
+        m.is_deleted = 0
+        <if test="userName != null and userName != ''">
+            and s.user_name like concat('%',#{userName},'%')
+        </if>
+        <if test="startTimeDate != null and endTimeDate != null">
+            and s.create_time between #{startTimeDate} and #{endTimeDate}
+        </if>
+        <if test="systemCode != null">
+            and s.system_code = #{systemCode}
+        </if>
+        order by s.create_time desc
+    </select>
+    <select id="selectExcelVOByIds" resultType="com.bmos.platform.service.signature.vo.SignatureExcelVO">
+        SELECT
+            s.login_name,
+            s.user_name,
+            s.signature_action,
+            s.signature_data,
+            s.signature_type,
+            s.remark,
+            s.create_time,
+            m.name as systemName,
+            s.success,
+            s.signature_data
+        FROM
+            bp_signature_log s
+            LEFT JOIN bp_menu m ON m.id = s.system_code
+        WHERE
+            m.is_deleted = 0
+        <if test="list != null and list.size() > 0">
+            and s.id in
+            <foreach collection="list" open="(" separator="," close=")" item="id">
+                #{id}
+            </foreach>
+        </if>
+        order by s.create_time desc
+    </select>
+    <select id="selectByCondition" resultType="com.bmos.platform.service.signature.vo.SignatureExcelVO">
+        SELECT
+        s.login_name,
+        s.user_name,
+        s.signature_action,
+        s.signature_data,
+        s.signature_type,
+        s.remark,
+        s.create_time,
+        m.name as systemName,
+        s.success,
+        s.signature_data
+        FROM
+        bp_signature_log s
+        LEFT JOIN bp_menu m ON m.id = s.system_code
+        WHERE
+        m.is_deleted = 0
+        <if test="userName != null and userName != ''">
+            and s.user_name like concat('%',#{userName},'%')
+        </if>
+        <if test="startTime != null and endTime != null">
+            and s.create_time between concat(#{startTime}, ' 00:00:00') and concat(#{endTime}, ' 23:59:59')
+        </if>
+        <if test="systemCode != null">
+            and s.system_code = #{systemCode}
+        </if>
+        order by s.create_time desc
+    </select>
+</mapper>

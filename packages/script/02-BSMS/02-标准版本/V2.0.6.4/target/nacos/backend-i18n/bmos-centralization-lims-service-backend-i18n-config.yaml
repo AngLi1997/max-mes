@@ -1,0 +1,26 @@
+i18n:
+  locations:
+    - data-id: lisms_exception_zh_CN.properties
+      group: backend-i18n
+    - data-id: lisms_exception_en_US.properties
+      group: backend-i18n
+    - data-id: lisms_exception_ru_RU.properties
+      group: backend-i18n      
+    - data-id: lisms_enum_zh_CN.properties
+      group: backend-i18n
+    - data-id: lisms_enum_en_US.properties
+      group: backend-i18n 
+    - data-id: lisms_enum_ru_RU.properties
+      group: backend-i18n       
+    - data-id: lisms_excel_zh_CN.properties
+      group: backend-i18n
+    - data-id: lisms_excel_en_US.properties
+      group: backend-i18n
+    - data-id: lisms_excel_ru_RU.properties
+      group: backend-i18n      
+    - data-id: lisms_message_zh_CN.properties
+      group: backend-i18n
+    - data-id: lisms_message_en_US.properties
+      group: backend-i18n
+    - data-id: lisms_message_ru_RU.properties
+      group: backend-i18n      

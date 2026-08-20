@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.recordprint.mapper.RecordPrintMapper">
+
+    <!-- 可打印检验单（已确认 + 存在复核通过任务）
+         返回 InspectionOrderDTO，包含请验单主要字段 + 检品名称/编码 -->
+    <select id="selectPrintableInspectionOrders" resultType="com.bmos.lims2.server.inspect.order.dto.InspectionOrderDTO">
+        SELECT DISTINCT
+            o.id                                         AS id,
+            o.order_no                                   AS orderNo,
+            o.material_id                                AS materialId,
+            m.name                                       AS materialName,
+            m.code                                       AS materialCode,
+            m.specification                              AS materialSpec,
+            m.unit_id                                    AS unitId,
+            o.scheme_version_id                          AS schemeVersionId,
+            o.order_status                               AS orderStatus,
+            o.batch_no                                   AS batchNo,
+            o.production_date                            AS productionDate,
+            o.template_id                                AS templateId,
+            o.remark                                     AS remark,
+            o.terminate_reason                           AS terminateReason,
+            o.terminate_time                             AS terminateTime,
+            o.create_time                                AS createTime,
+            o.update_time                                AS updateTime,
+            o.create_by                                  AS createBy,
+            o.update_by                                  AS updateBy,
+            /* 兼容“请验时间”语义 */
+            o.create_time                                AS requestTime
+        FROM lm_inspection_order o
+        INNER JOIN lm_task t ON t.inspection_order_id = o.id
+        LEFT JOIN lm_inspect_material m ON m.id = o.material_id
+        WHERE (o.order_status = 'CONFIRMED' or o.order_status='COMPLETED')
+          AND (t.status = 'REVIEW_PASSED' or t.status='COMPLETED')
+          AND t.execute_method = 'ELN'
+          <if test="orderNo != null and orderNo != ''">
+              AND o.order_no LIKE CONCAT('%', #{orderNo}, '%')
+          </if>
+          <if test="batchNo != null and batchNo != ''">
+              AND o.batch_no LIKE CONCAT('%', #{batchNo}, '%')
+          </if>
+          <if test="materialId != null">
+              AND o.material_id = #{materialId}
+          </if>
+          <if test="materialIds != null and materialIds.size() > 0">
+              AND o.material_id IN
+              <foreach collection="materialIds" item="mid" open="(" separator="," close=")">
+                  #{mid}
+              </foreach>
+          </if>
+          <if test="inspectionRequestTimeStart != null">
+              AND o.create_time <![CDATA[ >= ]]> #{inspectionRequestTimeStart}
+          </if>
+          <if test="inspectionRequestTimeEnd != null">
+              AND o.create_time <![CDATA[ <= ]]> #{inspectionRequestTimeEnd}
+          </if>
+        ORDER BY o.create_time DESC, o.id DESC
+    </select>
+
+    <!-- 检验单下可打印（复核通过）的分析项，按照编码升序 -->
+    <select id="listPrintableAnalysisItems" resultType="com.bmos.lims2.server.recordprint.dto.PrintableAnalysisItemDTO">
+        SELECT
+            sp.id      AS parameterId,        /* 方案分析项配置ID */
+            ip.code    AS parameterCode,      /* 分析项编码（来自lm_inspect_parameter） */
+            ip.name    AS parameterName,      /* 分析项名称（来自lm_inspect_parameter） */
+            t.id       AS taskId,             /* 复核通过任务ID */
+            pr.id      AS parameterRecordId   /* 绑定记录ID（与任务使用的record绑定） */
+        FROM lm_task t
+        INNER JOIN lm_inspection_scheme_parameter sp
+            ON sp.id = t.parameter_config_id
+        INNER JOIN lm_inspect_parameter ip
+            ON ip.id = t.parameter_id
+        LEFT JOIN lm_inspect_parameter_record pr
+            ON pr.parameter_id = ip.id
+           AND pr.record_id = t.record_id
+        WHERE t.inspection_order_id = #{inspectionId}
+          AND (t.status = 'REVIEW_PASSED' or t.status='COMPLETED' or t.status='SAMPLE_AUDIT_PENDING')
+          AND t.execute_method = 'ELN'
+        ORDER BY ip.code ASC
+    </select>
+
+    <!-- 检验单下可打印（复核通过）的分析项（稳定性方案），按照编码升序 -->
+    <select id="listPrintableAnalysisItemsForStability" resultType="com.bmos.lims2.server.recordprint.dto.PrintableAnalysisItemDTO">
+        SELECT
+            sp.id      AS parameterId,
+            ip.code    AS parameterCode,
+            ip.name    AS parameterName,
+            t.id       AS taskId,
+            pr.id      AS parameterRecordId
+        FROM lm_task t
+        INNER JOIN lm_stability_scheme_parameter sp
+            ON sp.id = t.parameter_config_id
+        INNER JOIN lm_inspect_parameter ip
+            ON ip.id = t.parameter_id
+        LEFT JOIN lm_inspect_parameter_record pr
+            ON pr.parameter_id = ip.id
+           AND pr.record_id = t.record_id
+        WHERE t.inspection_order_id = #{inspectionId}
+          AND (t.status = 'REVIEW_PASSED' or t.status='COMPLETED' or t.status='SAMPLE_AUDIT_PENDING')
+          AND t.execute_method = 'ELN'
+        ORDER BY ip.code ASC
+    </select>
+
+    <!-- 根据任务ID取HTML模板（限定任务的记录版本与记录项） -->
+    <select id="selectHtmlTemplateByTaskId" resultType="string">
+        SELECT bp.content
+        FROM lm_task t
+        INNER JOIN bm_batch_record br
+            ON br.id = t.record_id
+        INNER JOIN bm_batch_record_item bri
+            ON bri.item_id = t.record_item_id
+           AND bri.record_version_id = t.record_version_id
+        INNER JOIN bm_batch_record_parse bp
+            ON bp.id = bri.parse_id
+        WHERE t.id = #{taskId}
+        LIMIT 1
+    </select>
+
+    <!-- 任务ID -> 记录项模板与页眉页脚资源 -->
+    <select id="selectRecordItemAssetsByTaskId" resultType="com.bmos.lims2.server.recordprint.dto.RecordItemAssetsDTO">
+        SELECT
+            bp.file_content        AS templateContent,
+            bri.docx_header   AS docxHeader,
+            bri.docx_footer   AS docxFooter,
+            bri.item_id            AS recordItemId,
+            t.record_version_id AS recordVersionId,
+            bri.page_config   AS pageConfig,
+            bri.first_different AS firstDifferent,
+            bri.odd_and_even_different AS oddAndEvenDifferent,
+            bri.page_number_style AS pageNumberStyle,
+            bri.page_starting_number AS pageStartingNumber
+        FROM lm_task t
+        INNER JOIN bm_batch_record br
+            ON br.id = t.record_id
+        INNER JOIN bm_batch_record_item bri
+            ON bri.item_id = t.record_item_id
+           AND bri.record_version_id = t.record_version_id
+        INNER JOIN bm_batch_record_parse bp
+            ON bp.id = bri.id
+        WHERE t.id = #{taskId}
+        LIMIT 1
+    </select>
+
+    <!-- 根据绑定ID取HTML模板：parameter_record -> record -> record_item -> item_parse -->
+    <select id="selectHtmlTemplateByParameterRecordId" resultType="string">
+        SELECT bp.file_content
+        FROM lm_inspect_parameter_record pr
+        INNER JOIN bm_batch_record br ON br.id = pr.record_id
+        INNER JOIN bm_batch_record_item bri ON bri.record_id = br.id
+        INNER JOIN bm_batch_record_parse bp ON bp.id = bri.id
+        WHERE pr.id = #{parameterRecordId}
+        LIMIT 1
+    </select>
+
+    <!-- 任务ID -> 执行表单数据（存JSON）：转Map由TypeHandler或Service层处理，这里直接返回JSON字符串可选 -->
+    <select id="selectExecuteFormDataMapByTaskId" resultType="hashmap">
+        SELECT
+            d.data_json AS dataJson
+        FROM bm_execute_form_data d
+        WHERE d.task_id = #{taskId}
+        LIMIT 1
+    </select>
+
+    <!-- 操作日志插入（bm_log_operation） -->
+    <insert id="insertOperationLog">
+        INSERT INTO bm_log_operation
+        (
+            id, business_id, module, operation_type, remark, create_by, create_time
+        )
+        VALUES
+        (
+            #{fields.id}, #{fields.businessId}, #{fields.module}, #{fields.operationType},
+            #{fields.remark}, #{fields.createBy}, NOW()
+        )
+    </insert>
+</mapper>
+
+

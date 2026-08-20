@@ -1,0 +1,64 @@
+truncate table bmos_platform.bp_menu;
+select * from bmos_platform.bp_menu where is_menu = 1 order by sort;
+select * from bmos_platform.bp_menu order by sort;
+
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (100, '制药管理平台', 100, 0, 0, 1, 110, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (111, '审计追溯管理', 111, 0, 0, 1, 120, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (120, '制造执行系统', 120, 0, 0, 1, 130, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (121, '制造执行APP', 121, 0, 1, 1, 140, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (100010, '实施配置', 100010, 100, 0, 1, 110110, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (100020, '系统配置', 100020, 100, 0, 1, 110120, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (100030, '权限管理', 100030, 100, 0, 1, 110130, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (100040, '物料管理', 100040, 100, 0, 1, 110140, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (111010, '日志管理', 111010, 111, 0, 1, 120110, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (111020, '质量追溯', 111020, 111, 0, 1, 120120, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (120010, '生产物料', 120010, 120, 0, 1, 130110, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (120020, '生产配置', 120020, 120, 0, 1, 130120, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (120030, '生产管理', 120030, 120, 0, 1, 130130, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (120040, '批签发', 120040, 120, 0, 1, 130140, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (120050, '生产查询', 120050, 120, 0, 1, 130150, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (121010, '制造执行', 121010, 121, 1, 1, 140110, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (100010002, '参数配置', 100010002, 100010, 0, 1, 110110120, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (100020001, '编号规则', 100020001, 100020, 0, 1, 110120110, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (100020006, '公式配置', 100020006, 100020, 0, 1, 110120160, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (100020009, '字典管理', 100020009, 100020, 0, 1, 110120190, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (100030001, '用户管理', 100030001, 100030, 0, 1, 110130110, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (100030002, '部门管理', 100030002, 100030, 0, 1, 110130120, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (100030003, '角色管理', 100030003, 100030, 0, 1, 110130130, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (100030004, '权限授权', 100030004, 100030, 0, 1, 110130140, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (100030005, '菜单权限', 100030005, 100030, 0, 1, 110130150, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (100040001, '单位管理', 100040001, 100040, 0, 1, 110140110, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (100040002, '物料信息', 100040002, 100040, 0, 1, 110140120, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (111010001, '登录日志', 111010001, 111010, 0, 1, 120110110, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (111010002, '操作日志', 111010002, 111010, 0, 1, 120110120, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (111020001, '审批流追溯', 111020001, 111020, 0, 1, 120120110, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (111020003, '签名追溯', 111020003, 111020, 0, 1, 120120130, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (120010003, '产品信息', 120010003, 120010, 0, 1, 130110130, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (120020008, '流程配置', 120020008, 120020, 0, 1, 130120110, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (120020009, '编号规则', 120020009, 120020, 0, 1, 130120120, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (120020001, '记录配置', 120020001, 120020, 0, 1, 130120130, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (120020002, '记录审批', 120020002, 120020, 0, 1, 130120140, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (120020006, '工艺配置', 120020006, 120020, 0, 1, 130120180, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (120020007, '工艺审批', 120020007, 120020, 0, 1, 130120190, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (120030001, '生产计划', 120030001, 120030, 0, 1, 130130110, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (120030002, '计划审批', 120030002, 120030, 0, 1, 130130120, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (120030003, '指令单分解', 120030003, 120030, 0, 1, 130130130, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (120030004, '指令单确认', 120030004, 120030, 0, 1, 130130140, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (120030005, '班组管理', 120030005, 120030, 0, 1, 130130150, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (120040001, '数据集管理', 120040001, 120040, 0, 1, 130140110, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (120040002, '批签发模版', 120040002, 120040, 0, 1, 130140120, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (120040003, '批签发管理', 120040003, 120040, 0, 1, 130140130, 0);
+# replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (120040004, '批签发填报', 120040004, 120040, 0, 1, 120040004000000, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (120040005, '批签发审核', 120040005, 120040, 0, 1, 130140140, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (120040006, '批签发文件', 120040006, 120040, 0, 1, 130140150, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (120050001, '生产历史', 120050001, 120050, 0, 1, 130150110, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (120050002, '批记录打印', 120050002, 120050, 0, 1, 130150120, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (121010001, '生产管理', 121010001, 121010, 1, 1, 140110110, 0);
+replace into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted) values (121010002, '生产前确认', 121010002, 121010, 1, 1, 140110120, 0);
+
+delete from bmos_platform.bp_menu where id > 999999999;
+insert into bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, sort, is_deleted)
+select id * 1000000 + 1, '默认权限', id * 1000000 + 1, id, terminal_type, 0, concat(sort, 110), 0 from bmos_platform.bp_menu where id > 999999 and id < 999999999;
+
+# 当前时间刷新
+update bmos_platform.bp_menu set create_time = now(), update_time = now(), create_by = 1, update_by = 1 where 1 = 1;

@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.eln.record.mapper.BatchRecordComponentMapper">
+
+    <update id="deleteCompoenent">
+        update
+            bm_batch_record_component
+        set is_deleted = 1
+        where
+            record_item_id =#{itemId}
+        and record_version_id =#{recordVersionId}
+        and is_deleted = 0
+    </update>
+
+    <update id="deleteFormula">
+        UPDATE
+            bm_batch_record_component
+        SET
+            `is_result` = 0,
+            `formula_id` = NULL,
+            `formula_field` = NULL,
+            `formula_expression` = NULL,
+            `formula_precision` = NULL,
+            formula_type = NULL,
+            `formula_config` = NULL
+        WHERE
+	        `id` =#{componentId}
+    </update>
+
+    <sql id="baseQuery">
+        select t1.id,t1.record_item_id, t1.record_version_id, t1.record_version, t1.record_id, t1.component_type,
+               t1.component_name, t1.field_id, t1.component_number, t1.formula_precision, t1.is_result, t1.formula_id,
+               t1.formula_expression, t1.formula_type, t1.round_code, t1.parent_id, t1.create_time, t1.update_time,
+               t1.create_by, t1.update_by, t1.is_deleted, t1.used, t1.date_type,
+               t2.formula_field,t2.component_detail, t2.formula_config
+        from bm_batch_record_component t1
+                 left join bm_batch_record_component_detail t2 on t1.id = t2.id and t2.is_deleted = 0
+    </sql>
+    <select id="selectByVersionId" resultMap="baseMap">
+        <include refid="baseQuery"/>
+        where t1.is_deleted = 0
+        and t1.record_version_id = #{recordVersionId}
+    </select>
+    <select id="selectByIdList" resultMap="baseMap">
+        <include refid="baseQuery"/>
+        where t1.is_deleted = 0
+          and t1.id in
+        <foreach collection="idList" open="(" separator="," close=")" item="id">
+            #{id}
+        </foreach>
+    </select>
+    <select id="selectWithDetailById" resultMap="baseMap">
+        <include refid="baseQuery"/>
+        where t1.is_deleted = 0
+          and t1.id = #{id}
+        limit 1
+    </select>
+    <select id="selectComponentList" resultMap="baseMap">
+        <include refid="baseQuery"/>
+        where
+        t1.record_version_id = #{recordVersionId}
+        and t1.record_item_id  = #{itemId}
+        and t1.is_deleted = 0
+    </select>
+    <select id="selectGraphList" resultMap="baseMap">
+        <include refid="baseQuery"/>
+        where
+            t1.record_version_id = #{recordVersionId}
+          and t1.is_deleted = 0
+          and t1.is_result = 1
+    </select>
+    <select id="selectByRecordVersionIdListAndFields"
+            resultMap="baseMap">
+        <include refid="baseQuery"/>
+        where t1.is_deleted = 0
+        and t1.record_version_id in
+        <foreach collection="versionIds" open="(" separator="," close=")" item="versionId">
+            #{versionId}
+        </foreach>
+        and t1.field_id in
+        <foreach collection="fieldIds" open="(" separator="," close=")" item="fieldId">
+            #{fieldId}
+        </foreach>
+    </select>
+    <select id="selectByRecordVersionIdAndFields"
+            resultMap="baseMap">
+        <include refid="baseQuery"/>
+        where t1.is_deleted = 0
+        and t1.record_version_id = #{recordVersionId}
+        and t1.field_id in
+        <foreach collection="fieldIds" open="(" separator="," close=")" item="id">
+            #{id}
+        </foreach>
+        <if test="isResult != null">
+          and t1.is_result = #{isResult}
+        </if>
+
+    </select>
+    <select id="selectByRecordListAndTypeList"
+            resultMap="baseMap">
+        <include refid="baseQuery"/>
+        where t1.is_deleted = 0
+        and t1.used = true
+        and t1.record_version_id in
+        <foreach collection="recordVersionIdList" open="(" separator="," close=")" item="versionId">
+            #{versionId}
+        </foreach>
+        and t1.record_item_id in
+        <foreach collection="recordItemIdList" open="(" separator="," close=")" item="itemId">
+            #{itemId}
+        </foreach>
+        <if test="componentTypes != null and componentTypes.size() > 0">
+            and t1.component_type in
+            <foreach collection="componentTypes" open="(" separator="," close=")" item="type">
+                #{type}
+            </foreach>
+        </if>
+    </select>
+    <select id="selectByComponentDetailDTOS" resultType="com.bmos.lims2.server.eln.record.vo.ComponentDetailVO">
+        SELECT bm_batch_record_component_detail.component_detail as component_detail,
+        bm_process_batch_record.process_version_id,
+        bm_batch_record_component.record_item_id,
+        bm_batch_record_component.field_id         as field_id,
+        bm_batch_record_component.*
+        FROM bm_process_batch_record
+        LEFT JOIN bm_batch_record_component
+        on bm_batch_record_component.record_version_id = bm_process_batch_record.batch_record_version_id
+        left join bm_batch_record_component_detail on bm_batch_record_component_detail.id = bm_batch_record_component.id
+        where bm_batch_record_component.is_deleted = 0 AND
+            <foreach collection="detailList" open="(" separator=" OR " close=")" item="item">
+                (process_version_id = #{item.processVersionId} and record_item_id = #{item.recordItemId} and field_id = #{item.fieldId})
+            </foreach>
+    </select>
+    <select id="getByFieldId" resultType="java.lang.Long">
+        SELECT
+            distinct record_item_id
+        FROM
+            bm_batch_record_component
+        WHERE
+            field_id = #{fieldId}
+        AND is_deleted = 0
+        GROUP BY
+            record_item_id
+        LIMIT 1
+    </select>
+
+    <resultMap id="baseMap" type="com.bmos.lims2.server.eln.record.entity.BatchRecordComponent">
+        <id property="id" column="id"/>
+        <result property="recordItemId" column="record_item_id"/>
+        <result property="dateType" column="date_type"/>
+        <result property="componentType" column="component_type"/>
+        <result property="componentName" column="component_name"/>
+        <result property="fieldId" column="field_id"/>
+        <result property="componentNumber" column="component_number"/>
+        <result property="formulaPrecision" column="formula_precision"/>
+        <result property="isResult" column="is_result"/>
+        <result property="formulaId" column="formula_id"/>
+        <result property="formulaExpression" column="formula_expression"/>
+        <result property="formulaType" column="formula_type"/>
+        <result property="roundCode" column="round_code"/>
+        <result property="recordVersionId" column="record_version_id"/>
+        <result property="recordVersion" column="record_version"/>
+        <result property="recordId" column="record_id"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="used" column="used"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="componentDetail" column="component_detail" />
+        <result property="formulaField" column="formula_field" />
+        <result property="formulaConfig" column="formula_config" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler" />
+    </resultMap>
+
+    <select id="listByParentIds" resultType="com.bmos.lims2.server.eln.record.entity.BatchRecordComponent">
+        select
+        bm_batch_record_component.id, bm_batch_record_component.record_item_id,
+        bm_batch_record_component.record_version_id, bm_batch_record_component.record_version,
+        bm_batch_record_component.record_id, bm_batch_record_component.component_type,
+        bm_batch_record_component.component_name, bm_batch_record_component.field_id,
+        bm_batch_record_component.component_number, bm_batch_record_component.formula_precision, bm_batch_record_component.is_result,
+        bm_batch_record_component.formula_id, bm_batch_record_component.formula_field,
+        bm_batch_record_component.formula_expression, bm_batch_record_component.formula_type,
+        bm_batch_record_component.round_code, bm_batch_record_component.parent_id,
+        bm_batch_record_component.create_time, bm_batch_record_component.update_time,
+        bm_batch_record_component.create_by, bm_batch_record_component.update_by, bm_batch_record_component.is_deleted,
+        bm_batch_record_component.used, bm_batch_record_component.date_type, bm_batch_record_component.formula_config ,
+        bm_batch_record_component_detail.component_detail
+        from bm_batch_record_component
+        left join bm_batch_record_component_detail on bm_batch_record_component.id = bm_batch_record_component_detail.id
+        where bm_batch_record_component.is_deleted = 0
+        <if test="parentIds != null and parentIds.size() > 0">
+            and bm_batch_record_component.parent_id in
+            <foreach collection="parentIds" open="(" separator="," close=")" item="parentId">
+                #{parentId}
+            </foreach>
+        </if>
+        <if test="parentIds == null or parentIds.size() == 0">
+            and 1 = 0
+        </if>
+    </select>
+</mapper>

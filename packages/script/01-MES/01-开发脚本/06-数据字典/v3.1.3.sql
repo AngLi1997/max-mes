@@ -1,0 +1,11 @@
+-- =============================================
+-- 字典配置 - 稳定性考察试验类型
+-- 描述:稳定性考察方案检验计划试验类型内置字典
+-- 创建时间:2026-03-19
+-- =============================================
+INSERT INTO bmos_platform.bp_dict (id, dict_name, dict_code, state, create_by, update_by, create_time, update_time, is_deleted, del_flag) VALUES (130060001001, '稳定性考察试验类型', 'StabilityExperimentType', 1, '1', '', now(), now(), 0, 0) ON DUPLICATE KEY UPDATE dict_name = VALUES(dict_name), dict_code = VALUES(dict_code), state = VALUES(state), update_time = now();
+
+INSERT INTO bmos_platform.bp_dict_detail (id, dict_label, dict_value, dict_id, create_by, update_by, create_time, update_time, is_deleted) VALUES (130060001001001, '影响因素实验', 'INFLUENCE_FACTOR', 130060001001, '', '', DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s'), DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s'), 0) ON DUPLICATE KEY UPDATE dict_label = VALUES(dict_label), dict_value = VALUES(dict_value), update_time = VALUES(update_time);
+INSERT INTO bmos_platform.bp_dict_detail (id, dict_label, dict_value, dict_id, create_by, update_by, create_time, update_time, is_deleted) VALUES (130060001001002, '加速实验', 'ACCELERATED', 130060001001, '', '', DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s'), DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s'), 0) ON DUPLICATE KEY UPDATE dict_label = VALUES(dict_label), dict_value = VALUES(dict_value), update_time = VALUES(update_time);
+INSERT INTO bmos_platform.bp_dict_detail (id, dict_label, dict_value, dict_id, create_by, update_by, create_time, update_time, is_deleted) VALUES (130060001001003, '长期试验', 'LONG_TERM', 130060001001, '', '', DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s'), DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s'), 0) ON DUPLICATE KEY UPDATE dict_label = VALUES(dict_label), dict_value = VALUES(dict_value), update_time = VALUES(update_time);
+INSERT INTO bmos_platform.bp_dict_detail (id, dict_label, dict_value, dict_id, create_by, update_by, create_time, update_time, is_deleted) VALUES (130060001001004, '中间条件实验', 'INTERMEDIATE', 130060001001, '', '', DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s'), DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s'), 0) ON DUPLICATE KEY UPDATE dict_label = VALUES(dict_label), dict_value = VALUES(dict_value), update_time = VALUES(update_time);

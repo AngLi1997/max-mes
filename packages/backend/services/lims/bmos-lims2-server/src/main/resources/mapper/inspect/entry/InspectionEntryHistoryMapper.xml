@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.inspect.entry.mapper.InspectionEntryHistoryMapper">
+
+    <!-- 基础结果映射 -->
+    <resultMap id="BaseResultMap" type="com.bmos.lims2.server.inspect.entry.entity.InspectionEntryHistory">
+        <id column="id" property="id"/>
+        <result column="entry_record_id" property="entryRecordId"/>
+        <result column="task_id" property="taskId"/>
+        <result column="inspection_order_id" property="inspectionOrderId"/>
+        <result column="inspection_order_no" property="inspectionOrderNo"/>
+        <result column="data_point_id" property="dataPointId"/>
+        <result column="data_point_config_id" property="dataPointConfigId"/>
+        <result column="scheme_id" property="schemeId"/>
+        <result column="scheme_version_id" property="schemeVersionId"/>
+        <result column="package_id" property="packageId"/>
+        <result column="item_config_id" property="itemConfigId"/>
+        <result column="parameter_config_id" property="parameterConfigId"/>
+        <result column="inspect_item_id" property="inspectItemId"/>
+        <result column="inspect_item_code" property="inspectItemCode"/>
+        <result column="parameter_id" property="parameterId"/>
+        <result column="parameter_code" property="parameterCode"/>
+        <result column="data_point_name" property="dataPointName"/>
+        <result column="point_type" property="pointType"/>
+        <result column="old_value_text" property="oldValueText"/>
+        <result column="old_value_number" property="oldValueNumber"/>
+        <result column="new_value_text" property="newValueText"/>
+        <result column="new_value_number" property="newValueNumber"/>
+        <result column="change_reason" property="changeReason"/>
+        <result column="operator_id" property="operatorId"/>
+        <result column="operator_name" property="operatorName"/>
+        <result column="operate_time" property="operateTime"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="is_deleted" property="deleted"/>
+    </resultMap>
+
+    <!-- 根据录入记录ID查询历史记录 -->
+    <select id="selectByEntryRecordId" resultMap="BaseResultMap">
+        SELECT
+            id,
+            entry_record_id,
+            task_id,
+            inspection_order_id,
+            inspection_order_no,
+            data_point_id,
+            data_point_config_id,
+            scheme_id,
+            scheme_version_id,
+            package_id,
+            item_config_id,
+            parameter_config_id,
+            inspect_item_id,
+            inspect_item_code,
+            parameter_id,
+            parameter_code,
+            order_parameter_id,
+            data_point_name,
+            point_type,
+            old_value_text,
+            old_value_number,
+            new_value_text,
+            new_value_number,
+            change_reason,
+            operator_id,
+            operator_name,
+            operate_time,
+            create_time,
+            create_by,
+            is_deleted
+        FROM lm_inspection_entry_history
+        WHERE entry_record_id = #{entryRecordId}
+        AND is_deleted = 0
+        ORDER BY operate_time DESC
+    </select>
+
+    <!-- 根据任务ID查询历史记录 -->
+    <select id="selectByTaskId" resultMap="BaseResultMap">
+        SELECT
+            id,
+            entry_record_id,
+            task_id,
+            inspection_order_id,
+            inspection_order_no,
+            data_point_id,
+            data_point_config_id,
+            scheme_id,
+            scheme_version_id,
+            package_id,
+            item_config_id,
+            parameter_config_id,
+            inspect_item_id,
+            inspect_item_code,
+            parameter_id,
+            parameter_code,
+            order_parameter_id,
+            data_point_name,
+            point_type,
+            old_value_text,
+            old_value_number,
+            new_value_text,
+            new_value_number,
+            change_reason,
+            operator_id,
+            operator_name,
+            operate_time,
+            create_time,
+            create_by,
+            is_deleted
+        FROM lm_inspection_entry_history
+        WHERE task_id = #{taskId}
+        AND is_deleted = 0
+        ORDER BY operate_time DESC
+    </select>
+
+    <!-- 根据数据点ID查询历史记录 -->
+    <select id="selectByDataPointId" resultMap="BaseResultMap">
+        SELECT
+            id,
+            entry_record_id,
+            task_id,
+            inspection_order_id,
+            inspection_order_no,
+            data_point_id,
+            data_point_config_id,
+            scheme_id,
+            scheme_version_id,
+            package_id,
+            item_config_id,
+            parameter_config_id,
+            inspect_item_id,
+            inspect_item_code,
+            parameter_id,
+            parameter_code,
+            order_parameter_id,
+            data_point_name,
+            point_type,
+            old_value_text,
+            old_value_number,
+            new_value_text,
+            new_value_number,
+            change_reason,
+            operator_id,
+            operator_name,
+            operate_time,
+            create_time,
+            create_by,
+            is_deleted
+        FROM lm_inspection_entry_history
+        WHERE data_point_id = #{dataPointId}
+        AND is_deleted = 0
+        ORDER BY operate_time DESC
+    </select>
+
+</mapper>

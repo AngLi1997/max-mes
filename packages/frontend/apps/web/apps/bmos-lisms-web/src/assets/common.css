@@ -1,0 +1,40 @@
+.cursor-common {
+  cursor: pointer;
+}
+
+/* flex between */
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+/* flex center */
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* flex start */
+.flex-start {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+/* fourth-level-text */
+.fourth-level-text {
+  color: var(--bmos-fourth-level-text-color);
+}
+
+.allow-click {
+  cursor: pointer;
+}
+
+.link-text {
+  color: #1677ff;
+  cursor: pointer;
+}
+.error-text {
+  color: #ff3b30;
+  cursor: pointer;
+}

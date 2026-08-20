@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.lotrelease.manage.mapper.ILotReleaseMapper">
+    <select id="selectTemplateIdsByProcessId" resultType="com.bmos.mes.service.lotrelease.manage.vo.LotReleasePageVO">
+        select bm_lot_release_template.id,
+               bm_lot_release_template.name,
+               bm_lot_release_template.effective_lot_release_id,
+               bm_lot_release.no,
+               bm_lot_release.template_version,
+               bm_lot_release.generator_name,
+               bm_lot_release.generator_id,
+               bm_lot_release.generate_time,
+               bm_lot_release.effect_time,
+               bm_lot_release.file_url
+        from bm_lot_release_template_process
+                 left join bm_lot_release_template
+                           on bm_lot_release_template.id = bm_lot_release_template_process.lot_release_template_id and
+                              bm_lot_release_template.is_deleted = 0
+                 left join bm_lot_release on bm_lot_release_template.effective_lot_release_id = bm_lot_release.id
+                                                and bm_lot_release.plan_id = #{planId}
+                                                and bm_lot_release.is_deleted = 0
+                 left join bm_product_plan
+                           on bm_product_plan.id = bm_lot_release.plan_id and bm_product_plan.is_deleted = 0
+        where bm_lot_release_template_process.process_id = #{processId}
+    </select>
+
+    <select id="queryGeneratePreviewListByProcessId"
+            resultType="com.bmos.mes.service.lotrelease.manage.vo.LotReleaseGeneratePreviewVO">
+        select bm_lot_release.id,
+               bm_lot_release.plan_id,
+               bm_lot_release.product_name,
+               bm_lot_release.process_name,
+               bm_product_plan.process_version,
+               bm_lot_release.batch_no,
+               bm_product_plan.start_time
+        from bm_lot_release
+                 left join bm_product_plan
+                           on bm_lot_release.plan_id = bm_product_plan.id and bm_product_plan.is_deleted = 0
+        where bm_lot_release.is_deleted = 0
+          and bm_lot_release.process_id = #{processId}
+    </select>
+
+    <select id="selectListByTemplateId" resultType="com.bmos.mes.service.lotrelease.manage.vo.LotReleaseVersionPageVO">
+        select bm_lot_release.*,
+               audit_process_instance.process_instance_id,
+               audit_process_instance.deployment_id
+        from bm_lot_release
+                 left join audit_process_instance
+                           on bm_lot_release.audit_process_instance = audit_process_instance.process_instance_id
+        <where>
+            bm_lot_release.is_deleted = 0
+            <if test="pageQuery.lotReleaseTemplateId != null">
+                and bm_lot_release.template_id = #{pageQuery.lotReleaseTemplateId}
+            </if>
+            <if test="pageQuery.planId != null">
+                and bm_lot_release.plan_id = #{pageQuery.planId}
+            </if>
+        </where>
+        order by bm_lot_release.generate_time desc
+    </select>
+</mapper>

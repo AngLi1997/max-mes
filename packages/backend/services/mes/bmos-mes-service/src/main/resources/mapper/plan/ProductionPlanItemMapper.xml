@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.plan.production.mapper.ProductionPlanItemMapper">
+    <select id="selectDetailByProductionPlanId" resultType="com.bmos.mes.service.plan.production.vo.ProductionPlanItemDetailVO">
+        SELECT
+            item.*,
+            t3.`name` as processName,
+            batch.product_name,
+            batch.product_name,
+            batch.product_merge_code,
+            batch.product_specification,
+            batch.reuse_batch_number,
+            item.group_number,
+            item.procedure_list as procedureListItem,
+            item.related_batch_info
+        FROM
+            bm_production_plan_item AS item
+            JOIN bm_plan_template_batch AS batch ON item.template_batch_id = batch.id
+            join bm_process as t3 on t3.id = batch.process_id
+        WHERE
+            item.is_deleted = 0
+            and item.production_plan_id =#{productionPlanId}
+    </select>
+
+    <select id="selectProductionPlanCalendar"
+            resultType="com.bmos.mes.service.plan.production.vo.ProductionPlanCalendarVO">
+        select distinct
+            t1.id,
+            t1.production_plan_id,
+            t1.start_time,
+            t1.end_time,
+            t1.procedure_list,
+            t1.production_line_id,
+            t1.production_line_code,
+            t1.production_line_name,
+            t2.plan_no,
+            t2.batch_no,
+            t2.process_name,
+            t2.process_version
+        from bm_production_plan_item as t1
+        left join bm_product_plan as t2 on t2.production_plan_item_id = t1.id
+        left join bm_resource_permission t3 on t3.resource_id = t2.process_id
+        where t1.is_deleted = 0 and t2.status != 'DISCARD'
+            and
+            ((YEAR(t1.start_time) &lt;= #{year} AND YEAR(t1.end_time) &gt;= #{year})
+                OR
+            (YEAR(t1.start_time) = #{year} OR YEAR(t1.end_time) = #{year}))
+        <if test="deptIds != null and deptIds.size() > 0">
+            and t3.dept_id in
+            <foreach collection="deptIds" open="(" separator="," close=")" item="deptId">
+                #{deptId}
+            </foreach>
+        </if>
+        <if test="productionPlanId != null">
+            and t1.production_plan_id = #{productionPlanId}
+        </if>
+        <if test="productionPlanItemId != null">
+            and t1.id = #{productionPlanItemId}
+        </if>
+        <if test="month != null">
+            AND (t1.start_time &lt;= LAST_DAY(STR_TO_DATE(CONCAT(#{year}, '-', #{month}, '-01'), '%Y-%m-%d'))
+            AND t1.end_time >= STR_TO_DATE(CONCAT(#{year}, '-', #{month}, '-01'), '%Y-%m-%d'))
+        </if>
+        <if test="processId != null">
+            and t2.process_id =#{processId}
+        </if>
+        order by t1.start_time asc
+    </select>
+    <select id="selectProductPlanInfoByItemIdList"
+            resultType="com.bmos.mes.service.plan.production.vo.ProductionPlanItemVO">
+        select t1.id as productionPlanItemId,
+               t1.start_time as productDate,
+               t1.plan_no,
+               t1.batch_no,
+               t1.process_num,
+               t2.product_id,
+               t2.product_name,
+               t2.product_merge_code,
+               t2.product_specification,
+               t2.inner_packing_specification,
+               t2.packing_specification,
+               t1.production_line_id,
+               t1.production_line_code,
+               t2.product_mark,
+               t1.batch_quantity,
+               t2.unit_id,
+               t2.process_id,
+               t2.process_name,
+               t2.process_version,
+               t3.production_stage_code
+        from bm_production_plan_item t1
+        left join bm_plan_template_batch t2 on t1.template_batch_id = t2.id
+        left join bm_process_version t3 on (t2.process_id = t3.process_id and t2.process_version = t3.version)
+        where t2.is_deleted = 0 and t1.is_deleted = 0
+        and t1.id in
+        <foreach collection="idList" open="(" separator="," close=")" item="id">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="selectProcedureConfigByPlanIds" resultType="com.bmos.mes.service.workflow.vo.ProcedureTimeVO">
+        SELECT
+            t2.id as planItemId,
+            t3.procedure_config,
+            t2.procedure_list
+        FROM
+            bm_production_plan_item AS t2
+            JOIN bm_plan_template_batch AS t3 ON t2.template_batch_id = t3.id
+        WHERE
+            t2.is_deleted = 0
+            and t2.id in
+        <foreach collection="planItemIds" open="(" separator="," close=")" item="id">
+            #{id}
+        </foreach>
+    </select>
+    <select id="selectProductionPlanMonthsCalendar"
+            resultType="com.bmos.mes.service.plan.production.vo.ProductionPlanCalendarVO">
+        select distinct
+        t1.id,
+        t1.production_plan_id,
+        t1.start_time,
+        t1.end_time,
+        t1.procedure_list,
+        t1.production_line_id,
+        t1.production_line_code,
+        t1.production_line_name,
+        t2.plan_no,
+        t2.batch_no,
+        t2.process_name,
+        t2.process_version
+        from bm_production_plan_item as t1
+        left join bm_product_plan as t2 on t2.production_plan_item_id = t1.id
+        left join bm_resource_permission t3 on t3.resource_id = t2.process_id
+        where t1.is_deleted = 0 and t2.status != 'DISCARD'
+        AND (t1.start_time &lt;= LAST_DAY(STR_TO_DATE(CONCAT(#{endMonth}, '-01'), '%Y-%m-%d'))
+        AND t1.end_time >= STR_TO_DATE(CONCAT(#{startMonth}, '-01'), '%Y-%m-%d'))
+        <if test="deptIds != null and deptIds.size() > 0">
+            and t3.dept_id in
+            <foreach collection="deptIds" open="(" separator="," close=")" item="deptId">
+                #{deptId}
+            </foreach>
+        </if>
+        <if test="productionPlanId != null">
+            and t1.production_plan_id = #{productionPlanId}
+        </if>
+        <if test="productionPlanItemId != null">
+            and t1.id = #{productionPlanItemId}
+        </if>
+        <if test="processId != null">
+            and t2.process_id =#{processId}
+        </if>
+        order by t1.start_time asc
+    </select>
+</mapper>

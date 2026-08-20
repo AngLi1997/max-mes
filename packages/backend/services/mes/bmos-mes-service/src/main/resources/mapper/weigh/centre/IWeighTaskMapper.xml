@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.weigh.centre.task.mapper.IWeighTaskMapper">
+    <select id="queryPage" resultType="com.bmos.mes.service.weigh.centre.task.vo.WeighTaskPageVO">
+        select distinct bm_weigh_task.id,
+                        bm_weigh_task.task_no,
+                        bm_material.name                     as material_name,
+                        bm_material.merge_code               as material_merge_code,
+                        bm_material.specification            as material_specification,
+                        bm_weigh_centre.name                 as weigh_centre_name,
+                        bm_weigh_centre.code                 as weigh_centre_code,
+                        bm_weigh_task.requirement_quantity,
+                        bm_weigh_task.unit_id,
+                        bm_weigh_task.execute_date,
+                        bm_weigh_task.task_status,
+                        (select count(1) = 0
+                         from bm_weigh_requirement
+                         where weigh_requirement_task_id = bm_weigh_task.id
+                           and requirement_status in (2, 3) and weigh_status != 0) as cancel_able
+        from bm_weigh_task
+                 left join bm_material
+                           on bm_weigh_task.material_id = bm_material.id and
+                              bm_material.is_deleted = 0
+                 left join bm_weigh_centre on bm_weigh_task.weigh_centre_id = bm_weigh_centre.id and
+                                              bm_weigh_centre.is_deleted = 0
+                 left join bm_resource_permission
+                           on bm_weigh_task.weigh_centre_id = bm_resource_permission.resource_id
+        <where>
+            bm_weigh_task.is_deleted = 0
+            -- 部门权限
+            <if test="deptIds != null and deptIds.size() > 0">
+                and bm_resource_permission.dept_id in
+                <foreach collection="deptIds" open="(" separator="," close=")" item="deptId">
+                    #{deptId}
+                </foreach>
+            </if>
+            <if test="deptIds == null or deptIds.size() == 0">
+                and 1 = 0
+            </if>
+            -- 搜索条件
+            <if test="pageQuery.taskNo != null and pageQuery.taskNo != ''">
+                and bm_weigh_task.task_no like concat('%', #{pageQuery.taskNo}, '%')
+            </if>
+            <if test="pageQuery.materialName != null and pageQuery.materialName != ''">
+                and bm_material.name like concat('%', #{pageQuery.materialName}, '%')
+            </if>
+            <if test="pageQuery.materialMergeCode != null and pageQuery.materialMergeCode != ''">
+                and bm_material.merge_code like concat('%', #{pageQuery.materialMergeCode}, '%')
+            </if>
+            <if test="pageQuery.weighCentre != null and pageQuery.weighCentre != ''">
+                and ((bm_weigh_centre.name like concat('%', #{pageQuery.weighCentre}, '%')) or
+                     (bm_weigh_centre.code like concat('%', #{pageQuery.weighCentre}, '%')))
+            </if>
+            <if test="pageQuery.executeDateStart != null and pageQuery.executeDateEnd != null">
+                and bm_weigh_task.execute_date between #{pageQuery.executeDateStart} and #{pageQuery.executeDateEnd}
+            </if>
+        </where>
+        order by bm_weigh_task.id desc
+    </select>
+
+    <select id="queryExecuteTaskPageWithDeptAndStation"
+            resultType="com.bmos.mes.service.weigh.centre.execute.vo.WeighExecuteTaskPageVO">
+        select distinct bm_weigh_task.id,
+                        bm_material.name          as material_name,
+                        bm_material.merge_code    as material_merge_code,
+                        bm_material.specification as material_specification,
+                        bm_weigh_centre.code      as weigh_centre_code,
+                        bm_weigh_centre.name      as weigh_centre_name,
+                        bm_weigh_task.finish_time as finish_time,
+                        bm_weigh_task.task_no,
+                        bm_weigh_task.send_time,
+                        bm_weigh_task.execute_date
+        from bm_weigh_task
+                 left join bm_material
+                           on bm_weigh_task.material_id = bm_material.id and
+                              bm_material.is_deleted = 0
+                 left join bm_weigh_centre on bm_weigh_task.weigh_centre_id = bm_weigh_centre.id and
+                                              bm_weigh_centre.is_deleted = 0
+                 left join bm_resource_permission
+                           on bm_weigh_task.weigh_centre_id = bm_resource_permission.resource_id
+                 left join bm_weigh_centre_station
+                           on bm_weigh_task.weigh_centre_id = bm_weigh_centre_station.weigh_centre_id
+                left join (select count(1) != 0 as active,
+                    weigh_requirement_task_id
+                    from bm_weigh_requirement
+                    where bm_weigh_requirement.is_deleted = 0
+                    and weigh_requirement_task_id is not null
+                    and ((requirement_status = 1 and expired_date >= date(now())) or requirement_status = 2 or (requirement_status = 3 and weigh_process in  (3,4)))
+                    group by weigh_requirement_task_id) req on req.weigh_requirement_task_id = bm_weigh_task.id
+        <where>
+            bm_weigh_task.is_deleted = 0
+            <if test="taskStatus != null and taskStatus == 2">
+                -- 只查询已下发的
+                and bm_weigh_task.task_status = 2
+                -- 只查询带有已下发的且未称量未过期或称量中的需求的任务
+                and req.active = true
+            </if>
+            <if test="taskStatus != null and taskStatus == 3">
+                -- 只查询已完成的
+                and bm_weigh_task.task_status = 3
+            </if>
+            -- 部门权限
+            <if test="deptIds != null and deptIds.size() > 0">
+                and bm_resource_permission.dept_id in
+                <foreach collection="deptIds" open="(" separator="," close=")" item="deptId">
+                    #{deptId}
+                </foreach>
+            </if>
+            <if test="deptIds == null or deptIds.size() == 0">
+                and 1 = 0
+            </if>
+            -- 工位权限
+            <if test="stationIds != null and stationIds.size() > 0">
+                and bm_weigh_centre_station.station_id in
+                <foreach collection="stationIds" open="(" separator="," close=")" item="stationId">
+                    #{stationId}
+                </foreach>
+            </if>
+            <if test="stationIds == null or stationIds.size() == 0">
+                and 1 = 0
+            </if>
+            -- 搜索条件
+            <if test="pageQuery.taskNo != null and pageQuery.taskNo != ''">
+                and bm_weigh_task.task_no like concat('%', #{pageQuery.taskNo}, '%')
+            </if>
+            <if test="pageQuery.material != null and pageQuery.material != ''">
+                and (bm_material.name like concat('%', #{pageQuery.material}, '%') or bm_material.merge_code like concat('%', #{pageQuery.material}, '%'))
+            </if>
+            <if test="pageQuery.weighCentre != null and pageQuery.weighCentre != ''">
+                and (bm_weigh_centre.name like concat('%', #{pageQuery.weighCentre}, '%') or bm_weigh_centre.code like concat('%', #{pageQuery.weighCentre}, '%'))
+            </if>
+        </where>
+        order by bm_weigh_task.send_time desc
+    </select>
+
+    <select id="selectWeighExecuteTaskDetailById"
+            resultType="com.bmos.mes.service.weigh.centre.execute.vo.WeighExecuteTaskDetailVO">
+        select bm_weigh_task.id,
+               bm_weigh_task.material_id,
+               bm_material.name as material_name,
+               bm_material.merge_code as material_merge_code,
+               bm_weigh_task.weigh_centre_id,
+               bm_weigh_centre.name as weigh_centre_name,
+               bm_weigh_centre.code as weigh_centre_code,
+               bm_weigh_task.requirement_quantity,
+               bm_weigh_task.unit_id,
+               bm_weigh_task.storage_material_batch_id
+        from bm_weigh_task
+                 left join bm_material on bm_weigh_task.material_id = bm_material.id and bm_material.is_deleted = 0
+                 left join bm_weigh_centre on bm_weigh_task.weigh_centre_id = bm_weigh_centre.id and bm_weigh_centre.is_deleted = 0
+        where bm_weigh_task.is_deleted = 0
+        and bm_weigh_task.id = #{taskId}
+    </select>
+</mapper>

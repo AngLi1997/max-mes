@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# husky v8 通过 $1 传递 commit message 文件路径（非 v4 的 HUSKY_GIT_PARAMS）
+cd "$(dirname -- "$0")/.." && ./node_modules/.bin/commitlint --edit "$1"

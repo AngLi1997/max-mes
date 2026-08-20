@@ -1,0 +1,1 @@
+import{t as e}from"./index-eacb5835.js";function r(r,o=!0){return Number(r)<=0&&o?Promise.reject(e("请输入正数")):/^\d{1,10}(\.\d{1,9})?$/.test(r)?Promise.resolve():Promise.reject(e("整数部分最多为10位，小数部分最多9位"))}export{r as n};

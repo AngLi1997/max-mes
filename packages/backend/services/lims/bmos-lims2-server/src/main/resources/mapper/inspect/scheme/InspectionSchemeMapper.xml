@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.inspect.scheme.mapper.InspectionSchemeMapper">
+    
+
+
+    <select id="checkNameDuplicate" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM lm_inspection_scheme
+        WHERE name = #{name}
+        AND is_deleted = 0
+        <if test="excludeId != null">
+            AND id != #{excludeId}
+        </if>
+    </select>
+
+    <resultMap id="SchemeWithActiveVersionResultMap" type="com.bmos.lims2.server.inspect.scheme.dto.response.InspectionSchemeDTO">
+        <id property="id" column="scheme_id"/>
+        <result property="name" column="scheme_name"/>
+        <result property="materialId" column="material_id"/>
+        <result property="materialCode" column="material_code"/>
+        <result property="materialName" column="material_name"/>
+        <result property="packageId" column="package_id"/>
+        <result property="packageCode" column="package_code"/>
+        <result property="packageName" column="package_name"/>
+        <result property="activeVersionId" column="active_version_id"/>
+        <result property="activeVersionNo" column="active_version_no"/>
+    </resultMap>
+
+    <select id="selectPageWithActiveVersion" resultMap="SchemeWithActiveVersionResultMap">
+        SELECT
+            s.id AS scheme_id,
+            s.name AS scheme_name,
+            s.material_id,
+            s.material_code,
+            m.name AS material_name,
+            s.package_id,
+            s.package_code,
+            p.name AS package_name,
+            s.active_version_no AS active_version_no,
+            v.id AS active_version_id
+        FROM lm_inspection_scheme s
+        LEFT JOIN lm_inspection_scheme_version v ON v.scheme_id = s.id AND v.status = 'ACTIVE' AND v.is_deleted = 0 AND v.version_no = s.active_version_no
+        LEFT JOIN lm_material m ON m.id = s.material_id AND m.is_deleted = 0
+        LEFT JOIN lm_inspect_package p ON p.id = s.package_id AND p.is_deleted = 0
+        <where>
+            s.is_deleted = 0
+            AND s.active_version_no IS NOT NULL
+            <if test="name != null and name != ''">
+                AND s.name LIKE CONCAT('%', #{name}, '%')
+            </if>
+            <if test="materialIds != null and materialIds.size > 0">
+                AND s.material_id IN
+                <foreach collection="materialIds" item="mid" open="(" separator="," close=")">
+                    #{mid}
+                </foreach>
+            </if>
+        </where>
+        ORDER BY s.create_time DESC
+    </select>
+
+    <select id="selectByMaterialIds" resultType="com.bmos.lims2.server.inspect.scheme.entity.InspectionScheme">
+        SELECT
+            id,
+            name,
+            material_id,
+            material_code,
+            package_id,
+            package_code,
+            active_version_no,
+            create_time,
+            update_time,
+            create_by,
+            update_by,
+            is_deleted
+        FROM lm_inspection_scheme
+        <where>
+            is_deleted = 0
+            <if test="materialIds != null and materialIds.size > 0">
+                AND material_id IN
+                <foreach collection="materialIds" item="mid" open="(" separator="," close=")">
+                    #{mid}
+                </foreach>
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 根据实验包ID查询已绑定该包的方案名称列表 -->
+    <select id="selectSchemeNamesByPackageId" resultType="java.lang.String">
+        SELECT s.name
+        FROM lm_inspection_scheme s
+        WHERE s.is_deleted = 0
+          AND s.package_id = #{packageId}
+        ORDER BY s.create_time DESC
+    </select>
+</mapper> 

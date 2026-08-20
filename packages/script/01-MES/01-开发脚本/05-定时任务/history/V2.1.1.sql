@@ -1,0 +1,4 @@
+# 工艺版本生效状态修改定时任务 by lilong 240710
+INSERT INTO `bmos_scheduler`.`xxl_job_info` (`id`, `job_group`, `job_desc`, `add_time`, `update_time`, `author`, `alarm_email`, `schedule_type`, `schedule_conf`, `misfire_strategy`, `executor_route_strategy`, `executor_handler`, `executor_param`, `executor_block_strategy`, `executor_timeout`, `executor_fail_retry_count`, `glue_type`, `glue_source`, `glue_remark`, `glue_updatetime`, `child_jobid`, `trigger_status`, `trigger_last_time`, `trigger_next_time`) VALUES (6, 1, '工艺版本生效状态修改', now(), now(), 'admin', '', 'CRON', '0 8 0 ? * *', 'DO_NOTHING', 'FIRST', 'updateProcessVersionActionState', '', 'SERIAL_EXECUTION', 0, 0, 'BEAN', '', 'GLUE代码初始化', now(), '', 1, 0, 1720627680000);
+# 更新工艺版本生效状态修改cron表达式 by renjinguang 240712
+UPDATE bmos_scheduler.xxl_job_info SET schedule_conf = '0 8 0 * * ?' WHERE id = 6;

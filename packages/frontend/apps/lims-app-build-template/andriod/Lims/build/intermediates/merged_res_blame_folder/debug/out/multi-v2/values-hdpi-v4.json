@@ -1,0 +1,20 @@
+{
+    "logs": [
+        {
+            "outputFile": "uni.UNIFD40210.simpleDemo-mergeDebugResources-11:/values-hdpi-v4/values-hdpi-v4.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\bmos\\.gradle\\caches\\transforms-3\\e42b0c523090c65dbf753e8e7d02250c\\transformed\\appcompat-1.1.0\\res\\values-hdpi-v4\\values-hdpi-v4.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endLines": "6",
+                        "endColumns": "13",
+                        "endOffsets": "327"
+                    }
+                }
+            ]
+        }
+    ]
+}

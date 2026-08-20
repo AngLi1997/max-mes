@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.platform.service.system.role.mapper.AuthRoleMenuMapper">
+
+
+    <select id="selectRootMenuListByUserId" resultType="com.bmos.platform.service.system.menu.model.Menu">
+        SELECT distinct
+        t1.id,
+        t1.name,
+        t1.sort,
+        t1.parent_id,
+        t1.is_menu
+        FROM bp_menu t1
+        JOIN bp_auth_role_menu t2 on t2.menu_id = t1.id
+        JOIN bp_user_role t3 ON t3.role_id = t2.role_id
+        WHERE t1.is_deleted = 0
+        AND t3.is_deleted = 0
+        AND t3.user_id = #{userId}
+        <if test="maxRootId != null">
+            and t1.id &lt;= #{maxRootId}
+        </if>
+    </select>
+
+    <select id="selectMenuListByUserId" resultType="com.bmos.platform.service.system.menu.model.Menu">
+        SELECT distinct
+        t1.id,
+        t1.name,
+        t1.sort,
+        t1.parent_id,
+        t1.is_menu
+        FROM bp_menu t1
+        JOIN bp_auth_role_menu t2 on t2.menu_id = t1.id
+        JOIN bp_user_role t3 ON t3.role_id = t2.role_id
+        WHERE t1.is_deleted = 0
+        AND t3.is_deleted = 0
+        <if test="userId != null and userId != ''">
+            AND t3.user_id = #{userId}
+        </if>
+        <if test="rootMenuCode != null">
+            and t1.code like concat(#{rootMenuCode},'%')
+        </if>
+        <if test="containsFunc == null || !containsFunc">
+            and t1.is_menu = 1
+        </if>
+    </select>
+    <select id="selectByRoleIdList" resultType="java.lang.Long">
+        select
+            distinct menu_id
+        from
+            bp_auth_role_menu
+        where
+            role_id in
+        <foreach collection="roleIdList" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </select>
+
+</mapper>

@@ -1,0 +1,8 @@
+i18n:
+    locations:
+      - data-id: exception_wms_zh_CN.properties
+        group: backend-i18n
+      - data-id: exception_wms_en_US.properties
+        group: backend-i18n
+      - data-id: exception_wms_ru_RU.properties
+        group: backend-i18n

@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.platform.service.equipment.mapper.EquipmentInfoMapper">
+
+    <select id="getEquipmentPage" resultType="com.bmos.platform.service.equipment.controller.vo.EquipmentInfoVO">
+        SELECT
+        info.id as id,
+        info.`name` AS `name`,
+        info.`code` AS `code`,
+        info.update_by as updateBy,
+        info.update_time as updateTime,
+        info.`enable` as `enable`,
+        info.category_id as categoryId,
+        info.description AS description,
+        info.acquisition_platform
+        FROM
+        bp_equipment_info AS info
+        JOIN bp_equipment_tag_info AS bp ON info.id = bp.equipment_id
+        WHERE
+        info.is_deleted = 0
+        AND bp.is_deleted = 0
+        <if test="name != null and name != ''">
+            and info.`name` like concat('%',#{name},'%')
+        </if>
+        <if test="tagIds != null and tagIds.size() > 0">
+            and bp.tag_id in
+            <foreach collection="tagIds" open="(" separator="," close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
+        <if test="enable != null ">
+            and info.`enable` =#{enable}
+        </if>
+        <if test="categoryIdList != null and categoryIdList.size() > 0">
+            and info.category_id in
+            <foreach collection="categoryIdList" open="(" separator="," close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
+        GROUP BY
+        info.id
+        ORDER BY
+            info.update_time desc
+    </select>
+
+    <select id="getConfigByStationId" resultType="com.bmos.platform.service.equipment.controller.vo.EquipmentInfoVO">
+        SELECT
+            info.id,
+            info.`code`,
+            info.`name`,
+            info.`status`,
+            info.expire_date,
+            info.acquisition_platform
+        FROM
+            bp_equipment_info AS info
+            JOIN bp_equipment_station_info AS station ON info.id = station.equipment_id
+        WHERE
+            info.is_deleted = 0
+            AND station.is_deleted = 0
+            and station.station_id in
+            <foreach collection="stationId" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+    </select>
+
+    <select id="getEquipmentByTagCode" resultType="com.bmos.platform.service.equipment.controller.vo.EquipmentInfoVO">
+        SELECT
+            info.id,
+            info.`code`,
+            info.`name`,
+            info.`status`,
+            info.acquisition_platform
+        FROM
+            bp_equipment_info AS info
+        JOIN bp_equipment_tag_info AS tag ON info.id = tag.equipment_id
+        JOIN bp_equipment_tag AS bp ON tag.tag_id = bp.id
+        WHERE
+            info.is_deleted = 0
+        AND tag.is_deleted = 0
+        AND bp.is_deleted = 0
+        and info.`enable` = 1
+        AND bp.`code` =#{tagCode}
+        GROUP BY
+            info.id
+    </select>
+    <select id="getConfigByStationIdList"
+            resultType="com.bmos.platform.service.equipment.controller.vo.EquipmentInfoVO">
+        SELECT
+            info.id,
+            info.`code`,
+            info.`name`,
+            info.`status`,
+            info.expire_date_time,
+            station.station_id,
+            info.acquisition_platform
+        FROM
+            bp_equipment_info AS info
+                JOIN bp_equipment_station_info AS station ON info.id = station.equipment_id
+        WHERE
+            info.is_deleted = 0
+          AND station.is_deleted = 0
+          <if test="stationIdList != null and stationIdList.size() > 0">
+              and station.station_id in
+              <foreach collection="stationIdList" open="(" separator="," close=")" item="stationId">
+                  #{stationId}
+              </foreach>
+          </if>
+    </select>
+
+    <select id="getEquipmentAppList" resultType="com.bmos.platform.service.equipment.controller.vo.EquipmentAppPageVO">
+        SELECT
+            info.*
+        FROM
+            bp_equipment_info AS info
+            JOIN bp_equipment_tag_info as tag on info.id = tag.equipment_id
+        where
+            info.is_deleted = 0
+            and tag.is_deleted = 0
+            and info.`enable` = 1
+        <if test="infoIdList != null and infoIdList.size() > 0 ">
+            and info.id in
+            <foreach collection="infoIdList" open="(" separator="," close=")" item="infoId">
+                #{infoId}
+            </foreach>
+        </if>
+        <if test="code != null and code != ''">
+            and info.`code` like concat('%',#{code},'%')
+        </if>
+        <if test="name != null and name != ''">
+            and info.`name` like concat('%',#{name},'%')
+        </if>
+        <if test="ids != null and ids.size() > 0">
+            and tag.tag_id in
+            <foreach collection="ids" open="(" separator="," close=")" item="id">
+                #{id}
+            </foreach>
+        </if>
+        GROUP BY tag.equipment_id
+        ORDER BY
+            field(info.`status`,4,1,2,3) ASC,info.`name` ASC
+
+    </select>
+    <select id="getAcquisitionDataPointByEquipmentId" resultType="com.bmos.platform.service.equipment.controller.vo.EquipmentAcquisitionDataPointVO">
+        select
+               ap.id,
+               ap.code,
+               ap.name,
+               ap.data_point_name,
+               ap.data_type,
+               ap.status,
+               ap.`type`
+        from bp_equipment_acquisition ea
+                 left join bp_acquisition_point ap on ea.acquisition_point_id = ap.id
+        where ea.equipment_id = #{equipmentId}
+                 and ap.status='ENABLE'
+                 and ea.is_deleted = 0
+                 and ap.is_deleted = 0
+    </select>
+
+    <select id="getDeleteEquipment"
+            resultType="com.bmos.platform.facade.equipment.vo.EquipmentVO">
+        SELECT
+        info.id as id,
+        info.`code` as code,
+        info.`name` as name,
+        info.`enable` as enable,
+        info.is_deleted as deleted,
+        info.acquisition_platform
+        FROM
+        bp_equipment_info AS info
+        where info.id in
+        <foreach collection="equipmentIdList" open="(" separator="," close=")" item="equipmentId">
+            #{equipmentId}
+        </foreach>
+    </select>
+    <select id="getDistinctConfigByStationIdList"
+            resultType="com.bmos.platform.service.equipment.controller.vo.EquipmentInfoVO">
+        SELECT distinct
+        info.id,
+        info.`code`,
+        info.`name`,
+        info.`status`,
+        info.expire_date_time,
+        info.acquisition_platform
+        FROM
+        bp_equipment_info AS info
+        JOIN bp_equipment_station_info AS station ON info.id = station.equipment_id
+        WHERE
+        info.is_deleted = 0
+        AND station.is_deleted = 0
+        <if test="stationIdList != null and stationIdList.size() > 0">
+            and station.station_id in
+            <foreach collection="stationIdList" open="(" separator="," close=")" item="stationId">
+                #{stationId}
+            </foreach>
+        </if>
+    </select>
+</mapper>

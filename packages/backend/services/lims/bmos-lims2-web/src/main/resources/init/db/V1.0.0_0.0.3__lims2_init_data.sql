@@ -1,0 +1,1 @@
+ALTER TABLE lm_sample ADD COLUMN tag_printed TINYINT(1) NOT NULL DEFAULT 0 COMMENT '标签是否已打印';

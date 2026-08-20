@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.inspect.parameter.mapper.InspectParameterMapper">
+
+    <sql id="BASE_COLUM">
+        id,
+        code,
+        name,
+        standard,
+        create_by,
+        update_by,
+        create_time,
+        update_time,
+        is_deleted
+    </sql>
+
+    <select id="selectParam" resultType="com.bmos.lims2.server.inspect.parameter.entity.InspectParameter">
+        SELECT
+            <include refid="BASE_COLUM"/>
+        FROM
+            lm_inspect_parameter
+        <where>
+            <if test="param.code != null and param.code != ''">
+                AND code like CONCAT('%', #{param.code}, '%')
+            </if>
+            <if test="param.name != null and param.name != ''">
+                AND name like CONCAT('%', #{param.name}, '%')
+            </if>
+            <if test="param.keyword != null and param.keyword != ''">
+                AND (code like CONCAT('%', #{param.keyword}, '%') OR name like CONCAT('%', #{param.keyword}, '%'))
+            </if>
+            <if test="param.excludeIdList != null and param.excludeIdList.size > 0">
+                AND id not in
+                <foreach collection="param.excludeIdList" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+            AND
+                is_deleted = 0
+        </where>
+    </select>
+</mapper>

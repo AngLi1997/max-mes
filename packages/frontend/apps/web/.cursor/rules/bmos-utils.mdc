@@ -1,0 +1,184 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# BMOS 工具库使用指南
+@bmos/utils 是一个工具函数库类似lodash，采用 pnpm monorepo 架构管理。主要组件位于 `packages/utils/src` 目录下。
+## 目录结构
+
+```
+packages/utils/
+├── src/
+│   ├── object/         # 对象操作工具
+│   ├── number/         # 数字处理工具
+│   ├── date/           # 日期处理工具
+│   ├── file/           # 文件处理工具
+│   ├── tree/           # 树结构处理工具
+│   ├── url/            # URL 处理工具
+│   ├── message/        # 消息处理工具
+│   ├── element/        # DOM 元素处理
+│   ├── indexDB/        # IndexedDB 操作
+│   ├── RSA/            # RSA 加密工具
+│   ├── zoom/           # 缩放处理工具
+│   ├── print/          # 打印工具
+│   ├── func/           # 函数工具
+│   ├── global/         # 全局工具
+│   ├── common/         # 通用工具
+│   └── types/          # 类型定义
+```
+
+## 核心功能模块
+
+### 1. 对象操作 (object/)
+```typescript
+import { cloneDeep, merge, get, omit, deepEqual, omitNil } from '@bmos/utils';
+
+// 深克隆对象
+const cloned = cloneDeep(obj);
+
+// 合并对象
+const merged = merge(obj1, obj2, [obj3, obj4, ...]);
+
+// 提取对象属性
+const picked = get(obj, ['prop1', 'prop2']); // picked = obj.prop1.prop2
+
+// 删除对象中的某些属性
+const omited = omit(obj, ['prop1', 'prop2']);
+
+// 递归地比较两个对象的每个属性和值。返回是否相等
+const deepEqualed = deepEqual(obj1, obj2);
+
+// 删除对象中 value 为 null 或 undefined 的属性
+const omitNull = omitNil(obj);
+```
+
+### 2. 数字运算处理 (number/)
+注意：运算返回的结果为数字字符串
+```javascript
+import { addNumber, subtractNumber, gtNumber, ltNumber } from '@bmos/utils';
+
+// 两个数字相加
+const addNum = addNumber(a, b);
+
+// 两个数字相减
+const subNum = subtractNumber(a, b);
+
+// 判断大小 a > b 返回 true 否则返回 false
+console.log(gtNumber(a, b));
+
+// 判断大小 a < b 返回 true 否则返回 false
+console.log(ltNumber(a, b));
+```
+
+### 3. 日期处理 (date/)
+```typescript
+import { formatToDate, addDate, compareDate } from '@bmos/utils';
+
+// 格式化日期
+const formatted = formatToDate(new Date(), 'YYYY-MM-DD');
+
+// 添加天数
+const addDAY = addDate('2024-01-04', 4, 'YYYY-MM-DD');
+
+// 日期比较 -1: date1 < date2, 0: date1 = date2, 1: date1 > date2
+const compDate = compareDate(date1, date2);
+```
+
+### 4. 树结构处理 (tree/)
+```typescript
+import { findItemByAttr, loopSelectableTree, loopSelectableNotValueTree, loopSelectableLeafTree } from '@bmos/utils';
+
+// 查找树节点, 根据传入的属性以及属性值，找到对应的item
+const node = findItemByAttr(tree, 'key', value)
+
+// 下面的方法通常配合树形选择器使用
+
+// 根据传入的属性以及属性值，禁止选择， 等于value的不可选择
+const treeData = loopSelectableTree(tree, 'key', value);
+
+// 根据传入的属性以及属性值，禁止选择, 不等于value的不可选择
+const treeData2 = loopSelectableNotValueTree(tree, 'key', value);
+
+// 只有叶子节点才可以被选中
+const treeData3 = loopSelectableLeafTree(tree);
+```
+
+## 使用规范
+
+### 1. 导入方式
+```typescript
+// 推荐：按需导入
+import { methodName } from '@bmos/utils';
+
+// 不推荐：导入整个模块
+import * as utils from '@bmos/utils';
+```
+
+### 2. 类型使用
+```typescript
+import type { TreeNode, FileType } from '@bmos/utils';
+```
+
+### 3. 异步处理
+```typescript
+// 使用 async/await
+try {
+  const result = await asyncFunction();
+} catch (error: any) {
+  // 错误处理
+  ...
+  error.message && message.error(error.message);
+}
+```
+
+## 最佳实践
+
+1. 性能优化
+   - 使用按需导入
+   - 避免重复计算
+   - 合理使用缓存
+
+2. 错误处理
+   - 统一错误处理机制
+   - 提供友好错误信息
+   - 支持调试信息
+
+3. 类型安全
+   - 使用 TypeScript 类型
+   - 避免 any 类型
+   - 保持类型定义最新
+
+## 注意事项
+
+1. 浏览器兼容性
+   - 检查 API 兼容性
+   - 提供兼容性方案
+   - 记录最低支持版本
+
+2. 性能影响
+   - 大文件处理
+   - 频繁操作优化
+   - 内存使用控制
+
+3. 安全考虑
+   - 数据加密
+   - XSS 防护
+   - 敏感信息处理
+
+## 常见问题
+
+1. 树结构处理
+   - 大数据量优化
+   - 循环引用处理
+   - 性能优化建议
+
+2. 文件操作
+   - 大文件处理
+   - 断点续传
+   - 格式兼容性
+
+3. 日期处理
+   - 时区问题
+   - 格式统一
+   - 特殊日期处理

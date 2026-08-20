@@ -1,0 +1,1 @@
+DELETE FROM `bm_process_record_order` where ISNULL(procedure_step_model_id);

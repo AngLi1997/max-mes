@@ -1,0 +1,86 @@
+---
+description:
+globs:*.java,*.xml
+alwaysApply:true
+---
+
+# 多模块结构
+- 项目采用多模块架构设计：
+  - bmos-lims2.0-common：公共模块，存放常量、枚举、工具类等
+  - bmos-lims2.0-feign：Feign客户端模块，存放对外暴露的接口
+  - bmos-lims2.0-server：服务层模块，存放业务逻辑实现
+  - bmos-lims2.0-web：Web控制层模块，存放控制器和配置
+
+# 分层结构
+- 采用标准分层架构：
+  - controller：控制器层，处理HTTP请求
+  - service：服务接口层
+  - service.impl：服务实现层
+  - entity：实体类层
+  - dto：数据传输对象
+  - mapper：数据访问层
+  - converter：对象转换器
+  - config：配置类
+  - constant：常量类
+  - enums：枚举类
+
+# 包命名规范
+- 包名全部小写
+- 业务模块使用单数形式
+- 示例：com.bmos.lims2.server.material
+
+# 类命名规范
+- 控制器层：XxxController
+- 服务接口层：XxxService
+- 服务实现层：XxxServiceImpl
+- 实体类层：Xxx
+- DTO对象：XxxDTO、XxxSaveDTO、XxxUpdateDTO
+- VO对象：XxxVO、XxxSaveVO、XxxUpdateVO
+- Mapper接口：XxxMapper
+- 转换器：XxxConverter
+
+# 分包规则
+- web模块：
+  ```
+  com.bmos.lims2.web
+  ├── [业务模块]/
+  │   ├── XxxController.java
+  │   └── vo/
+  │       ├── req/
+  │       └── resp/
+  ```
+- server模块：
+  ```
+  com.bmos.lims2.server
+  ├── [业务模块]/
+  │   ├── entity/
+  │   ├── mapper/
+  │   ├── service/
+  │   │   └── impl/
+  │   ├── dto/
+  │   └── converter/
+  ```
+
+# 统一返回结构
+- 所有接口统一使用ResponseInfo<T>作为返回结构
+- 成功返回：ResponseInfo.success()
+- 失败返回：ResponseInfo.fail()
+- 分页返回：ResponseInfo<CommonPage<T>>
+
+# 命名规范
+- 方法和变量名使用驼峰命名法
+- 常量全大写，使用下划线分隔
+- 布尔类型方法使用is、has、can等前缀
+- 集合类型使用复数形式或List、Map后缀
+
+# 文件组织
+- 相关的类放在同一个包下
+- 每个业务模块独立成包
+- 工具类放在common模块
+- 配置类放在config包下
+
+
+
+# 统一返回结构
+- 统一使用 ResponseInfo<T> 结构体作为接口返回，便于前后端交互。
+

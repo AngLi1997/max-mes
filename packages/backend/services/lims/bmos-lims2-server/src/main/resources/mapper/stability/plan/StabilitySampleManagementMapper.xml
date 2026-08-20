@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.stability.sample.mapper.StabilitySampleManagementMapper">
+
+    <!-- 公共 WHERE 片段（过滤条件） -->
+    <sql id="whereConditions">
+        sp.is_deleted = 0
+        AND sp.status IN ('RECEIVED', 'PENDING_DESTROY', 'DESTROYED')
+        AND s.id IS NOT NULL
+        <if test="query.materialId != null">
+            AND p.material_id = #{query.materialId}
+        </if>
+        <if test="query.planCode != null and query.planCode != ''">
+            AND p.code LIKE CONCAT('%', #{query.planCode}, '%')
+        </if>
+        <if test="query.batchNo != null and query.batchNo != ''">
+            AND sp.batch_no LIKE CONCAT('%', #{query.batchNo}, '%')
+        </if>
+        <if test="query.sampleNo != null and query.sampleNo != ''">
+            AND sp.sample_no LIKE CONCAT('%', #{query.sampleNo}, '%')
+        </if>
+        <if test="query.planEndDateStart != null">
+            AND p.plan_end_date &gt;= #{query.planEndDateStart}
+        </if>
+        <if test="query.planEndDateEnd != null">
+            AND p.plan_end_date &lt;= #{query.planEndDateEnd}
+        </if>
+        <if test="query.status != null">
+            AND sp.status = #{query.status.value}
+        </if>
+    </sql>
+
+    <select id="countDistinctPlans" resultType="long">
+        SELECT COUNT(DISTINCT sp.plan_id)
+        FROM lm_stability_plan_sample sp
+        INNER JOIN lm_stability_inspect_plan p ON p.id = sp.plan_id AND p.is_deleted = 0
+        LEFT JOIN lm_sample s ON s.id = sp.sample_id AND s.is_deleted = 0
+        WHERE <include refid="whereConditions"/>
+    </select>
+
+    <select id="selectDistinctPlanIds" resultType="long">
+        SELECT DISTINCT sp.plan_id
+        FROM lm_stability_plan_sample sp
+        INNER JOIN lm_stability_inspect_plan p ON p.id = sp.plan_id AND p.is_deleted = 0
+        LEFT JOIN lm_sample s ON s.id = sp.sample_id AND s.is_deleted = 0
+        WHERE <include refid="whereConditions"/>
+        ORDER BY sp.plan_id DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <select id="selectSampleFlatRows"
+            resultType="com.bmos.lims2.server.stability.sample.dto.response.StabilitySampleFlatRowDTO">
+        SELECT
+            sp.id                AS overallSampleId,
+            sp.plan_id           AS planId,
+            sp.batch_id          AS batchId,
+            sp.batch_no          AS batchNo,
+            sp.sample_id         AS sampleId,
+            sp.sample_no         AS sampleNo,
+            sp.actual_sample_amount AS actualSampleAmount,
+            sp.sample_unit       AS sampleUnit,
+            sp.receive_date      AS receiveDate,
+            sp.receiver_name     AS receiverName,
+            sp.experiment_type   AS experimentType,
+            sp.storage_condition AS storageCondition,
+            p.code               AS planCode,
+            p.material_id        AS materialId,
+            p.material_name      AS materialName,
+            p.material_code      AS materialCode,
+            p.material_spec      AS materialSpec,
+            p.create_by          AS planCreateBy,
+            p.create_time        AS planCreateTime,
+            p.start_date         AS startDate,
+            p.plan_end_date      AS planEndDate,
+            s.storage_location   AS storageLocation,
+            s.destroyed          AS destroyed,
+            s.current_quantity   AS currentQuantity,
+            s.process_time       AS destroyTime,
+            s.process_by         AS destroyBy,
+            s.process_remark     AS destroyReason,
+            sp.status            AS sampleStatus
+        FROM lm_stability_plan_sample sp
+        INNER JOIN lm_stability_inspect_plan p ON p.id = sp.plan_id AND p.is_deleted = 0
+        LEFT JOIN lm_sample s ON s.id = sp.sample_id AND s.is_deleted = 0
+        WHERE sp.plan_id IN
+        <foreach collection="planIds" item="pid" open="(" separator="," close=")">
+            #{pid}
+        </foreach>
+        AND sp.is_deleted = 0
+        AND sp.status IN ('RECEIVED', 'PENDING_DESTROY', 'DESTROYED')
+        AND s.id IS NOT NULL
+        <if test="query.batchNo != null and query.batchNo != ''">
+            AND sp.batch_no LIKE CONCAT('%', #{query.batchNo}, '%')
+        </if>
+        <if test="query.sampleNo != null and query.sampleNo != ''">
+            AND sp.sample_no LIKE CONCAT('%', #{query.sampleNo}, '%')
+        </if>
+        <if test="query.status != null">
+            AND sp.status = #{query.status.value}
+        </if>
+        ORDER BY sp.plan_id DESC, sp.batch_id ASC, sp.id ASC
+    </select>
+
+    <!-- 根据样品编号查询打印标签信息 -->
+    <select id="selectPrintTagResult"
+            resultType="com.bmos.lims2.server.stability.sample.dto.response.StabilitySamplePrintTagResultDTO">
+        SELECT
+            sp.sample_no            AS sampleNo,
+            sp.batch_no             AS batchNo,
+            sp.actual_sample_amount AS actualSampleAmount,
+            sp.sample_unit          AS sampleUnit,
+            sp.sampling_time        AS samplingTime,
+            sp.sampler_name         AS samplerName,
+            sp.experiment_type      AS experimentType,
+            sp.storage_condition    AS storageCondition,
+            sp.receive_time         AS receiveDate,
+            p.code                  AS planCode,
+            p.material_name         AS materialName,
+            p.material_code         AS materialCode,
+            p.material_spec         AS materialSpec,
+            s.storage_location      AS storageLocation,
+            b.production_date       AS productionDate
+        FROM lm_stability_plan_sample sp
+        INNER JOIN lm_stability_inspect_plan p ON p.id = sp.plan_id AND p.is_deleted = 0
+        LEFT JOIN lm_sample s ON s.id = sp.sample_id AND s.is_deleted = 0
+        LEFT JOIN lm_stability_inspect_plan_batch b ON b.id = sp.batch_id AND b.is_deleted = 0
+        WHERE sp.sample_no = #{sampleNo}
+          AND sp.is_deleted = 0
+        LIMIT 1
+    </select>
+
+    <!-- 根据时间点请验单样品编号查询周期任务取样打印标签信息 -->
+    <!-- 关联路径：lm_sample(s) → lm_inspection_order(o) → lm_stability_plan_timepoint_task(t) → lm_stability_inspect_plan(p) + lm_stability_inspect_plan_batch(b) -->
+    <select id="selectTimepointPrintTagResult"
+            resultType="com.bmos.lims2.server.stability.sample.dto.response.StabilitySamplePrintTagResultDTO">
+        SELECT
+            s.sample_no          AS sampleNo,
+            b.batch_no           AS batchNo,
+            s.quantity           AS actualSampleAmount,
+            CAST(s.unit_id AS CHAR) AS sampleUnit,
+            s.sampling_time      AS samplingTime,
+            s.sampler_name       AS samplerName,
+            t.experiment_type    AS experimentType,
+            t.storage_condition  AS storageCondition,
+            s.storage_location   AS storageLocation,
+            s.receive_time       AS receiveDate,
+            p.code               AS planCode,
+            p.material_name      AS materialName,
+            p.material_code      AS materialCode,
+            p.material_spec      AS materialSpec,
+            b.production_date    AS productionDate
+        FROM lm_sample s
+        INNER JOIN lm_inspection_order o
+            ON o.id = s.inspection_order_id AND o.is_deleted = 0
+        INNER JOIN lm_stability_plan_timepoint_task t
+            ON t.inspection_order_id = o.id AND t.is_deleted = 0
+        INNER JOIN lm_stability_inspect_plan p
+            ON p.id = t.plan_id AND p.is_deleted = 0
+        INNER JOIN lm_stability_inspect_plan_batch b
+            ON b.id = t.batch_id AND b.is_deleted = 0
+        WHERE s.sample_no = #{sampleNo}
+          AND s.is_deleted = 0
+        LIMIT 1
+    </select>
+
+</mapper>

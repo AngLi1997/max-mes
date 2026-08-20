@@ -1,0 +1,16 @@
+i18n:
+  locations:
+    - data-id: menu_zh_CN.properties
+      group: backend-i18n
+    - data-id: message_zh_CN.properties
+      group: backend-i18n
+    - data-id: exception_platform_zh_CN.properties
+      group: backend-i18n
+    - data-id: platform_enum_zh_CN.properties
+      group: backend-i18n
+    - data-id: flow_category_zh_CN.properties
+      group: backend-i18n
+    - data-id: platform_custom_string_zh_CN.properties
+      group: backend-i18n
+    - data-id: platform_custom_string_en_US.properties
+      group: backend-i18n

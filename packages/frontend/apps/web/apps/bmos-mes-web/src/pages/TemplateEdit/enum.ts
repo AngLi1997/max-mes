@@ -1,0 +1,49 @@
+import { t } from '@bmos/i18n';
+
+export enum MODAL_TYPE {
+  RECORD = 'RECORD',
+  INST = 'INST',
+}
+
+export enum ACTION_TYPE {
+  EDIT,
+  COPY,
+  DELETE,
+}
+
+export enum OPERATION {
+  SHOW = 'sh',
+  EDIT = 'ed',
+}
+
+export enum MODAL_ENUM {
+  RADIO = 'RADIO',
+  CHECKBOX = 'CHECKBOX',
+}
+
+export const MODAL_ENUM_T: Record<string, string> = {
+  RADIO: t('单选'),
+  CHECKBOX: t('多选'),
+};
+
+export const MODAL_BUTTON: any = [
+  'FEED_RECYCLE_BUTTON',
+  'OUTPUT_BUTTON_ASSEMBLY',
+  'PRODUCT_OUTPUT_BUTTON',
+  'MATERIAL_INPUT_BUTTON',
+  'BATCH_RECEIVE_BUTTON',
+  'MATERIAL_RECEIVE_BUTTON',
+  'PICKING_RECEIVE_BUTTON',
+  'INGREDIENTS_PLAN_BUTTON',
+  'WEIGHING_INGREDIENTS_BUTTON',
+  'INGREDIENTS_INPUT_BUTTON',
+  'MATERIAL_RESERVE_BUTTON',
+  'LIQUID_PLAN_BUTTON',
+  'LIQUID_MEASURE_BUTTON',
+  'LIQUID_INPUT_BUTTON',
+  'LIQUID_OUTPUT_BUTTON',
+];
+
+export const MODAL_NODE = ['RADIO', 'CHECKBOX'];
+
+export const ItemType = 'content';

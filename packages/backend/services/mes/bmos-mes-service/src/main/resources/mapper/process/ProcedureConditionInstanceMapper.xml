@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.process.mapper.task.ProcedureConditionInstanceMapper">
+
+    <select id="selectConditionList"
+            resultType="com.bmos.mes.service.process.model.task.ProcedureConditionInstance">
+        select ci.*
+        from bm_procedure_condition_instance ci
+        where ci.is_deleted = '0'
+        <if test="planId!=null">
+            and ci.plan_id=#{planId}
+        </if>
+    </select>
+    <select id="selectByPlanAndExpressionType"
+            resultType="com.bmos.mes.service.process.model.task.ProcedureConditionInstance">
+        select bci.*
+        from bm_procedure_condition_instance bci
+                 left join bm_procedure_expression bpe on bci.expression_id = bpe.id
+        where bci.procedure_step_model_id=#{stepModeId} and bpe.expression_type=#{expressionType} and bci.plan_id=#{planId}
+    </select>
+    <select id="selectByPlanAndExpressionTypes"
+            resultType="com.bmos.mes.service.process.model.task.ProcedureConditionInstance">
+        select bci.*
+        from bm_procedure_condition_instance bci
+                 left join bm_procedure_expression bpe on bci.expression_id = bpe.id
+        where bpe.expression_type=#{expressionType} and bci.plan_id in
+        <foreach collection="planIds" separator="," open="(" close=")" item="planId">
+            #{planId}
+        </foreach>
+        and bci.is_deleted = 0
+        and bpe.is_deleted = 0
+    </select>
+</mapper>

@@ -1,0 +1,2 @@
+ALTER TABLE `bm_plan_template_batch` MODIFY COLUMN `batch_quantity` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '生产批量';
+ALTER TABLE `bm_plan_template_batch` MODIFY COLUMN `production_line_id` bigint DEFAULT NULL COMMENT '产线id';

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.storage.config.mapper.ICargoPositionMapper">
+    <select id="queryList" resultType="com.bmos.mes.service.storage.config.model.CargoPosition">
+        select distinct bm_cargo_position.id,
+                        bm_cargo_position.storage_id,
+                        bm_cargo_position.position,
+                        bm_cargo_position.id_path,
+                        bm_cargo_position.code,
+                        bm_cargo_position.remark,
+                        bm_cargo_position.is_enable as enable,
+                        bm_cargo_position.create_time,
+                        bm_cargo_position.update_time,
+                        bm_cargo_position.create_by,
+                        bm_cargo_position.update_by,
+                        bm_cargo_position.is_deleted as deleted
+        from bm_cargo_position
+                 inner join bm_resource_permission on bm_cargo_position.id = bm_resource_permission.resource_id
+        <where>
+            bm_cargo_position.is_deleted = 0
+            <if test="deptIds == null or deptIds.size() == 0">
+                and 1 = 2
+            </if>
+            <if test="deptIds != null and deptIds.size() > 0">
+                and bm_resource_permission.dept_id in
+                <foreach collection="deptIds" open="(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="positionIds != null and positionIds.size() > 0">
+                and bm_cargo_position.storage_id in
+                <foreach collection="positionIds" open="(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="pageQuery.position != null and pageQuery.position != ''">
+                and bm_cargo_position.position like concat('%', #{pageQuery.position}, '%')
+            </if>
+            <if test="pageQuery.code != null and pageQuery.code != ''">
+                and bm_cargo_position.code like concat('%', #{pageQuery.code}, '%')
+            </if>
+        </where>
+        order by bm_cargo_position.code
+    </select>
+
+    <select id="queryEnabledListByStorageIdsWithPermission" resultType="com.bmos.mes.service.storage.config.model.CargoPosition">
+        select distinct bm_cargo_position.*
+        from bm_cargo_position
+                 inner join bm_resource_permission on bm_cargo_position.id = bm_resource_permission.resource_id
+            <where>
+                bm_cargo_position.is_deleted = 0
+                and bm_cargo_position.is_enable = 'TRUE'
+                <if test="storagesIds == null or storagesIds.size() == 0">
+                    and 1 = 2
+                </if>
+                <if test="storagesIds != null and storagesIds.size() > 0">
+                    and bm_cargo_position.storage_id in
+                    <foreach collection="storagesIds" open="(" close=")" separator="," item="item">
+                        #{item}
+                    </foreach>
+                </if>
+                <if test="deptIds == null or deptIds.size() == 0">
+                    and 1 = 2
+                </if>
+                <if test="deptIds != null and deptIds.size() > 0">
+                    and bm_resource_permission.dept_id in
+                    <foreach collection="deptIds" open="(" close=")" separator="," item="item">
+                        #{item}
+                    </foreach>
+                </if>
+            </where>
+    </select>
+
+    <select id="getCargoPositionPath" resultType="java.lang.String">
+        SELECT GROUP_CONCAT(bm_storage.name SEPARATOR #{sp}) AS names
+        FROM bm_cargo_position,
+        bm_storage
+        WHERE FIND_IN_SET(bm_storage.id, bm_cargo_position.id_path) and bm_cargo_position.id = #{id}
+    </select>
+    <select id="getCargoPositionPathMap" resultType="com.bmos.mes.service.storage.config.vo.CargoPathVO">
+        SELECT bm_cargo_position.id,CONCAT(GROUP_CONCAT(bm_storage.name SEPARATOR #{sp}),#{sp},bm_cargo_position.position) AS cargoPath
+        FROM bm_cargo_position,
+            bm_storage
+        WHERE FIND_IN_SET(bm_storage.id, bm_cargo_position.id_path)
+        and bm_cargo_position.id in
+        <foreach collection="idList" separator="," open="(" close=")" item="positionId">
+            #{positionId}
+        </foreach>
+        GROUP BY bm_cargo_position.id
+    </select>
+</mapper>

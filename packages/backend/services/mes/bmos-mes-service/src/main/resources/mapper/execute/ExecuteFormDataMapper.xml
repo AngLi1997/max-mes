@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.execute.mapper.ExecuteFormDataMapper">
+
+
+    <update id="discardFields">
+        update bm_execute_form_data set is_discard = true
+        where
+        product_plan_id = #{productPlanId}
+        and record_item_id = #{recordItemId}
+        and is_reuse = #{reuse}
+        and copy_version = #{copyVersion}
+        and is_discard = false
+        <if test="!reuse">
+            and procedure_step_id = #{procedureStepId}
+        </if>
+    </update>
+    <select id="selectCurrentRecordItemFieldValues"
+            resultType="com.bmos.mes.service.execute.model.ExecuteFormData">
+        select
+            *
+        from bm_execute_form_data
+        where
+        product_plan_id = #{query.productPlanId}
+        and record_item_id = #{query.recordItemId}
+        and is_reuse = #{query.reuse}
+        <if test="query.copyVersion != null">
+            and copy_version = #{query.copyVersion}
+        </if>
+        and is_discard = false
+        <if test="!query.reuse">
+            and procedure_step_id = #{query.procedureStepId}
+        </if>
+        and field_id in
+        <foreach collection="fieldIds" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </select>
+    <select id="selectOtherRecordItemFieldValues"
+            resultType="com.bmos.mes.service.execute.model.ExecuteFormData">
+        select
+        *
+        from bm_execute_form_data
+        where
+        product_plan_id = #{query.productPlanId}
+        and record_item_id &lt;&gt; #{query.recordItemId}
+        and is_reuse = #{query.reuse}
+        and copy_version = #{query.copyVersion}
+        and is_discard = false
+        <if test="!query.reuse">
+            and procedure_step_id &lt;&gt; #{query.procedureStepId}
+        </if>
+        and field_id in
+        <foreach collection="fieldIds" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="selectMaxRev" resultType="java.lang.Long">
+        select
+        max(rev)
+        from bm_execute_form_data
+        where
+        product_plan_id = #{productPlanId}
+        and field_id in
+        <foreach collection="fields" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="selectProcessAndProcedureByFormDataIds"
+            resultType="com.bmos.mes.service.execute.vo.FormDataProcedureInfo">
+        select
+            distinct
+            bm_execute_form_data.id as form_data_id,
+            bm_process.name as process_name,
+            bm_procedure_model.name as procedure_name
+        from bm_execute_form_data
+                 left join bm_process on bm_execute_form_data.process_id = bm_process.id and bm_process.is_deleted = 0
+                 left join bm_procedure_step_model on bm_execute_form_data.procedure_step_model_id = bm_procedure_step_model.id and bm_procedure_step_model.is_deleted = 0
+                 left join bm_procedure_model on bm_procedure_step_model.procedure_model_id = bm_procedure_model.id and bm_procedure_model.is_deleted = 0
+            <where>
+                bm_execute_form_data.id in
+                <foreach collection="formDataIds" open="(" separator="," close=")" item="item">
+                    #{item}
+                </foreach>
+            </where>
+        order by bm_execute_form_data.id desc;
+    </select>
+</mapper>

@@ -1,0 +1,494 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# @bmos/components 组件库指南
+
+## 项目结构
+
+@bmos/components 是一个基于 Ant Design Vue 的二次封装组件库，采用 pnpm monorepo 架构管理。主要组件位于 `packages/components/src` 目录下。
+
+### 推荐的页面组件目录结构如下
+```
+src/
+├── pages/             # 页面路由
+│   ├── 页面(组件)名称  # 页面的入口，使用大驼峰命名方式
+│   │   ├── components/    # 页面的子组件封装在这里面子组件的目录结构和pages的基本一致，但是一般不再嵌套components目录
+│   │   ├── hooks/         # 使用hooks管理table和表单的配置项(可能还有其他，比如使用工作流的配置等)
+│   │   │   ├── useTable.ts(.tsx)  # table的配置
+│   │   │   ├── useForm.ts(.tsx)   # 表单的配置
+│   │   │   ├── index.ts   # 将所有hook全部在这里导出方便使用
+│   │   ├── types.ts       # 这个页面需要使用的ts类型
+└── └── └── index.vue      # 这里写页面的内容并使用hooks和components子组件
+```
+#### 禁止将所有内容全部写入index.vue中，注意合理拆分文件
+
+### 核心组件
+
+1. PageComponent - 页面级组件
+   - 位置: [packages/components/src/PageComponent](mdc:packages/components/src/PageComponent)
+   - 功能: 提供页面级别的布局和功能封装
+   - 子组件:
+     - table: 表格组件，支持搜索、分页等功能
+     - pageTree: 树形结构组件，支持搜索和选择
+
+2. Table - 表格组件
+   - 位置: [packages/components/src/Table](mdc:packages/components/src/Table)
+   - 功能: 高级表格展示，支持分页、排序、搜索等特性
+   - 特点:
+     - 自动请求数据
+     - 支持额外参数
+     - flex布局自适应高度
+     - 操作列封装
+     - toolbar和title显示
+     - 支持自定义渲染
+     - 支持拖拽排序
+     - 支持虚拟滚动
+
+3. Form - 表单组件
+   - 位置: [packages/components/src/Form](mdc:packages/components/src/Form)
+   - 功能: 提供表单布局和验证功能
+
+4. ModalForm - 弹窗表单组件
+   - 位置: [packages/components/src/ModalForm](mdc:packages/components/src/ModalForm)
+   - 功能: 弹窗中的表单组件
+
+## 使用示例
+
+### PageComponent 使用示例
+
+PageComponent 组件支持四种使用场景：
+
+1. 单个表格：隐藏左侧树，columns 数组只传一项
+2. 两个表格：隐藏左侧树，columns 数组传两项
+3. 左侧树 + 上下两个表格：传入 treeData 树数据，columns 数组传两项
+4. 左侧树 + 单个表格：传入 treeData 树数据，columns 数组传一项
+
+#### 注意事项
+  1、操作列使用如下格式
+  ```ts
+  {
+      title: t('操作'),
+      align: 'left',
+      key: 'ACTION',
+      fixed: 'right',
+      width: 200,
+      actions: ({ record }) => [
+        {
+          label: t('查看'),
+          onClick: () => {
+            // 点击事件处理
+          },
+        },
+        {
+          label: t('删除'),
+          ifShow: hasPermission(权限码),
+          danger: true,
+          onClick: () => {
+            Modal.confirm({
+              title: t('是否删除此数据'),
+              icon: h(ExclamationCircleOutlined),
+              content: t('数据删除后无法恢复, 是否删除?'),
+              async onOk() {
+                try {
+                  await reqDatasetDeleteDataset(record.id);
+                  message.success(t('操作成功'));
+                  pageRef.value?.fetchDataTwo();
+                  return Promise.resolve();
+                } catch (error: any) {
+                  error.message && message.error(error.message);
+                  return Promise.reject();
+                }
+              },
+            });
+          },
+        },
+      ],
+    },
+  ```
+
+#### 场景一：单个表格
+
+```vue
+<template>
+  <BMPageComponent
+    ref="pageRef"
+    :columns="[columns]"
+    :requests="[loadData]"
+    :hideRightTree="true"
+    :search="true"
+    :formProps="[formProps]"
+    :showToolBars="[true]"
+    :showHeader="[true]"
+    :isSelects="[true]"
+    :showSearchBorders="[true]"
+    @table-change="handleTableChange">
+    <template #tableHeaderToolbar0="{ instance, selectedRowKeys, fetchData }">
+      <Button type="primary" @click="handleOption">操作</Button>
+    </template>
+    <template #tableHeaderTitle0>
+      <BMTableTitle title="数据列表"></BMTableTitle>
+    </template>
+  </BMPageComponent>
+</template>
+
+<script setup lang="ts">
+import { BMPageComponent, BMTableTitle } from '@bmos/components';
+import { Button } from 'ant-design-vue';
+import { ref } from 'vue';
+import { useForm, 下面的都在useTable } from './hooks';
+
+const { formProps } = useForm();
+const { pageRef, columns, loadData, handleTableChange } = useTable();
+
+const handleOption = () => {
+  // 操作按钮点击事件
+  ...
+}
+
+// useForm.ts(.tsx)
+const formProps = {
+  showAdvancedButton: false,
+  actionColOptions: {
+    span: 12,
+  },
+  schemas: [], // 表单项（是BMPageComponent的搜索项配置，同时也是BMForm和BMModalForm的表单项配置）
+};
+
+// ---下面的都在useTable.ts(.tsx)中---
+
+const pageRef = ref<any>(null);
+
+const columns = [
+  {
+    title: '名称',
+    dataIndex: 'name',
+  },
+  {
+    title: '状态',
+    dataIndex: 'status',
+    formItemProps: {
+      component: 'Select',
+      componentProps: {
+        options: [
+          { label: '启用', value: 1 },
+          { label: '禁用', value: 0 },
+        ],
+      },
+    },
+  },
+];
+
+const loadData = async (params) => {
+  // 实现数据加载逻辑
+  return {
+    data: [],
+    total: 0,
+  };
+};
+
+const handleTableChange = (pagination, filters, sorter) => {
+  console.log('表格变化:', pagination, filters, sorter);
+};
+
+</script>
+```
+
+#### 场景二：左侧树 + 上下两个表格
+
+```vue
+<template>
+  <BMPageComponent
+    ref="pageRef"
+    :columns="[firstColumns, secondColumns]"
+    :requests="[loadFirstData, loadSecondData]"
+    :treeData="treeData"
+    :search="[true, false]"
+    :formProps="[formFirstProps, {}]"
+    :showToolBars="[true, true]"
+    :showHeader="[true, true]"
+    :isSelects="[true, true]"
+    :showSearchBorders="[true, true]"
+    :rowClick="handleRowClick"
+    :fieldNames="{
+      title: 'name',
+      key: 'id',
+    }"
+    :treeField="{
+      field: {
+        categoryId: 'id',
+      },
+    }"
+    :tableFields="[
+      {},
+      {
+        field: {
+          parentId: 'id',
+        },
+      },
+    ]"
+    :selectedKeys="treeSelectedKeys"
+    @tree-select="selectTreeNode"
+    @tree-action="handleTreeAction">
+    <!-- 第一个表格的工具栏 -->
+    <template #tableHeaderToolbar0="{ currentNode, instance, selectedRowKeys, fetchData }">
+      <Button type="primary" @click="() => handleOption(currentNode)">操作</Button>
+    </template>
+    
+    <!-- 第一个表格的标题 -->
+    <template #tableHeaderTitle0>
+      <BMTableTitle title="主数据列表"></BMTableTitle>
+    </template>
+    
+    <!-- 第二个表格的标题 -->
+    <template #tableHeaderTitle1>
+      <BMTableTitle title="子数据列表"></BMTableTitle>
+    </template>
+  </BMPageComponent>
+</template>
+
+<script setup lang="ts">
+import { BMPageComponent, BMTableTitle } from '@bmos/components';
+import { Button } from 'ant-design-vue';
+import { ref } from 'vue';
+
+// 树形数据
+const treeData = ref([
+  {
+    id: 'all',
+    name: '全部',
+    key: 'all',
+    children: [
+      {
+        id: '1',
+        name: '分类1',
+        key: '1',
+      },
+      {
+        id: '2',
+        name: '分类2',
+        key: '2',
+      },
+    ],
+  },
+]);
+
+// 第一个表格的列配置
+const firstColumns = [
+  {
+    title: '名称',
+    dataIndex: 'name',
+  },
+  {
+    title: '状态',
+    dataIndex: 'status',
+    formItemProps: {
+      component: 'Select',
+      componentProps: {
+        options: [
+          { label: '启用', value: 1 },
+          { label: '禁用', value: 0 },
+        ],
+      },
+    },
+  },
+];
+
+// 第二个表格的列配置
+const secondColumns = [
+  {
+    title: '子项名称',
+    dataIndex: 'name',
+  },
+  {
+    title: '描述',
+    dataIndex: 'description',
+  },
+];
+
+// 表单配置
+const formFirstProps = {
+  showAdvancedButton: false,
+  actionColOptions: {
+    span: 12,
+  },
+};
+
+// 数据加载函数
+const loadFirstData = async (params) => {
+  // 实现第一个表格的数据加载逻辑
+  return {
+    data: [],
+    total: 0,
+  };
+};
+
+const loadSecondData = async (params) => {
+  // 实现第二个表格的数据加载逻辑
+  return {
+    data: [],
+    total: 0,
+  };
+};
+
+// 树节点选择处理
+const treeSelectedKeys = ref(['all']);
+const selectTreeNode = (selectedKeys, info) => {
+  console.log('选中节点:', selectedKeys, info);
+};
+
+// 树节点操作处理
+const handleTreeAction = (actionItem, node) => {
+  console.log('树节点操作:', actionItem, node);
+};
+
+// 表格行点击处理
+const handleRowClick = (record, index, instance, keys) => {
+  console.log('点击行:', record, index);
+};
+
+// 操作按钮事件
+const handleOption = (currentNode) => {
+  console.log('操作:', currentNode);
+};
+</script>
+```
+
+### Table 组件使用示例
+
+```vue
+<template>
+  <BMTable
+    ref="tableRef"
+    :data-request="loadData"
+    :columns="columns"
+    row-key="id"
+    :scroll="{ x: 1144, y: 400 }"
+    :show-refresh="true"
+    :form-props="formProps"
+    :is-select="true"
+    :show-tool-bar="true"
+    show-search-border
+    @change="handleTableChange"
+    @handle-click-row="handleClickRow">
+    <!-- 自定义单元格渲染 -->
+    <template #bodyCell="{ column, record }">
+      <template v-if="column.dataIndex === 'name'">
+        {{ record.name }}
+        <a>[测试]</a>
+      </template>
+    </template>
+    
+    <!-- 自定义工具栏 -->
+    <template #toolbar="{ reload }">
+      <Button type="primary">新增</Button>
+      <Button>导入</Button>
+      <Button @click="reload">刷新</Button>
+    </template>
+  </BMTable>
+</template>
+
+<script setup lang="ts">
+import { BMTable } from '@bmos/components';
+import { ref } from 'vue';
+
+const columns = [
+  {
+    title: '姓名',
+    dataIndex: 'name',
+  },
+  {
+    title: '状态',
+    dataIndex: 'status',
+    formItemProps: {
+      component: 'Select',
+      componentProps: {
+        options: [
+          { label: '启用', value: 1 },
+          { label: '禁用', value: 0 },
+        ],
+      },
+    },
+  },
+];
+
+const loadData = async (params) => {
+  // 实现数据加载逻辑
+  return {
+    data: [],
+    total: 0,
+  };
+};
+
+const handleTableChange = (pagination, filters, sorter) => {
+  console.log('表格变化:', pagination, filters, sorter);
+};
+
+const handleClickRow = (record) => {
+  console.log('点击行:', record);
+};
+</script>
+```
+
+## 组件关系
+
+1. PageComponent 是页面级组件，内部集成了:
+   - 左侧树形结构 (pageTree)
+   - 右侧内容区域 (table)
+
+2. Table 组件是独立的功能组件，可以:
+   - 单独使用
+   - 在 PageComponent 中使用
+   - 在 ModalForm 中使用
+
+3. Form 组件是基础组件，被:
+   - Table 组件用于搜索表单
+   - ModalForm 组件用于弹窗表单
+
+## 类型定义
+
+主要类型定义:
+
+```typescript
+// 键值类型
+type KEY = string | number;
+
+// 表格列配置
+type TableColumn = {
+  title: string;
+  dataIndex: string;
+  headerSearchComponent?: string;
+  formItemProps?: {
+    component: string;
+    componentProps?: any;
+  };
+  // ... 其他属性
+};
+
+// 表格实例
+type TableInstance = {
+  fetchData: (params?: any) => Promise<void>;
+  getQueryFormRef: () => any;
+  // ... 其他方法
+};
+```
+
+## 最佳实践
+
+1. 使用 PageComponent 时:
+   - 合理规划树形结构
+   - 利用插槽自定义界面
+   - 处理好树形选择和表格数据的联动
+
+2. 使用 Table 组件时:
+   - 合理设置列配置
+   - 使用 headerSearchComponent 实现表头搜索
+   - 利用插槽实现自定义渲染
+   - 注意性能优化（虚拟滚动等）
+
+3. 表单相关:
+   - 使用 formItemProps 配置表单项
+   - 合理使用组件联动
+   - 注意表单验证
+

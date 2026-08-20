@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.platform.service.factory.mapper.FactoryRoomMapper">
+    <sql id="BASE_COLUM">
+        id
+        ,
+        code,
+        name,
+        status,
+        enable,
+        time_limit,
+        expire_time,
+        description,
+        operator,
+        operate_time,
+        operate_id,
+        module_id,
+        create_by,
+        update_by,
+        tenement_id,
+        floor_id,
+        clean_level,
+        three_d_model_id,
+        create_time,
+        update_time,
+        is_deleted
+    </sql>
+    <select id="selectByParam" resultType="com.bmos.platform.service.factory.model.FactoryRoom">
+        SELECT
+        <include refid="BASE_COLUM"/>
+        FROM bp_factory_room
+        <if test="param.deptIdList != null and param.deptIdList.size > 0">
+            LEFT JOIN bm_resource_permission ON bm_resource_permission.resource_id = bp_factory_room.id
+        </if>
+        <where>
+            <if test="param.name != null and param.name != ''">
+                AND name LIKE CONCAT('%',#{param.name},'%')
+            </if>
+            <if test="param.moduleId != null">
+                AND module_id = #{param.moduleId}
+            </if>
+            <if test="param.code != null and param.code != ''">
+                AND code LIKE CONCAT('%', #{param.code}, '%')
+            </if>
+            <if test="param.enable != null">
+                AND enable = #{param.enable}
+            </if>
+            <if test="param.moduleIdList != null and param.moduleIdList.size > 0">
+                AND module_id IN
+                <foreach collection="param.moduleIdList" item="moduleId" separator="," open="(" close=")">
+                    #{moduleId}
+                </foreach>
+            </if>
+            <if test="param.deptIdList != null and param.deptIdList.size > 0">
+                AND bm_resource_permission.dept_id IN
+                <foreach collection="param.deptIdList" item="deptId" separator="," open="(" close=")">
+                    #{deptId}
+                </foreach>
+            </if>
+            <if test="param.status != null">
+                AND status = #{param.status}
+            </if>
+            AND bp_factory_room.is_deleted = 0
+        </where>
+        group by bp_factory_room.id
+        <choose>
+            <when test="param.mobile != null and param.mobile">
+                order by bp_factory_room.status desc ,bp_factory_room.`name` DESC
+            </when>
+            <otherwise>
+                order by bp_factory_room.code asc
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="queryRoomListByRoomIds" resultType="com.bmos.platform.facade.factory.vo.FactoryRoomFeignVO">
+        SELECT
+        id,
+        code,
+        name,
+        module_id,
+        `enable`,
+        is_deleted
+        FROM bp_factory_room
+        where
+        id in
+        <foreach collection="roomIds" item="roomId" separator="," open="(" close=")">
+            #{roomId}
+        </foreach>
+
+    </select>
+    <select id="list" resultType="com.bmos.platform.service.factory.service.dto.FactoryRoomDTO">
+        SELECT
+        room.id,
+        room.code,
+        room.name,
+        room.status,
+        room.enable,
+        room.time_limit,
+        room.expire_time,
+        room.description,
+        room.operator,
+        room.operate_time,
+        room.operate_id,
+        room.module_id,
+        room.create_by,
+        room.update_by,
+        room.create_time,
+        room.update_time,
+        room.clean_level,
+        room.three_d_model_id,
+        room.is_deleted,bftf.id floorId, bftf.name floorName,
+        bft.name tenementName, bfl.name moduleName
+        FROM bp_factory_room room
+        LEFT JOIN bp_factory_line_room bflr ON room.id = bflr.room_id and bflr.is_deleted = 0
+        LEFT JOIN bp_factory_line bfl ON bflr.line_id = bfl.id and bfl.is_deleted = 0
+        LEFT JOIN bp_factory_tenement_floor bftf ON bftf.id = room.floor_id and bftf.is_deleted = 0
+        LEFT JOIN bp_factory_tenement bft ON bftf.tenement_id = bft.id and bft.is_deleted = 0
+        <where>
+            <if test="roomListQueryDTO.productLineIds != null and roomListQueryDTO.productLineIds.size()>0">
+                AND bflr.line_id in
+                <foreach collection="roomListQueryDTO.productLineIds" open="(" close=")" item="productLine"
+                         separator=",">
+                    #{productLine}
+                </foreach>
+            </if>
+            <if test="roomListQueryDTO.tenementFloorIds != null and roomListQueryDTO.tenementFloorIds.size()>0">
+                AND room.floor_id in
+                <foreach collection="roomListQueryDTO.tenementFloorIds" open="(" close=")" item="floor" separator=",">
+                    #{floor}
+                </foreach>
+            </if>
+            <if test="roomListQueryDTO.roomIds != null and roomListQueryDTO.roomIds.size()>0">
+                AND room.id in
+                <foreach collection="roomListQueryDTO.roomIds" open="(" close=")" item="room" separator=",">
+                    #{room}
+                </foreach>
+            </if>
+            <if test="roomListQueryDTO.cleanLevels != null and roomListQueryDTO.cleanLevels.size()>0">
+                AND room.clean_level in
+                <foreach collection="roomListQueryDTO.cleanLevels" open="(" close=")" item="cleanLevel" separator=",">
+                    #{cleanLevel}
+                </foreach>
+            </if>
+            <if test="roomListQueryDTO.tenementIds != null and roomListQueryDTO.tenementIds.size()>0">
+                AND bft.id in
+                <foreach collection="roomListQueryDTO.tenementIds" open="(" close=")" item="tenement" separator=",">
+                    #{tenement}
+                </foreach>
+            </if>
+        </where>
+    </select>
+</mapper>

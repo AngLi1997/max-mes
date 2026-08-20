@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.weigh.centre2.requirement.mapper.ITicketRequirementMapper">
+    <select id="selectMaterialList" resultType="com.bmos.mes.service.weigh.centre2.requirement.vo.TicketRequirementVO">
+        SELECT distinct bm_storage_material_batch.material_id,
+                        bm_storage_material_batch.id                             as storage_material_batch_id,
+                        bm_storage_material_batch.material_batch_no,
+                        bm_storage_material_batch.hydration,
+                        bm_storage_material_batch.no_hydration_content,
+                        COALESCE(SUM(bm_storage_material.available_quantity), 0) AS quantity,
+                        bm_storage_material_batch.expired_date,
+                        bm_storage_material_batch.supplier,
+                        bm_storage_material_batch.producer,
+                        bm_storage_material_batch.factory_batch_no,
+                        bm_storage_material_batch.original_batch_no,
+                        bm_storage_material_batch.report_no,
+                        bm_storage_material_batch.licence_no
+        FROM bm_storage_material_batch
+                 LEFT JOIN bm_storage_material
+                           ON bm_storage_material_batch.id = bm_storage_material.storage_material_batch_id
+                               AND bm_storage_material.is_deleted = 0
+                               AND (bm_storage_material.sign_status IS NULL OR bm_storage_material.sign_status = 1)
+        WHERE bm_storage_material_batch.expired_date > NOW()
+          and bm_storage_material.id is not null
+          and bm_storage_material.material_position_id is not null
+          and bm_storage_material_batch.material_id = #{materialId}
+        GROUP BY bm_storage_material_batch.id, bm_storage_material_batch.material_batch_no
+        order by bm_storage_material_batch.material_batch_no
+    </select>
+
+    <select id="selectOccupancyQuantity"
+            resultType="com.bmos.mes.service.weigh.centre2.requirement.vo.TicketRequirementOccupancyQuantityResult">
+        select bm_weigh_ticket_requirement.storage_material_batch_id,
+               ifnull(bm_weigh_ticket_requirement.formula_quantity, 0) as occupancy_quantity,
+               bm_weigh_ticket_requirement.unit_id
+        from bm_weigh_ticket_requirement
+                 left join bm_weigh_ticket_requirement_group
+                           on bm_weigh_ticket_requirement.requirement_group_id = bm_weigh_ticket_requirement_group.id
+                               and bm_weigh_ticket_requirement.is_deleted = 0
+        where bm_weigh_ticket_requirement.is_deleted = 0
+          and bm_weigh_ticket_requirement.requirement_status in (0, 1, 2)
+          and bm_weigh_ticket_requirement_group.release_status in (0, 1)
+        <if test="storageMaterialBatchIds != null and storageMaterialBatchIds.size() > 0">
+            and bm_weigh_ticket_requirement.storage_material_batch_id in
+            <foreach collection="storageMaterialBatchIds" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="expectKey != null and expectKey != ''">
+            and bm_weigh_ticket_requirement.requirement_key != #{expectKey}
+        </if>
+    </select>
+
+    <select id="queryRequirementList"
+            resultType="com.bmos.mes.service.weigh.centre2.requirement.vo.WeighRequirementListVO">
+        select bm_weigh_ticket_requirement.id,
+               bm_material.name                              as material_name,
+               bm_material.merge_code                        as material_merge_code,
+               bm_material.specification                     as material_specification,
+               bm_storage_material_batch.material_batch_no   as storage_material_batch_no,
+               bm_storage_material_batch.id                  as storage_material_batch_id,
+               bm_weigh_centre.name                          as weigh_centre_name,
+               bm_weigh_ticket_requirement.formula_quantity  as formula_quantity,
+               product.name                                  as product_name,
+               product.merge_code                            as product_merge_code,
+               bm_weigh_ticket_requirement_group.batch_no    as batch_no,
+               bm_weigh_ticket_requirement.plan_date         as plan_date,
+               bm_weigh_ticket_requirement.requirement_usage as requirement_usage,
+               bm_weigh_ticket_requirement_group.remark,
+               bm_weigh_ticket_requirement.unit_id
+        from bm_weigh_ticket_requirement
+                 left join bm_material
+                           on bm_weigh_ticket_requirement.material_id = bm_material.id and bm_material.is_deleted = 0
+                 left join bm_storage_material_batch
+                           on bm_weigh_ticket_requirement.storage_material_batch_id = bm_storage_material_batch.id and
+                              bm_storage_material_batch.is_deleted = 0
+                 left join bm_weigh_centre on bm_weigh_ticket_requirement.weigh_centre_id = bm_weigh_centre.id and
+                                              bm_weigh_centre.is_deleted = 0
+                 left join bm_product_formula_material
+                           on bm_weigh_ticket_requirement.formula_material_id = bm_product_formula_material.id and
+                              bm_product_formula_material.is_deleted = 0
+                 left join bm_weigh_ticket_requirement_group
+                           on bm_weigh_ticket_requirement.requirement_group_id =
+                              bm_weigh_ticket_requirement_group.id and
+                              bm_weigh_ticket_requirement_group.is_deleted = 0
+                 left join bm_material product
+                           on bm_weigh_ticket_requirement_group.material_id = product.id and product.is_deleted = 0
+        where (bm_weigh_ticket_requirement.is_deleted = 0 and bm_weigh_ticket_requirement_group.release_status = 1
+        <if test="query != null">
+            <if test="query.materialName != null and query.materialName != ''">
+                AND bm_material.name LIKE CONCAT('%', #{query.materialName}, '%')
+            </if>
+            <if test="query.materialMergeCode != null and query.materialMergeCode != ''">
+                AND bm_material.merge_code = #{query.materialMergeCode}
+            </if>
+            <if test="query.storageMaterialBatchNo != null and query.storageMaterialBatchNo != ''">
+                AND bm_storage_material_batch.material_batch_no like CONCAT('%', #{query.storageMaterialBatchNo}, '%')
+            </if>
+            <if test="query.weighCentreName != null and query.weighCentreName != ''">
+                AND bm_weigh_centre.name LIKE CONCAT('%', #{query.weighCentreName}, '%')
+            </if>
+            <if test="query.productName != null and query.productName != ''">
+                AND bm_product_formula_material.material_name LIKE CONCAT('%', #{query.productName}, '%')
+            </if>
+            <if test="query.productId != null">
+                AND product.id = #{query.productId}
+            </if>
+            <if test="query.batchNo != null and query.batchNo != ''">
+                AND bm_weigh_ticket_requirement_group.batch_no like CONCAT('%', #{query.batchNo}, '%')
+            </if>
+            <if test="query.planDateStart != null">
+                AND bm_weigh_ticket_requirement.plan_date &gt;= #{query.planDateStart}
+            </if>
+            <if test="query.planDateEnd != null">
+                AND bm_weigh_ticket_requirement.plan_date &lt;= #{query.planDateEnd}
+            </if>
+            <if test="query.materialId != null">
+                AND bm_weigh_ticket_requirement.material_id = #{query.materialId}
+            </if>
+            <if test="query.storageMaterialBatchId != null">
+                AND bm_weigh_ticket_requirement.storage_material_batch_id = #{query.storageMaterialBatchId}
+            </if>
+            <if test="query.unitId != null">
+                AND bm_weigh_ticket_requirement.unit_id = #{query.unitId}
+            </if>
+            <if test="query.weighCentreId != null">
+                AND bm_weigh_ticket_requirement.weigh_centre_id = #{query.weighCentreId}
+            </if>
+            <if test="query.ticketId == null">
+                and bm_weigh_ticket_requirement.requirement_status = 0
+            </if>
+            <if test="query.ticketId != null">
+                AND bm_weigh_ticket_requirement.ticket_id = #{query.ticketId}
+                    and bm_weigh_ticket_requirement.requirement_status != 0
+            </if>
+            <!--这里是页面列表中已经添加但还未保存到数据库的数据，所以在这里过滤出去-->
+            <if test="query.addRequirementIds != null and query.addRequirementIds.size() != 0">
+                and bm_weigh_ticket_requirement.id not in
+                <foreach collection="query.addRequirementIds" item="item" index="index" separator="," open="("
+                         close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </if>
+        )
+        <!--这里是页面列表中已经标记了删除但还未保存到数据库的数据，所以在这里添加进去，可以重新选择-->
+        <if test="query.deleteRequirementIds != null and query.deleteRequirementIds.size() != 0">
+            or bm_weigh_ticket_requirement.id in
+            <foreach collection="query.deleteRequirementIds" item="item" index="index" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        and bm_weigh_ticket_requirement.weigh_centre_id in
+        <foreach collection="centreIds" item="item" index="index" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        order by bm_weigh_ticket_requirement.plan_date
+    </select>
+</mapper>

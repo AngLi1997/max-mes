@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.ingredient.weigh.mapper.WeighLogMapper">
+
+    <select id="selectPageList" resultType="com.bmos.mes.service.ingredient.weigh.vo.WeighLogPageVO">
+        select * from bm_weigh_log log
+        <where>
+            <if test="categoryType != null">
+                and log.material_type = #{categoryType}
+            </if>
+            <if test="materialId != null">
+                and log.material_id = #{materialId}
+            </if>
+            <if test="materialBatchNo != null and materialBatchNo != ''">
+                and log.material_batch_no like concat('%',#{materialBatchNo},'%')
+            </if>
+            <if test="materialNo != null and materialNo != ''">
+                and log.material_no like concat('%',#{materialNo},'%')
+            </if>
+            <if test="weighType != null">
+                and log.weigh_type = #{weighType}
+            </if>
+            <if test="equipmentInfo != null and equipmentInfo != ''">
+                and (log.equipment_name like concat('%',#{equipmentInfo},'%') or log.equipment_code like concat('%',#{equipmentInfo},'%'))
+            </if>
+            <if test="productInfo != null and productInfo != ''">
+                and (log.product_name like concat('%',#{productInfo},'%') or log.product_merge_code like concat('%',#{productInfo},'%'))
+            </if>
+            <if test="productBatchNo != null and productBatchNo!= ''">
+                and log.product_batch_no like concat('%',#{productBatchNo},'%')
+            </if>
+            <if test="startTime != null and startTime != '' and endTime != null and endTime != ''">
+                and log.weigh_time between concat(#{startTime}, ' 00:00:00') and concat(#{endTime}, ' 23:59:59')
+            </if>
+        </where>
+        order by weigh_time desc
+    </select>
+</mapper>

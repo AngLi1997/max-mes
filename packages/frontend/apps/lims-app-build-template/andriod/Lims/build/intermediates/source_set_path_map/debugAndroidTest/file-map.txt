@@ -1,0 +1,4 @@
+uni.UNIFD40210.test.simpleDemo-androidTest-0 C:\Users\bmos\Desktop\app-build\HBuilder-Integrate-AS\simpleDemo\build\generated\res\resValues\androidTest\debug
+uni.UNIFD40210.test.simpleDemo-mergeDebugAndroidTestResources-1 C:\Users\bmos\Desktop\app-build\HBuilder-Integrate-AS\simpleDemo\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\merged.dir
+uni.UNIFD40210.test.simpleDemo-mergeDebugAndroidTestResources-2 C:\Users\bmos\Desktop\app-build\HBuilder-Integrate-AS\simpleDemo\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\stripped.dir
+uni.UNIFD40210.test.simpleDemo-merged_res-3 C:\Users\bmos\Desktop\app-build\HBuilder-Integrate-AS\simpleDemo\build\intermediates\merged_res\debugAndroidTest

@@ -1,0 +1,25 @@
+server:
+  port: 60100
+  servlet:
+    context-path: /api/app/platform
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant-path-matcher
+  servlet:
+    multipart:
+      max-file-size: 20971520
+      max-request-size: 20971520
+
+rocketmq:
+  name-server: ${ROCKETMQ_HOST:172.30.1.160}:9876
+  producer:
+    group: ${spring.application.name}
+
+pagehelper:
+  helper-dialect: mysql
+
+
+
+
+

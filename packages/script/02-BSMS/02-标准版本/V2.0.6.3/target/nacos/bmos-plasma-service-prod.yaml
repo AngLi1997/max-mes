@@ -1,0 +1,148 @@
+db:
+  schema: bmos_plasma_pro
+xxlJobExecutorPort: 9101
+server:
+  servlet:
+    context-path: /api/${api-module}/
+  port: 58200
+api-module: bmos-plasma
+spring:
+  application:
+    name: bmos-plasma-service
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
+
+
+mybatis-plus:
+  mapper-locations: classpath:mapper/**/*.xml
+  global-config:
+    db-config:
+      logic-delete-field: delFlag
+      logic-delete-value: true # 逻辑已删除值(默认为 1)
+      logic-not-delete-value: false # 逻辑未删除值(默认为 0)
+      update-strategy: not_null
+bmos:
+  i18n:
+    locations:
+      - i18n/message_plasma
+      - i18n/validate_plasma
+    
+  auth:
+    exclude-urls:
+      - ${server.servlet.context-path}/user/login
+      - ${server.servlet.context-path}/swagger-ui/**
+      - ${server.servlet.context-path}/swagger-resources/**
+      - ${server.servlet.context-path}/api-docs
+      - ${server.servlet.context-path}/v3/api-docs
+      #三方系统登录接口
+      - ${server.servlet.context-path}/os/login
+    activeUrls:
+      - ${server.servlet.context-path}/license/active
+      - ${server.servlet.context-path}/license/activated
+      # - ${server.servlet.context-path}/examination-report/receive
+      # - ${server.servlet.context-path}/examination/result/result-receive
+      - ${server.servlet.context-path}/prethawing/callback
+    enable: true
+#系统模式，新厂模式-2/旧厂模式-1
+  system:
+    model: 2
+minio:
+  server: http://127.0.0.1
+  port: 9000
+  endpoint: ${minio.server}:${minio.port}
+  accessKey: minio
+  secretKey: Bmos1018
+  buckets:
+    plasma: bmos-plasma
+    signature: bmos-platform-sign
+# 浆站数据传递密钥
+origin:
+  sm4: ~^h5ysd-FME(rlP2 
+
+## feign接口路径
+feign:
+  ## transport_url: http://61.54.100.27:27546
+  transport_url: http://127.0.0.1:27546
+  pre_url: http://172.30.1.163/api/bmos-lims/pre
+
+## 运输信息
+transport:
+  company: HLSWGC
+  secret: kry9loymqjv9s224
+  
+# 出库管理-计划批号生成
+outbound:
+    plasma:
+      rule_code: PlasmaOutboundNo
+      map: "{\"type\":\"{}\",\"outboundDate\":\"{}\"}"
+    sample:
+      rule_code: SampleOutPlanNo
+      map: "{\"type\":\"{}\",\"outWarehouseDate\":\"{}\"}"
+  
+# 菜单Code
+menu:
+  outbound:
+    plan: 170100001 # 出库计划
+    feedProcess: 170100002 # 投料出库审核
+    scientificProcess: 170100003 # 科研出库审核
+    callProcess: 170100003 # 调用出库审核
+    destroyProcess: 170100004 # 销毁出库审核
+    qualityManagementApproval: 170100005 # 质量管理批准
+
+    warrantyProcess: 170060006 # 科研调用质保审核
+    warrantyFirstProcess: 170060007 # 销毁质保初审
+    warrantyReviewProcess: 170060008 # 销毁质保复审
+
+document:
+# 检疫期核查
+  quarantine:
+    check:
+      documentNo: "HLGF/4-ZK-303-009-02"
+      reportNo: "QuarantineCheckReportNo" # 303-20230210-J01
+# 放行单文件编号
+  releasePermit:
+    numbering: "HLGF/4-WL-000-004-02"
+
+# 核查数量
+quarantine:
+  checkNum: 2500
+
+# excel导入设置
+importExcel:
+  maxSize: 10485760 # 10M
+  maxLine: 1000 # 1000条
+  
+# pdf导出模板路径
+export:
+  templateRoute:
+    report: /template/inspectionReport.docx
+    reportAnnex: /template/inspectionReport_annex.docx
+    outBoundPlan: /template/bloodOutWarehouse.docx
+    outBoundPlanAnnex: /template/bloodOutWarehouse_annex.docx
+    unqualifiedReport: /template/unqualifiedReport.docx
+    unqualifiedInspectionRecord: /template/unqualifiedInspectionRecord.docx
+    HLM05_plasmaRelease: /template/HLM05_plasmaRelease.docx
+    plasmaTestRecord: /template/plasmaTestRecord.docx
+    sampleReceipt: /template/sampleReceipt.docx
+    plasmaReceipt: /template/plasmaReceipt.docx
+    plasmaBoxPrint: /template/plasmaBoxPrint.docx
+    sampleBoxPrint: /template/sampleBoxPrint.docx
+    quarantineCheckReport: /template/quarantineCheckReport.docx
+    quarantineCheckResult: /template/quarantineCheckResult.docx
+    quarantineCheckRecord: /template/quarantineCheckRecord.docx
+
+# 浆站url相关信息
+plasma:
+  stations:
+    - stationCode: BMOSS
+      #url: http://172.30.1.88:38080
+      url: http://192.168.112.2:38080
+      secretKey: BMOS_STATION
+      companyName: 华兰生物工程股份有限公司
+
+# 南环自动挑浆对接url（以下为随机地址，生产需调整）
+south:
+  sortingUrl: http://127.0.0.1:8080
+  preUrl: http://127.0.1.1:8080
+  wmsUrl: http://127.0.2.1:8080

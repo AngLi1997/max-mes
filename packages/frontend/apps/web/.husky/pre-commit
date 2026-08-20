@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# husky 执行时 cwd 是 git 仓库根(bmos-monorepo)，需切到前端 workspace 再执行
+cd "$(dirname -- "$0")/.." && ./node_modules/.bin/lint-staged --allow-empty

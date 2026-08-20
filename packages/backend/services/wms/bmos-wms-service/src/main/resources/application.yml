@@ -1,0 +1,14 @@
+server:
+  port: 60900
+  servlet:
+    context-path: /api/app/wms
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant-path-matcher
+  servlet:
+    multipart:
+      max-file-size: 20971520
+      max-request-size: 20971520
+  main:
+    allow-circular-references: true

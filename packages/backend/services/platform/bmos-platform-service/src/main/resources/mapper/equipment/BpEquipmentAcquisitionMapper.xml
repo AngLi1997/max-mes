@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.platform.service.equipment.mapper.EquipmentAcquisitionMapper">
+
+    <resultMap type="com.bmos.platform.service.equipment.model.EquipmentAcquisition" id="BpEquipmentAcquisitionMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="equipmentId" column="equipment_id" jdbcType="INTEGER"/>
+        <result property="equipmentCode" column="equipment_code" jdbcType="VARCHAR"/>
+        <result property="acquisitionPointId" column="acquisition_point_id" jdbcType="INTEGER"/>
+        <result property="acquisitionPointCode" column="acquisition_point_code" jdbcType="VARCHAR"/>
+        <result property="createBy" column="create_by" jdbcType="INTEGER"/>
+        <result property="updateBy" column="update_by" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <select id="selectAcquisitionByEquipmentId"
+            resultType="com.bmos.platform.service.equipment.service.dto.EquipmentAcquisitionDataPointDTO">
+        select ea.*,
+               ap.id,
+               ap.code,
+               ap.name,
+               ap.data_point_name,
+               ap.data_type,
+               ap.status
+        from bp_equipment_acquisition ea
+                 left join bp_acquisition_point ap on ea.acquisition_point_id = ap.id
+        where ea.equipment_id = #{equipmentId}
+                 and ap.status='ENABLE'
+                 and ap.is_deleted = 0
+                 and ea.is_deleted = 0
+    </select>
+    <select id="selectAcquisitionByEquipmentIdAndAcquisitionId"
+            resultType="com.bmos.platform.service.equipment.service.dto.EquipmentAcquisitionDataPointDTO">
+        select ea.*,
+               ap.id,
+               ap.code,
+               ap.name,
+               ap.data_point_name,
+               ap.data_type,
+               ap.status
+        from bp_equipment_acquisition ea
+                 left join bp_acquisition_point ap on ea.acquisition_point_id = ap.id
+        where ea.equipment_id = #{equipmentId}
+          and ea.acquisition_point_id = #{acquisitionId}
+          and ap.status='ENABLE'
+          and ap.is_deleted = 0
+          and ea.is_deleted=0
+    </select>
+    <select id="selectAcquisitionByEquipmentIdAndAcquisitionIds"
+            resultType="com.bmos.platform.service.equipment.service.dto.EquipmentAcquisitionDataPointDTO">
+        <foreach collection="dataPoints" open="(" close=")" separator=";" item="dataPoint">
+            select ea.*,
+            ap.id,
+            ap.code,
+            ap.name,
+            ap.data_point_name,
+            ap.data_type,
+            ap.status
+            from bp_equipment_acquisition ea
+            left join bp_acquisition_point ap on ea.acquisition_point_id = ap.id
+            where ea.equipment_id = #{dataPoint.equipmentId}
+            and ea.acquisitionId = #{dataPoint.acquisitionId}
+        </foreach>
+    </select>
+
+</mapper>
+

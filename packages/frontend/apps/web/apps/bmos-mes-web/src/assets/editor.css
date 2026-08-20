@@ -1,0 +1,39 @@
+.vue-ueditor {
+  height: 100%;
+}
+
+.vue-ueditor .edui-editor-iframeholder {
+  margin: 0 auto;
+}
+
+.edui-default .edui-editor {
+  background-color: unset !important;
+}
+
+.edui-default .edui-editor-iframeholder {
+  background-color: #fff;
+}
+
+.edui-default .edui-editor-bottomContainer {
+  background-color: #fff;
+}
+
+.vue-ueditor-container {
+  height: 100%;
+  position: relative;
+}
+
+.vue-ueditor-component {
+  position: relative;
+}
+
+.vue-ueditor-toggle {
+  position: absolute;
+  right: 4px;
+  top: 4px;
+  z-index: 999;
+}
+
+.radio-component-container {
+  white-space: normal;
+}

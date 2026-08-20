@@ -1,0 +1,600 @@
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective settings
+[WARNING] expected START_TAG or END_TAG not TEXT (position: TEXT seen ...</mirror> -->\r\n\t\r\n\t<mirror>\r\n\t\u3000\u3000<i... @183:6)  @ D:\Maven\apache-maven-3.8.6\conf\settings.xml, line 183, column 6
+[WARNING] 
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] bmos-lims2                                                         [pom]
+[INFO] bmos-lims2-common                                                  [jar]
+[INFO] bmos-lims2-feign                                                   [jar]
+[INFO] bmos-lims2-server                                                  [jar]
+[INFO] bmos-lims2-web                                                     [jar]
+[INFO] 
+[INFO] ----------------------< com.bmos.lims:bmos-lims2 >----------------------
+[INFO] Building bmos-lims2 1.0-SNAPSHOT                                   [1/5]
+[INFO] --------------------------------[ pom ]---------------------------------
+[INFO] 
+[INFO] --- maven-dependency-plugin:2.8:tree (default-cli) @ bmos-lims2 ---
+[INFO] com.bmos.lims:bmos-lims2:pom:1.0-SNAPSHOT
+[INFO] 
+[INFO] ------------------< com.bmos.lims:bmos-lims2-common >-------------------
+[INFO] Building bmos-lims2-common 1.0-SNAPSHOT                            [2/5]
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-dependency-plugin:2.8:tree (default-cli) @ bmos-lims2-common ---
+[INFO] com.bmos.lims:bmos-lims2-common:jar:1.0-SNAPSHOT
+[INFO] +- com.bmos:bmos-starter-common:jar:1.15.2-SNAPSHOT:compile
+[INFO] |  +- org.springframework.boot:spring-boot-starter-web:jar:2.6.15:compile
+[INFO] |  |  +- org.springframework.boot:spring-boot-starter:jar:2.6.15:compile
+[INFO] |  |  |  +- org.springframework.boot:spring-boot:jar:2.6.15:compile
+[INFO] |  |  |  |  +- (org.springframework:spring-core:jar:5.3.27:compile - omitted for duplicate)
+[INFO] |  |  |  |  \- (org.springframework:spring-context:jar:5.3.27:compile - omitted for duplicate)
+[INFO] |  |  |  +- org.springframework.boot:spring-boot-autoconfigure:jar:2.6.15:compile
+[INFO] |  |  |  |  \- (org.springframework.boot:spring-boot:jar:2.6.15:compile - omitted for duplicate)
+[INFO] |  |  |  +- jakarta.annotation:jakarta.annotation-api:jar:1.3.5:compile
+[INFO] |  |  |  +- org.springframework:spring-core:jar:5.3.27:compile
+[INFO] |  |  |  |  \- org.springframework:spring-jcl:jar:5.3.27:compile
+[INFO] |  |  |  \- org.yaml:snakeyaml:jar:1.29:compile
+[INFO] |  |  +- org.springframework.boot:spring-boot-starter-json:jar:2.6.15:compile
+[INFO] |  |  |  +- (org.springframework.boot:spring-boot-starter:jar:2.6.15:compile - omitted for duplicate)
+[INFO] |  |  |  +- (org.springframework:spring-web:jar:5.3.27:compile - omitted for duplicate)
+[INFO] |  |  |  +- com.fasterxml.jackson.core:jackson-databind:jar:2.13.5:compile
+[INFO] |  |  |  |  +- com.fasterxml.jackson.core:jackson-annotations:jar:2.13.5:compile
+[INFO] |  |  |  |  \- com.fasterxml.jackson.core:jackson-core:jar:2.13.5:compile
+[INFO] |  |  |  +- com.fasterxml.jackson.datatype:jackson-datatype-jdk8:jar:2.13.5:compile
+[INFO] |  |  |  |  +- (com.fasterxml.jackson.core:jackson-core:jar:2.13.5:compile - omitted for duplicate)
+[INFO] |  |  |  |  \- (com.fasterxml.jackson.core:jackson-databind:jar:2.13.5:compile - omitted for duplicate)
+[INFO] |  |  |  +- com.fasterxml.jackson.datatype:jackson-datatype-jsr310:jar:2.13.5:compile
+[INFO] |  |  |  |  +- (com.fasterxml.jackson.core:jackson-annotations:jar:2.13.5:compile - omitted for duplicate)
+[INFO] |  |  |  |  +- (com.fasterxml.jackson.core:jackson-core:jar:2.13.5:compile - omitted for duplicate)
+[INFO] |  |  |  |  \- (com.fasterxml.jackson.core:jackson-databind:jar:2.13.5:compile - omitted for duplicate)
+[INFO] |  |  |  \- com.fasterxml.jackson.module:jackson-module-parameter-names:jar:2.13.5:compile
+[INFO] |  |  |     +- (com.fasterxml.jackson.core:jackson-core:jar:2.13.5:compile - omitted for duplicate)
+[INFO] |  |  |     \- (com.fasterxml.jackson.core:jackson-databind:jar:2.13.5:compile - omitted for duplicate)
+[INFO] |  |  +- org.springframework.boot:spring-boot-starter-tomcat:jar:2.6.15:compile
+[INFO] |  |  |  +- (jakarta.annotation:jakarta.annotation-api:jar:1.3.5:compile - omitted for duplicate)
+[INFO] |  |  |  +- org.apache.tomcat.embed:tomcat-embed-core:jar:9.0.75:compile
+[INFO] |  |  |  +- org.apache.tomcat.embed:tomcat-embed-el:jar:9.0.75:compile
+[INFO] |  |  |  \- org.apache.tomcat.embed:tomcat-embed-websocket:jar:9.0.75:compile
+[INFO] |  |  |     \- (org.apache.tomcat.embed:tomcat-embed-core:jar:9.0.75:compile - omitted for duplicate)
+[INFO] |  |  +- org.springframework:spring-web:jar:5.3.27:compile
+[INFO] |  |  |  +- org.springframework:spring-beans:jar:5.3.27:compile
+[INFO] |  |  |  |  \- (org.springframework:spring-core:jar:5.3.27:compile - omitted for duplicate)
+[INFO] |  |  |  \- (org.springframework:spring-core:jar:5.3.27:compile - omitted for duplicate)
+[INFO] |  |  \- org.springframework:spring-webmvc:jar:5.3.27:compile
+[INFO] |  |     +- org.springframework:spring-aop:jar:5.3.27:compile
+[INFO] |  |     |  +- (org.springframework:spring-beans:jar:5.3.27:compile - omitted for duplicate)
+[INFO] |  |     |  \- (org.springframework:spring-core:jar:5.3.27:compile - omitted for duplicate)
+[INFO] |  |     +- (org.springframework:spring-beans:jar:5.3.27:compile - omitted for duplicate)
+[INFO] |  |     +- org.springframework:spring-context:jar:5.3.27:compile
+[INFO] |  |     |  +- (org.springframework:spring-aop:jar:5.3.27:compile - omitted for duplicate)
+[INFO] |  |     |  +- (org.springframework:spring-beans:jar:5.3.27:compile - omitted for duplicate)
+[INFO] |  |     |  +- (org.springframework:spring-core:jar:5.3.27:compile - omitted for duplicate)
+[INFO] |  |     |  \- (org.springframework:spring-expression:jar:5.3.27:compile - omitted for duplicate)
+[INFO] |  |     +- (org.springframework:spring-core:jar:5.3.27:compile - omitted for duplicate)
+[INFO] |  |     +- org.springframework:spring-expression:jar:5.3.27:compile
+[INFO] |  |     |  \- (org.springframework:spring-core:jar:5.3.27:compile - omitted for duplicate)
+[INFO] |  |     \- (org.springframework:spring-web:jar:5.3.27:compile - omitted for duplicate)
+[INFO] |  +- org.springframework.boot:spring-boot-starter-log4j2:jar:2.6.15:compile
+[INFO] |  |  +- org.apache.logging.log4j:log4j-slf4j-impl:jar:2.17.2:compile
+[INFO] |  |  |  +- (org.slf4j:slf4j-api:jar:1.7.25:compile - omitted for duplicate)
+[INFO] |  |  |  +- org.apache.logging.log4j:log4j-api:jar:2.17.2:compile
+[INFO] |  |  |  \- (org.apache.logging.log4j:log4j-core:jar:2.17.2:runtime - omitted for duplicate)
+[INFO] |  |  +- org.apache.logging.log4j:log4j-core:jar:2.17.2:compile
+[INFO] |  |  |  \- (org.apache.logging.log4j:log4j-api:jar:2.17.2:compile - omitted for duplicate)
+[INFO] |  |  +- org.apache.logging.log4j:log4j-jul:jar:2.17.2:compile
+[INFO] |  |  |  \- (org.apache.logging.log4j:log4j-api:jar:2.17.2:compile - omitted for duplicate)
+[INFO] |  |  \- org.slf4j:jul-to-slf4j:jar:1.7.36:compile
+[INFO] |  |     \- (org.slf4j:slf4j-api:jar:1.7.36:compile - omitted for conflict with 1.7.25)
+[INFO] |  +- com.lmax:disruptor:jar:3.4.4:compile
+[INFO] |  +- io.springfox:springfox-boot-starter:jar:3.0.0:compile
+[INFO] |  |  +- io.springfox:springfox-oas:jar:3.0.0:compile
+[INFO] |  |  |  +- io.swagger.core.v3:swagger-annotations:jar:2.1.2:compile
+[INFO] |  |  |  +- io.swagger.core.v3:swagger-models:jar:2.1.2:compile
+[INFO] |  |  |  |  \- (com.fasterxml.jackson.core:jackson-annotations:jar:2.10.1:compile - omitted for conflict with 2.13.5)
+[INFO] |  |  |  +- io.springfox:springfox-spi:jar:3.0.0:compile
+[INFO] |  |  |  |  \- (io.springfox:springfox-core:jar:3.0.0:compile - omitted for duplicate)
+[INFO] |  |  |  +- io.springfox:springfox-schema:jar:3.0.0:compile
+[INFO] |  |  |  |  +- (io.springfox:springfox-core:jar:3.0.0:compile - omitted for duplicate)
+[INFO] |  |  |  |  \- (io.springfox:springfox-spi:jar:3.0.0:compile - omitted for duplicate)
+[INFO] |  |  |  +- io.springfox:springfox-core:jar:3.0.0:compile
+[INFO] |  |  |  |  +- net.bytebuddy:byte-buddy:jar:1.10.11:compile
+[INFO] |  |  |  |  +- (com.fasterxml:classmate:jar:1.5.1:compile - omitted for duplicate)
+[INFO] |  |  |  |  +- (org.slf4j:slf4j-api:jar:1.7.25:compile - omitted for duplicate)
+[INFO] |  |  |  |  +- (org.springframework.plugin:spring-plugin-core:jar:2.0.0.RELEASE:compile - omitted for duplicate)
+[INFO] |  |  |  |  \- (org.springframework.plugin:spring-plugin-metadata:jar:2.0.0.RELEASE:compile - omitted for duplicate)
+[INFO] |  |  |  +- io.springfox:springfox-spring-web:jar:3.0.0:compile
+[INFO] |  |  |  |  +- (io.springfox:springfox-spi:jar:3.0.0:compile - omitted for duplicate)
+[INFO] |  |  |  |  +- (io.springfox:springfox-schema:jar:3.0.0:compile - omitted for duplicate)
+[INFO] |  |  |  |  +- (io.springfox:springfox-core:jar:3.0.0:compile - omitted for duplicate)
+[INFO] |  |  |  |  +- io.github.classgraph:classgraph:jar:4.8.83:compile
+[INFO] |  |  |  |  +- (com.fasterxml:classmate:jar:1.5.1:compile - omitted for duplicate)
+[INFO] |  |  |  |  +- (org.slf4j:slf4j-api:jar:1.7.25:compile - omitted for duplicate)
+[INFO] |  |  |  |  +- (org.springframework.plugin:spring-plugin-core:jar:2.0.0.RELEASE:compile - omitted for duplicate)
+[INFO] |  |  |  |  \- (org.springframework.plugin:spring-plugin-metadata:jar:2.0.0.RELEASE:compile - omitted for duplicate)
+[INFO] |  |  |  +- io.springfox:springfox-spring-webmvc:jar:3.0.0:compile
+[INFO] |  |  |  |  +- (io.springfox:springfox-spi:jar:3.0.0:compile - omitted for duplicate)
+[INFO] |  |  |  |  +- (io.springfox:springfox-schema:jar:3.0.0:compile - omitted for duplicate)
+[INFO] |  |  |  |  +- (io.springfox:springfox-core:jar:3.0.0:compile - omitted for duplicate)
+[INFO] |  |  |  |  +- (io.springfox:springfox-spring-web:jar:3.0.0:compile - omitted for duplicate)
+[INFO] |  |  |  |  +- (com.fasterxml:classmate:jar:1.5.1:compile - omitted for duplicate)
+[INFO] |  |  |  |  +- (org.slf4j:slf4j-api:jar:1.7.25:compile - omitted for duplicate)
+[INFO] |  |  |  |  +- (org.springframework.plugin:spring-plugin-core:jar:2.0.0.RELEASE:compile - omitted for duplicate)
+[INFO] |  |  |  |  \- (org.springframework.plugin:spring-plugin-metadata:jar:2.0.0.RELEASE:compile - omitted for duplicate)
+[INFO] |  |  |  +- io.springfox:springfox-spring-webflux:jar:3.0.0:compile
+[INFO] |  |  |  |  +- (com.fasterxml:classmate:jar:1.5.1:compile - omitted for duplicate)
+[INFO] |  |  |  |  +- (org.slf4j:slf4j-api:jar:1.7.25:compile - omitted for duplicate)
+[INFO] |  |  |  |  +- (org.springframework.plugin:spring-plugin-core:jar:2.0.0.RELEASE:compile - omitted for duplicate)
+[INFO] |  |  |  |  +- (org.springframework.plugin:spring-plugin-metadata:jar:2.0.0.RELEASE:compile - omitted for duplicate)
+[INFO] |  |  |  |  +- (io.springfox:springfox-spi:jar:3.0.0:runtime - omitted for duplicate)
+[INFO] |  |  |  |  +- (io.springfox:springfox-schema:jar:3.0.0:runtime - omitted for duplicate)
+[INFO] |  |  |  |  +- (io.springfox:springfox-core:jar:3.0.0:runtime - omitted for duplicate)
+[INFO] |  |  |  |  \- (io.springfox:springfox-spring-web:jar:3.0.0:runtime - omitted for duplicate)
+[INFO] |  |  |  +- io.springfox:springfox-swagger-common:jar:3.0.0:compile
+[INFO] |  |  |  |  +- (io.springfox:springfox-spi:jar:3.0.0:compile - omitted for duplicate)
+[INFO] |  |  |  |  +- (io.springfox:springfox-schema:jar:3.0.0:compile - omitted for duplicate)
+[INFO] |  |  |  |  +- (io.springfox:springfox-spring-web:jar:3.0.0:compile - omitted for duplicate)
+[INFO] |  |  |  |  +- (io.springfox:springfox-spring-webmvc:jar:3.0.0:compile - omitted for duplicate)
+[INFO] |  |  |  |  +- (com.fasterxml:classmate:jar:1.5.1:compile - omitted for duplicate)
+[INFO] |  |  |  |  +- (org.slf4j:slf4j-api:jar:1.7.25:compile - omitted for duplicate)
+[INFO] |  |  |  |  +- (org.springframework.plugin:spring-plugin-core:jar:2.0.0.RELEASE:compile - omitted for duplicate)
+[INFO] |  |  |  |  +- (org.springframework.plugin:spring-plugin-metadata:jar:2.0.0.RELEASE:compile - omitted for duplicate)
+[INFO] |  |  |  |  +- (io.swagger:swagger-annotations:jar:1.5.20:compile - omitted for duplicate)
+[INFO] |  |  |  |  +- (io.swagger:swagger-models:jar:1.5.20:compile - omitted for duplicate)
+[INFO] |  |  |  |  \- (io.swagger.core.v3:swagger-annotations:jar:2.1.2:compile - omitted for duplicate)
+[INFO] |  |  |  +- (com.fasterxml:classmate:jar:1.5.1:compile - omitted for duplicate)
+[INFO] |  |  |  +- (org.slf4j:slf4j-api:jar:1.7.25:compile - omitted for duplicate)
+[INFO] |  |  |  +- (org.springframework.plugin:spring-plugin-core:jar:2.0.0.RELEASE:compile - omitted for duplicate)
+[INFO] |  |  |  +- (org.springframework.plugin:spring-plugin-metadata:jar:2.0.0.RELEASE:compile - omitted for duplicate)
+[INFO] |  |  |  \- (org.mapstruct:mapstruct:jar:1.3.1.Final:runtime - omitted for conflict with 1.4.1.Final)
+[INFO] |  |  +- io.springfox:springfox-data-rest:jar:3.0.0:compile
+[INFO] |  |  |  +- (com.fasterxml:classmate:jar:1.5.1:compile - omitted for duplicate)
+[INFO] |  |  |  +- (org.slf4j:slf4j-api:jar:1.7.25:compile - omitted for duplicate)
+[INFO] |  |  |  +- (org.springframework.plugin:spring-plugin-core:jar:2.0.0.RELEASE:compile - omitted for duplicate)
+[INFO] |  |  |  +- (org.springframework.plugin:spring-plugin-metadata:jar:2.0.0.RELEASE:compile - omitted for duplicate)
+[INFO] |  |  |  +- (io.springfox:springfox-spi:jar:3.0.0:compile - omitted for duplicate)
+[INFO] |  |  |  +- (io.springfox:springfox-core:jar:3.0.0:compile - omitted for duplicate)
+[INFO] |  |  |  \- (io.springfox:springfox-spring-webmvc:jar:3.0.0:compile - omitted for duplicate)
+[INFO] |  |  +- io.springfox:springfox-bean-validators:jar:3.0.0:compile
+[INFO] |  |  |  +- (com.fasterxml:classmate:jar:1.5.1:compile - omitted for duplicate)
+[INFO] |  |  |  +- (org.slf4j:slf4j-api:jar:1.7.25:compile - omitted for duplicate)
+[INFO] |  |  |  +- (org.springframework.plugin:spring-plugin-core:jar:2.0.0.RELEASE:compile - omitted for duplicate)
+[INFO] |  |  |  +- (org.springframework.plugin:spring-plugin-metadata:jar:2.0.0.RELEASE:compile - omitted for duplicate)
+[INFO] |  |  |  \- (io.springfox:springfox-spring-web:jar:3.0.0:compile - omitted for duplicate)
+[INFO] |  |  +- io.springfox:springfox-swagger2:jar:3.0.0:compile
+[INFO] |  |  |  +- (io.springfox:springfox-spi:jar:3.0.0:compile - omitted for duplicate)
+[INFO] |  |  |  +- (io.springfox:springfox-schema:jar:3.0.0:compile - omitted for duplicate)
+[INFO] |  |  |  +- (io.springfox:springfox-swagger-common:jar:3.0.0:compile - omitted for duplicate)
+[INFO] |  |  |  +- (io.springfox:springfox-spring-web:jar:3.0.0:compile - omitted for duplicate)
+[INFO] |  |  |  +- (io.springfox:springfox-spring-webmvc:jar:3.0.0:compile - omitted for duplicate)
+[INFO] |  |  |  +- (io.springfox:springfox-spring-webflux:jar:3.0.0:compile - omitted for duplicate)
+[INFO] |  |  |  +- (com.fasterxml:classmate:jar:1.5.1:compile - omitted for duplicate)
+[INFO] |  |  |  +- (org.slf4j:slf4j-api:jar:1.7.25:compile - omitted for duplicate)
+[INFO] |  |  |  +- (org.springframework.plugin:spring-plugin-core:jar:2.0.0.RELEASE:compile - omitted for duplicate)
+[INFO] |  |  |  +- (org.springframework.plugin:spring-plugin-metadata:jar:2.0.0.RELEASE:compile - omitted for duplicate)
+[INFO] |  |  |  +- io.swagger:swagger-annotations:jar:1.5.20:compile
+[INFO] |  |  |  +- io.swagger:swagger-models:jar:1.5.20:compile
+[INFO] |  |  |  |  +- (com.fasterxml.jackson.core:jackson-annotations:jar:2.9.5:compile - omitted for conflict with 2.13.5)
+[INFO] |  |  |  |  +- (org.slf4j:slf4j-api:jar:1.7.22:compile - omitted for conflict with 1.7.25)
+[INFO] |  |  |  |  \- (io.swagger:swagger-annotations:jar:1.5.20:compile - omitted for duplicate)
+[INFO] |  |  |  \- (org.mapstruct:mapstruct:jar:1.3.1.Final:runtime - omitted for duplicate)
+[INFO] |  |  +- io.springfox:springfox-swagger-ui:jar:3.0.0:compile
+[INFO] |  |  |  \- (io.springfox:springfox-spring-webmvc:jar:3.0.0:runtime - omitted for duplicate)
+[INFO] |  |  +- com.fasterxml:classmate:jar:1.5.1:compile
+[INFO] |  |  +- org.slf4j:slf4j-api:jar:1.7.25:compile
+[INFO] |  |  +- org.springframework.plugin:spring-plugin-core:jar:2.0.0.RELEASE:compile
+[INFO] |  |  |  +- (org.springframework:spring-beans:jar:5.2.0.RELEASE:compile - omitted for conflict with 5.3.27)
+[INFO] |  |  |  +- (org.springframework:spring-context:jar:5.2.0.RELEASE:compile - omitted for conflict with 5.3.27)
+[INFO] |  |  |  +- (org.springframework:spring-aop:jar:5.2.0.RELEASE:compile - omitted for conflict with 5.3.27)
+[INFO] |  |  |  \- (org.slf4j:slf4j-api:jar:1.7.25:compile - omitted for duplicate)
+[INFO] |  |  \- org.springframework.plugin:spring-plugin-metadata:jar:2.0.0.RELEASE:compile
+[INFO] |  |     +- (org.springframework.plugin:spring-plugin-core:jar:2.0.0.RELEASE:compile - omitted for duplicate)
+[INFO] |  |     \- (org.slf4j:slf4j-api:jar:1.7.25:compile - omitted for duplicate)
+[INFO] |  +- org.projectlombok:lombok:jar:1.18.20:compile
+[INFO] |  +- cn.hutool:hutool-all:jar:5.8.3:compile
+[INFO] |  +- com.google.guava:guava:jar:32.1.2-jre:compile
+[INFO] |  |  +- com.google.guava:failureaccess:jar:1.0.1:compile
+[INFO] |  |  +- com.google.guava:listenablefuture:jar:9999.0-empty-to-avoid-conflict-with-guava:compile
+[INFO] |  |  +- com.google.code.findbugs:jsr305:jar:3.0.2:compile
+[INFO] |  |  +- org.checkerframework:checker-qual:jar:3.33.0:compile
+[INFO] |  |  +- com.google.errorprone:error_prone_annotations:jar:2.18.0:compile
+[INFO] |  |  \- com.google.j2objc:j2objc-annotations:jar:2.8:compile
+[INFO] |  +- jakarta.validation:jakarta.validation-api:jar:2.0.2:compile
+[INFO] |  +- org.hibernate.validator:hibernate-validator:jar:6.2.5.Final:compile
+[INFO] |  |  +- (jakarta.validation:jakarta.validation-api:jar:2.0.2:compile - omitted for duplicate)
+[INFO] |  |  +- org.jboss.logging:jboss-logging:jar:3.4.1.Final:compile
+[INFO] |  |  \- (com.fasterxml:classmate:jar:1.5.1:compile - omitted for duplicate)
+[INFO] |  +- org.mapstruct:mapstruct:jar:1.4.1.Final:compile
+[INFO] |  +- io.jsonwebtoken:jjwt:jar:0.12.3:compile
+[INFO] |  |  +- io.jsonwebtoken:jjwt-api:jar:0.12.3:compile
+[INFO] |  |  +- io.jsonwebtoken:jjwt-impl:jar:0.12.3:runtime
+[INFO] |  |  |  \- (io.jsonwebtoken:jjwt-api:jar:0.12.3:runtime - omitted for duplicate)
+[INFO] |  |  \- io.jsonwebtoken:jjwt-jackson:jar:0.12.3:runtime
+[INFO] |  |     +- (io.jsonwebtoken:jjwt-api:jar:0.12.3:runtime - omitted for duplicate)
+[INFO] |  |     \- (com.fasterxml.jackson.core:jackson-databind:jar:2.12.7.1:runtime - omitted for conflict with 2.13.5)
+[INFO] |  \- com.alibaba:easyexcel:jar:3.3.2:compile (version managed from 3.0.5)
+[INFO] |     +- com.alibaba:easyexcel-core:jar:3.3.2:compile
+[INFO] |     |  +- com.alibaba:easyexcel-support:jar:3.3.2:compile
+[INFO] |     |  |  \- (org.slf4j:slf4j-api:jar:1.7.32:compile - omitted for conflict with 1.7.25)
+[INFO] |     |  +- org.apache.poi:poi:jar:4.1.2:compile
+[INFO] |     |  |  +- commons-codec:commons-codec:jar:1.13:compile
+[INFO] |     |  |  +- org.apache.commons:commons-collections4:jar:4.4:compile
+[INFO] |     |  |  +- org.apache.commons:commons-math3:jar:3.6.1:compile
+[INFO] |     |  |  \- com.zaxxer:SparseBitSet:jar:1.2:compile
+[INFO] |     |  +- org.apache.poi:poi-ooxml:jar:4.1.2:compile
+[INFO] |     |  |  +- (org.apache.poi:poi:jar:4.1.2:compile - omitted for duplicate)
+[INFO] |     |  |  +- (org.apache.poi:poi-ooxml-schemas:jar:4.1.2:compile - omitted for duplicate)
+[INFO] |     |  |  +- org.apache.commons:commons-compress:jar:1.19:compile
+[INFO] |     |  |  \- com.github.virtuald:curvesapi:jar:1.06:compile
+[INFO] |     |  +- org.apache.poi:poi-ooxml-schemas:jar:4.1.2:compile
+[INFO] |     |  |  \- org.apache.xmlbeans:xmlbeans:jar:3.1.0:compile
+[INFO] |     |  +- org.apache.commons:commons-csv:jar:1.8:compile
+[INFO] |     |  +- org.ehcache:ehcache:jar:3.9.9:compile
+[INFO] |     |  |  \- (org.slf4j:slf4j-api:jar:1.7.25:compile - omitted for duplicate)
+[INFO] |     |  +- commons-io:commons-io:jar:2.11.0:compile
+[INFO] |     |  \- (org.slf4j:slf4j-api:jar:1.7.32:compile - omitted for conflict with 1.7.25)
+[INFO] |     \- (org.slf4j:slf4j-api:jar:1.7.32:compile - omitted for conflict with 1.7.25)
+[INFO] +- com.alibaba:fastjson:jar:1.2.83:compile
+[INFO] \- com.baomidou:mybatis-plus:jar:3.5.3.2:compile
+[INFO]    \- com.baomidou:mybatis-plus-extension:jar:3.5.3.2:compile
+[INFO]       +- com.baomidou:mybatis-plus-core:jar:3.5.3.2:compile
+[INFO]       |  +- com.baomidou:mybatis-plus-annotation:jar:3.5.3.2:compile
+[INFO]       |  +- com.github.jsqlparser:jsqlparser:jar:4.6:compile
+[INFO]       |  \- org.mybatis:mybatis:jar:3.5.13:compile
+[INFO]       \- org.mybatis:mybatis-spring:jar:2.1.1:compile
+[INFO] 
+[INFO] -------------------< com.bmos.lims:bmos-lims2-feign >-------------------
+[INFO] Building bmos-lims2-feign 1.0-SNAPSHOT                             [3/5]
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-dependency-plugin:2.8:tree (default-cli) @ bmos-lims2-feign ---
+[INFO] com.bmos.lims:bmos-lims2-feign:jar:1.0-SNAPSHOT
+[INFO] +- com.bmos:bmos-cloud-dependency:jar:1.15.2-SNAPSHOT:compile
+[INFO] |  +- com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-config:jar:2021.0.4.0:compile
+[INFO] |  |  +- com.alibaba.cloud:spring-cloud-alibaba-commons:jar:2021.0.4.0:compile
+[INFO] |  |  +- com.alibaba.spring:spring-context-support:jar:1.0.11:compile
+[INFO] |  |  +- com.alibaba.nacos:nacos-client:jar:2.0.4:compile
+[INFO] |  |  |  +- commons-codec:commons-codec:jar:1.11:compile
+[INFO] |  |  |  +- org.apache.httpcomponents:httpasyncclient:jar:4.1.3:compile
+[INFO] |  |  |  |  +- org.apache.httpcomponents:httpcore:jar:4.4.6:compile
+[INFO] |  |  |  |  +- org.apache.httpcomponents:httpcore-nio:jar:4.4.6:compile
+[INFO] |  |  |  |  |  \- (org.apache.httpcomponents:httpcore:jar:4.4.6:compile - omitted for duplicate)
+[INFO] |  |  |  |  +- org.apache.httpcomponents:httpclient:jar:4.5.3:compile
+[INFO] |  |  |  |  |  +- (org.apache.httpcomponents:httpcore:jar:4.4.6:compile - omitted for duplicate)
+[INFO] |  |  |  |  |  +- (commons-logging:commons-logging:jar:1.2:compile - omitted for duplicate)
+[INFO] |  |  |  |  |  \- (commons-codec:commons-codec:jar:1.9:compile - omitted for conflict with 1.11)
+[INFO] |  |  |  |  \- commons-logging:commons-logging:jar:1.2:compile
+[INFO] |  |  |  +- org.reflections:reflections:jar:0.9.11:compile
+[INFO] |  |  |  |  +- (com.google.guava:guava:jar:20.0:compile - omitted for conflict with 32.1.2-jre)
+[INFO] |  |  |  |  \- org.javassist:javassist:jar:3.21.0-GA:compile
+[INFO] |  |  |  +- io.prometheus:simpleclient:jar:0.5.0:compile
+[INFO] |  |  |  \- (org.yaml:snakeyaml:jar:1.23:compile - omitted for conflict with 1.29)
+[INFO] |  |  +- (org.springframework.cloud:spring-cloud-commons:jar:3.1.4:compile - omitted for conflict with 3.1.8)
+[INFO] |  |  +- org.springframework.cloud:spring-cloud-context:jar:3.1.4:compile
+[INFO] |  |  |  \- (org.springframework.security:spring-security-crypto:jar:5.6.7:compile - omitted for duplicate)
+[INFO] |  |  \- (org.slf4j:slf4j-api:jar:1.7.36:compile - omitted for duplicate)
+[INFO] |  +- org.slf4j:slf4j-api:jar:1.7.36:compile
+[INFO] |  +- com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-discovery:jar:2021.0.4.0:compile
+[INFO] |  |  +- (com.alibaba.cloud:spring-cloud-alibaba-commons:jar:2021.0.4.0:compile - omitted for duplicate)
+[INFO] |  |  +- (com.alibaba.nacos:nacos-client:jar:2.0.4:compile - omitted for duplicate)
+[INFO] |  |  +- (com.alibaba.spring:spring-context-support:jar:1.0.11:compile - omitted for duplicate)
+[INFO] |  |  +- (org.springframework.cloud:spring-cloud-commons:jar:3.1.4:compile - omitted for duplicate)
+[INFO] |  |  \- (org.springframework.cloud:spring-cloud-context:jar:3.1.4:compile - omitted for duplicate)
+[INFO] |  +- org.springframework.boot:spring-boot-starter:jar:2.6.15:compile
+[INFO] |  |  +- org.springframework.boot:spring-boot:jar:2.6.15:compile
+[INFO] |  |  |  +- (org.springframework:spring-core:jar:5.3.27:compile - omitted for duplicate)
+[INFO] |  |  |  \- org.springframework:spring-context:jar:5.3.27:compile
+[INFO] |  |  |     +- (org.springframework:spring-aop:jar:5.3.27:compile - omitted for duplicate)
+[INFO] |  |  |     +- (org.springframework:spring-beans:jar:5.3.27:compile - omitted for duplicate)
+[INFO] |  |  |     +- (org.springframework:spring-core:jar:5.3.27:compile - omitted for duplicate)
+[INFO] |  |  |     \- (org.springframework:spring-expression:jar:5.3.27:compile - omitted for duplicate)
+[INFO] |  |  +- org.springframework.boot:spring-boot-autoconfigure:jar:2.6.15:compile
+[INFO] |  |  |  \- (org.springframework.boot:spring-boot:jar:2.6.15:compile - omitted for duplicate)
+[INFO] |  |  +- jakarta.annotation:jakarta.annotation-api:jar:1.3.5:compile
+[INFO] |  |  +- org.springframework:spring-core:jar:5.3.27:compile
+[INFO] |  |  |  \- org.springframework:spring-jcl:jar:5.3.27:compile
+[INFO] |  |  \- org.yaml:snakeyaml:jar:1.29:compile
+[INFO] |  +- org.springframework.cloud:spring-cloud-starter-bootstrap:jar:3.1.8:compile
+[INFO] |  |  \- org.springframework.cloud:spring-cloud-starter:jar:3.1.8:compile
+[INFO] |  |     +- (org.springframework.boot:spring-boot-starter:jar:2.6.15:compile - omitted for duplicate)
+[INFO] |  |     +- (org.springframework.cloud:spring-cloud-context:jar:3.1.8:compile - omitted for conflict with 3.1.4)
+[INFO] |  |     +- (org.springframework.cloud:spring-cloud-commons:jar:3.1.8:compile - omitted for conflict with 3.1.4)
+[INFO] |  |     \- org.springframework.security:spring-security-rsa:jar:1.0.12.RELEASE:compile
+[INFO] |  |        \- org.bouncycastle:bcpkix-jdk18on:jar:1.73:compile
+[INFO] |  |           +- org.bouncycastle:bcprov-jdk18on:jar:1.73:compile
+[INFO] |  |           \- org.bouncycastle:bcutil-jdk18on:jar:1.73:compile
+[INFO] |  |              \- (org.bouncycastle:bcprov-jdk18on:jar:1.73:compile - omitted for duplicate)
+[INFO] |  \- org.springframework.boot:spring-boot-starter-actuator:jar:2.6.15:compile
+[INFO] |     +- (org.springframework.boot:spring-boot-starter:jar:2.6.15:compile - omitted for duplicate)
+[INFO] |     +- org.springframework.boot:spring-boot-actuator-autoconfigure:jar:2.6.15:compile
+[INFO] |     |  +- org.springframework.boot:spring-boot-actuator:jar:2.6.15:compile
+[INFO] |     |  |  \- (org.springframework.boot:spring-boot:jar:2.6.15:compile - omitted for duplicate)
+[INFO] |     |  +- (org.springframework.boot:spring-boot:jar:2.6.15:compile - omitted for duplicate)
+[INFO] |     |  +- (org.springframework.boot:spring-boot-autoconfigure:jar:2.6.15:compile - omitted for duplicate)
+[INFO] |     |  +- (com.fasterxml.jackson.core:jackson-databind:jar:2.13.5:compile - scope updated from runtime; omitted for duplicate)
+[INFO] |     |  \- (com.fasterxml.jackson.datatype:jackson-datatype-jsr310:jar:2.13.5:compile - scope updated from runtime; omitted for duplicate)
+[INFO] |     \- io.micrometer:micrometer-core:jar:1.8.13:compile
+[INFO] |        +- org.hdrhistogram:HdrHistogram:jar:2.1.12:compile
+[INFO] |        \- org.latencyutils:LatencyUtils:jar:2.0.3:runtime
+[INFO] +- com.bmos:bmos-starter-adaptor:jar:1.15.2-SNAPSHOT:compile
+[INFO] |  +- (com.bmos:bmos-starter-common:jar:1.15.2-SNAPSHOT:compile - omitted for duplicate)
+[INFO] |  +- org.springframework.cloud:spring-cloud-starter-openfeign:jar:3.1.8:compile
+[INFO] |  |  +- (org.springframework.cloud:spring-cloud-starter:jar:3.1.7:compile - omitted for conflict with 3.1.8)
+[INFO] |  |  +- org.springframework.cloud:spring-cloud-openfeign-core:jar:3.1.8:compile
+[INFO] |  |  |  +- (org.springframework.boot:spring-boot-autoconfigure:jar:2.6.15:compile - omitted for duplicate)
+[INFO] |  |  |  +- org.springframework.boot:spring-boot-starter-aop:jar:2.6.15:compile
+[INFO] |  |  |  |  +- (org.springframework.boot:spring-boot-starter:jar:2.6.15:compile - omitted for duplicate)
+[INFO] |  |  |  |  +- (org.springframework:spring-aop:jar:5.3.27:compile - omitted for duplicate)
+[INFO] |  |  |  |  \- org.aspectj:aspectjweaver:jar:1.9.7:compile
+[INFO] |  |  |  +- (io.github.openfeign.form:feign-form-spring:jar:3.8.0:compile - omitted for conflict with 3.0.1)
+[INFO] |  |  |  \- commons-fileupload:commons-fileupload:jar:1.5:compile
+[INFO] |  |  |     \- (commons-io:commons-io:jar:2.11.0:compile - omitted for duplicate)
+[INFO] |  |  +- org.springframework:spring-web:jar:5.3.27:compile
+[INFO] |  |  |  +- org.springframework:spring-beans:jar:5.3.27:compile
+[INFO] |  |  |  |  \- (org.springframework:spring-core:jar:5.3.27:compile - omitted for duplicate)
+[INFO] |  |  |  \- (org.springframework:spring-core:jar:5.3.27:compile - omitted for duplicate)
+[INFO] |  |  +- (org.springframework.cloud:spring-cloud-commons:jar:3.1.7:compile - omitted for conflict with 3.1.4)
+[INFO] |  |  +- io.github.openfeign:feign-core:jar:11.10:compile
+[INFO] |  |  \- io.github.openfeign:feign-slf4j:jar:11.10:compile
+[INFO] |  |     +- (io.github.openfeign:feign-core:jar:11.10:compile - omitted for duplicate)
+[INFO] |  |     \- (org.slf4j:slf4j-api:jar:1.7.36:compile - omitted for duplicate)
+[INFO] |  +- com.bmos:bmos-starter-formula:jar:1.15.2-SNAPSHOT:compile
+[INFO] |  |  +- (com.bmos:bmos-starter-common:jar:1.15.2-SNAPSHOT:compile - omitted for duplicate)
+[INFO] |  |  \- ch.obermuhlner:big-math:jar:2.3.2:compile
+[INFO] |  +- org.springframework.cloud:spring-cloud-starter-loadbalancer:jar:3.1.8:compile
+[INFO] |  |  +- (org.springframework.cloud:spring-cloud-starter:jar:3.1.8:compile - omitted for duplicate)
+[INFO] |  |  +- org.springframework.cloud:spring-cloud-loadbalancer:jar:3.1.8:compile
+[INFO] |  |  |  +- (org.springframework.cloud:spring-cloud-commons:jar:3.1.8:compile - omitted for conflict with 3.1.4)
+[INFO] |  |  |  +- (org.springframework.cloud:spring-cloud-context:jar:3.1.8:compile - omitted for conflict with 3.1.4)
+[INFO] |  |  |  +- io.projectreactor:reactor-core:jar:3.4.29:compile
+[INFO] |  |  |  |  \- org.reactivestreams:reactive-streams:jar:1.0.4:compile
+[INFO] |  |  |  \- io.projectreactor.addons:reactor-extra:jar:3.4.10:compile
+[INFO] |  |  |     \- (io.projectreactor:reactor-core:jar:3.4.28:compile - omitted for conflict with 3.4.29)
+[INFO] |  |  +- org.springframework.boot:spring-boot-starter-cache:jar:2.6.15:compile
+[INFO] |  |  |  +- (org.springframework.boot:spring-boot-starter:jar:2.6.15:compile - omitted for duplicate)
+[INFO] |  |  |  \- org.springframework:spring-context-support:jar:5.3.27:compile
+[INFO] |  |  |     +- (org.springframework:spring-beans:jar:5.3.27:compile - omitted for duplicate)
+[INFO] |  |  |     +- (org.springframework:spring-context:jar:5.3.27:compile - omitted for duplicate)
+[INFO] |  |  |     \- (org.springframework:spring-core:jar:5.3.27:compile - omitted for duplicate)
+[INFO] |  |  \- com.stoyanr:evictor:jar:1.0.0:compile
+[INFO] |  +- org.springframework.cloud:spring-cloud-commons:jar:3.1.8:compile
+[INFO] |  |  \- org.springframework.security:spring-security-crypto:jar:5.6.10:compile
+[INFO] |  +- io.github.openfeign:feign-jackson:jar:11.10:compile
+[INFO] |  |  +- (io.github.openfeign:feign-core:jar:11.10:compile - omitted for duplicate)
+[INFO] |  |  \- com.fasterxml.jackson.core:jackson-databind:jar:2.13.4:compile
+[INFO] |  |     +- com.fasterxml.jackson.core:jackson-annotations:jar:2.13.4:compile
+[INFO] |  |     \- com.fasterxml.jackson.core:jackson-core:jar:2.13.4:compile
+[INFO] |  \- io.github.openfeign.form:feign-form-spring:jar:3.0.1:compile
+[INFO] |     +- io.github.openfeign.form:feign-form:jar:3.0.1:compile
+[INFO] |     \- (org.springframework:spring-web:jar:4.3.12.RELEASE:compile - omitted for conflict with 5.3.27)
+[INFO] +- com.bmos.lims:bmos-lims2-common:jar:1.0-SNAPSHOT:compile
+[INFO] |  +- (com.bmos:bmos-starter-common:jar:1.15.2-SNAPSHOT:compile - omitted for duplicate)
+[INFO] |  \- com.alibaba:fastjson:jar:1.2.83:compile
+[INFO] \- com.bmos:bmos-starter-common:jar:1.15.2-SNAPSHOT:compile
+[INFO]    +- org.springframework.boot:spring-boot-starter-web:jar:2.6.15:compile
+[INFO]    |  +- (org.springframework.boot:spring-boot-starter:jar:2.6.15:compile - omitted for duplicate)
+[INFO]    |  +- org.springframework.boot:spring-boot-starter-json:jar:2.6.15:compile
+[INFO]    |  |  +- (org.springframework.boot:spring-boot-starter:jar:2.6.15:compile - omitted for duplicate)
+[INFO]    |  |  +- (org.springframework:spring-web:jar:5.3.27:compile - omitted for duplicate)
+[INFO]    |  |  +- (com.fasterxml.jackson.core:jackson-databind:jar:2.13.5:compile - omitted for conflict with 2.13.4)
+[INFO]    |  |  +- com.fasterxml.jackson.datatype:jackson-datatype-jdk8:jar:2.13.5:compile
+[INFO]    |  |  |  +- (com.fasterxml.jackson.core:jackson-core:jar:2.13.5:compile - omitted for conflict with 2.13.4)
+[INFO]    |  |  |  \- (com.fasterxml.jackson.core:jackson-databind:jar:2.13.5:compile - omitted for conflict with 2.13.4)
+[INFO]    |  |  +- com.fasterxml.jackson.datatype:jackson-datatype-jsr310:jar:2.13.5:compile
+[INFO]    |  |  |  +- (com.fasterxml.jackson.core:jackson-annotations:jar:2.13.5:compile - omitted for conflict with 2.13.4)
+[INFO]    |  |  |  +- (com.fasterxml.jackson.core:jackson-core:jar:2.13.5:compile - omitted for conflict with 2.13.4)
+[INFO]    |  |  |  \- (com.fasterxml.jackson.core:jackson-databind:jar:2.13.5:compile - omitted for conflict with 2.13.4)
+[INFO]    |  |  \- com.fasterxml.jackson.module:jackson-module-parameter-names:jar:2.13.5:compile
+[INFO]    |  |     +- (com.fasterxml.jackson.core:jackson-core:jar:2.13.5:compile - omitted for conflict with 2.13.4)
+[INFO]    |  |     \- (com.fasterxml.jackson.core:jackson-databind:jar:2.13.5:compile - omitted for conflict with 2.13.4)
+[INFO]    |  +- org.springframework.boot:spring-boot-starter-tomcat:jar:2.6.15:compile
+[INFO]    |  |  +- (jakarta.annotation:jakarta.annotation-api:jar:1.3.5:compile - omitted for duplicate)
+[INFO]    |  |  +- org.apache.tomcat.embed:tomcat-embed-core:jar:9.0.75:compile
+[INFO]    |  |  +- org.apache.tomcat.embed:tomcat-embed-el:jar:9.0.75:compile
+[INFO]    |  |  \- org.apache.tomcat.embed:tomcat-embed-websocket:jar:9.0.75:compile
+[INFO]    |  |     \- (org.apache.tomcat.embed:tomcat-embed-core:jar:9.0.75:compile - omitted for duplicate)
+[INFO]    |  +- (org.springframework:spring-web:jar:5.3.27:compile - omitted for duplicate)
+[INFO]    |  \- org.springframework:spring-webmvc:jar:5.3.27:compile
+[INFO]    |     +- org.springframework:spring-aop:jar:5.3.27:compile
+[INFO]    |     |  +- (org.springframework:spring-beans:jar:5.3.27:compile - omitted for duplicate)
+[INFO]    |     |  \- (org.springframework:spring-core:jar:5.3.27:compile - omitted for duplicate)
+[INFO]    |     +- (org.springframework:spring-beans:jar:5.3.27:compile - omitted for duplicate)
+[INFO]    |     +- (org.springframework:spring-context:jar:5.3.27:compile - omitted for duplicate)
+[INFO]    |     +- (org.springframework:spring-core:jar:5.3.27:compile - omitted for duplicate)
+[INFO]    |     +- org.springframework:spring-expression:jar:5.3.27:compile
+[INFO]    |     |  \- (org.springframework:spring-core:jar:5.3.27:compile - omitted for duplicate)
+[INFO]    |     \- (org.springframework:spring-web:jar:5.3.27:compile - omitted for duplicate)
+[INFO]    +- org.springframework.boot:spring-boot-starter-log4j2:jar:2.6.15:compile
+[INFO]    |  +- org.apache.logging.log4j:log4j-slf4j-impl:jar:2.17.2:compile
+[INFO]    |  |  +- (org.slf4j:slf4j-api:jar:1.7.25:compile - omitted for conflict with 1.7.36)
+[INFO]    |  |  +- org.apache.logging.log4j:log4j-api:jar:2.17.2:compile
+[INFO]    |  |  \- (org.apache.logging.log4j:log4j-core:jar:2.17.2:runtime - omitted for duplicate)
+[INFO]    |  +- org.apache.logging.log4j:log4j-core:jar:2.17.2:compile
+[INFO]    |  |  \- (org.apache.logging.log4j:log4j-api:jar:2.17.2:compile - omitted for duplicate)
+[INFO]    |  +- org.apache.logging.log4j:log4j-jul:jar:2.17.2:compile
+[INFO]    |  |  \- (org.apache.logging.log4j:log4j-api:jar:2.17.2:compile - omitted for duplicate)
+[INFO]    |  \- org.slf4j:jul-to-slf4j:jar:1.7.36:compile
+[INFO]    |     \- (org.slf4j:slf4j-api:jar:1.7.36:compile - omitted for duplicate)
+[INFO]    +- com.lmax:disruptor:jar:3.4.4:compile
+[INFO]    +- io.springfox:springfox-boot-starter:jar:3.0.0:compile
+[INFO]    |  +- io.springfox:springfox-oas:jar:3.0.0:compile
+[INFO]    |  |  +- io.swagger.core.v3:swagger-annotations:jar:2.1.2:compile
+[INFO]    |  |  +- io.swagger.core.v3:swagger-models:jar:2.1.2:compile
+[INFO]    |  |  |  \- (com.fasterxml.jackson.core:jackson-annotations:jar:2.10.1:compile - omitted for conflict with 2.13.4)
+[INFO]    |  |  +- io.springfox:springfox-spi:jar:3.0.0:compile
+[INFO]    |  |  |  \- (io.springfox:springfox-core:jar:3.0.0:compile - omitted for duplicate)
+[INFO]    |  |  +- io.springfox:springfox-schema:jar:3.0.0:compile
+[INFO]    |  |  |  +- (io.springfox:springfox-core:jar:3.0.0:compile - omitted for duplicate)
+[INFO]    |  |  |  \- (io.springfox:springfox-spi:jar:3.0.0:compile - omitted for duplicate)
+[INFO]    |  |  +- io.springfox:springfox-core:jar:3.0.0:compile
+[INFO]    |  |  |  +- net.bytebuddy:byte-buddy:jar:1.10.11:compile
+[INFO]    |  |  |  +- (com.fasterxml:classmate:jar:1.5.1:compile - omitted for duplicate)
+[INFO]    |  |  |  +- (org.slf4j:slf4j-api:jar:1.7.25:compile - omitted for conflict with 1.7.36)
+[INFO]    |  |  |  +- (org.springframework.plugin:spring-plugin-core:jar:2.0.0.RELEASE:compile - omitted for duplicate)
+[INFO]    |  |  |  \- (org.springframework.plugin:spring-plugin-metadata:jar:2.0.0.RELEASE:compile - omitted for duplicate)
+[INFO]    |  |  +- io.springfox:springfox-spring-web:jar:3.0.0:compile
+[INFO]    |  |  |  +- (io.springfox:springfox-spi:jar:3.0.0:compile - omitted for duplicate)
+[INFO]    |  |  |  +- (io.springfox:springfox-schema:jar:3.0.0:compile - omitted for duplicate)
+[INFO]    |  |  |  +- (io.springfox:springfox-core:jar:3.0.0:compile - omitted for duplicate)
+[INFO]    |  |  |  +- io.github.classgraph:classgraph:jar:4.8.83:compile
+[INFO]    |  |  |  +- (com.fasterxml:classmate:jar:1.5.1:compile - omitted for duplicate)
+[INFO]    |  |  |  +- (org.slf4j:slf4j-api:jar:1.7.25:compile - omitted for conflict with 1.7.36)
+[INFO]    |  |  |  +- (org.springframework.plugin:spring-plugin-core:jar:2.0.0.RELEASE:compile - omitted for duplicate)
+[INFO]    |  |  |  \- (org.springframework.plugin:spring-plugin-metadata:jar:2.0.0.RELEASE:compile - omitted for duplicate)
+[INFO]    |  |  +- io.springfox:springfox-spring-webmvc:jar:3.0.0:compile
+[INFO]    |  |  |  +- (io.springfox:springfox-spi:jar:3.0.0:compile - omitted for duplicate)
+[INFO]    |  |  |  +- (io.springfox:springfox-schema:jar:3.0.0:compile - omitted for duplicate)
+[INFO]    |  |  |  +- (io.springfox:springfox-core:jar:3.0.0:compile - omitted for duplicate)
+[INFO]    |  |  |  +- (io.springfox:springfox-spring-web:jar:3.0.0:compile - omitted for duplicate)
+[INFO]    |  |  |  +- (com.fasterxml:classmate:jar:1.5.1:compile - omitted for duplicate)
+[INFO]    |  |  |  +- (org.slf4j:slf4j-api:jar:1.7.25:compile - omitted for conflict with 1.7.36)
+[INFO]    |  |  |  +- (org.springframework.plugin:spring-plugin-core:jar:2.0.0.RELEASE:compile - omitted for duplicate)
+[INFO]    |  |  |  \- (org.springframework.plugin:spring-plugin-metadata:jar:2.0.0.RELEASE:compile - omitted for duplicate)
+[INFO]    |  |  +- io.springfox:springfox-spring-webflux:jar:3.0.0:compile
+[INFO]    |  |  |  +- (com.fasterxml:classmate:jar:1.5.1:compile - omitted for duplicate)
+[INFO]    |  |  |  +- (org.slf4j:slf4j-api:jar:1.7.25:compile - omitted for conflict with 1.7.36)
+[INFO]    |  |  |  +- (org.springframework.plugin:spring-plugin-core:jar:2.0.0.RELEASE:compile - omitted for duplicate)
+[INFO]    |  |  |  +- (org.springframework.plugin:spring-plugin-metadata:jar:2.0.0.RELEASE:compile - omitted for duplicate)
+[INFO]    |  |  |  +- (io.springfox:springfox-spi:jar:3.0.0:runtime - omitted for duplicate)
+[INFO]    |  |  |  +- (io.springfox:springfox-schema:jar:3.0.0:runtime - omitted for duplicate)
+[INFO]    |  |  |  +- (io.springfox:springfox-core:jar:3.0.0:runtime - omitted for duplicate)
+[INFO]    |  |  |  \- (io.springfox:springfox-spring-web:jar:3.0.0:runtime - omitted for duplicate)
+[INFO]    |  |  +- io.springfox:springfox-swagger-common:jar:3.0.0:compile
+[INFO]    |  |  |  +- (io.springfox:springfox-spi:jar:3.0.0:compile - omitted for duplicate)
+[INFO]    |  |  |  +- (io.springfox:springfox-schema:jar:3.0.0:compile - omitted for duplicate)
+[INFO]    |  |  |  +- (io.springfox:springfox-spring-web:jar:3.0.0:compile - omitted for duplicate)
+[INFO]    |  |  |  +- (io.springfox:springfox-spring-webmvc:jar:3.0.0:compile - omitted for duplicate)
+[INFO]    |  |  |  +- (com.fasterxml:classmate:jar:1.5.1:compile - omitted for duplicate)
+[INFO]    |  |  |  +- (org.slf4j:slf4j-api:jar:1.7.25:compile - omitted for conflict with 1.7.36)
+[INFO]    |  |  |  +- (org.springframework.plugin:spring-plugin-core:jar:2.0.0.RELEASE:compile - omitted for duplicate)
+[INFO]    |  |  |  +- (org.springframework.plugin:spring-plugin-metadata:jar:2.0.0.RELEASE:compile - omitted for duplicate)
+[INFO]    |  |  |  +- (io.swagger:swagger-annotations:jar:1.5.20:compile - omitted for duplicate)
+[INFO]    |  |  |  +- (io.swagger:swagger-models:jar:1.5.20:compile - omitted for duplicate)
+[INFO]    |  |  |  \- (io.swagger.core.v3:swagger-annotations:jar:2.1.2:compile - omitted for duplicate)
+[INFO]    |  |  +- (com.fasterxml:classmate:jar:1.5.1:compile - omitted for duplicate)
+[INFO]    |  |  +- (org.slf4j:slf4j-api:jar:1.7.25:compile - omitted for conflict with 1.7.36)
+[INFO]    |  |  +- (org.springframework.plugin:spring-plugin-core:jar:2.0.0.RELEASE:compile - omitted for duplicate)
+[INFO]    |  |  +- (org.springframework.plugin:spring-plugin-metadata:jar:2.0.0.RELEASE:compile - omitted for duplicate)
+[INFO]    |  |  \- (org.mapstruct:mapstruct:jar:1.3.1.Final:runtime - omitted for conflict with 1.4.1.Final)
+[INFO]    |  +- io.springfox:springfox-data-rest:jar:3.0.0:compile
+[INFO]    |  |  +- (com.fasterxml:classmate:jar:1.5.1:compile - omitted for duplicate)
+[INFO]    |  |  +- (org.slf4j:slf4j-api:jar:1.7.25:compile - omitted for conflict with 1.7.36)
+[INFO]    |  |  +- (org.springframework.plugin:spring-plugin-core:jar:2.0.0.RELEASE:compile - omitted for duplicate)
+[INFO]    |  |  +- (org.springframework.plugin:spring-plugin-metadata:jar:2.0.0.RELEASE:compile - omitted for duplicate)
+[INFO]    |  |  +- (io.springfox:springfox-spi:jar:3.0.0:compile - omitted for duplicate)
+[INFO]    |  |  +- (io.springfox:springfox-core:jar:3.0.0:compile - omitted for duplicate)
+[INFO]    |  |  \- (io.springfox:springfox-spring-webmvc:jar:3.0.0:compile - omitted for duplicate)
+[INFO]    |  +- io.springfox:springfox-bean-validators:jar:3.0.0:compile
+[INFO]    |  |  +- (com.fasterxml:classmate:jar:1.5.1:compile - omitted for duplicate)
+[INFO]    |  |  +- (org.slf4j:slf4j-api:jar:1.7.25:compile - omitted for conflict with 1.7.36)
+[INFO]    |  |  +- (org.springframework.plugin:spring-plugin-core:jar:2.0.0.RELEASE:compile - omitted for duplicate)
+[INFO]    |  |  +- (org.springframework.plugin:spring-plugin-metadata:jar:2.0.0.RELEASE:compile - omitted for duplicate)
+[INFO]    |  |  \- (io.springfox:springfox-spring-web:jar:3.0.0:compile - omitted for duplicate)
+[INFO]    |  +- io.springfox:springfox-swagger2:jar:3.0.0:compile
+[INFO]    |  |  +- (io.springfox:springfox-spi:jar:3.0.0:compile - omitted for duplicate)
+[INFO]    |  |  +- (io.springfox:springfox-schema:jar:3.0.0:compile - omitted for duplicate)
+[INFO]    |  |  +- (io.springfox:springfox-swagger-common:jar:3.0.0:compile - omitted for duplicate)
+[INFO]    |  |  +- (io.springfox:springfox-spring-web:jar:3.0.0:compile - omitted for duplicate)
+[INFO]    |  |  +- (io.springfox:springfox-spring-webmvc:jar:3.0.0:compile - omitted for duplicate)
+[INFO]    |  |  +- (io.springfox:springfox-spring-webflux:jar:3.0.0:compile - omitted for duplicate)
+[INFO]    |  |  +- (com.fasterxml:classmate:jar:1.5.1:compile - omitted for duplicate)
+[INFO]    |  |  +- (org.slf4j:slf4j-api:jar:1.7.25:compile - omitted for conflict with 1.7.36)
+[INFO]    |  |  +- (org.springframework.plugin:spring-plugin-core:jar:2.0.0.RELEASE:compile - omitted for duplicate)
+[INFO]    |  |  +- (org.springframework.plugin:spring-plugin-metadata:jar:2.0.0.RELEASE:compile - omitted for duplicate)
+[INFO]    |  |  +- io.swagger:swagger-annotations:jar:1.5.20:compile
+[INFO]    |  |  +- io.swagger:swagger-models:jar:1.5.20:compile
+[INFO]    |  |  |  +- (com.fasterxml.jackson.core:jackson-annotations:jar:2.9.5:compile - omitted for conflict with 2.13.4)
+[INFO]    |  |  |  +- (org.slf4j:slf4j-api:jar:1.7.22:compile - omitted for conflict with 1.7.36)
+[INFO]    |  |  |  \- (io.swagger:swagger-annotations:jar:1.5.20:compile - omitted for duplicate)
+[INFO]    |  |  \- (org.mapstruct:mapstruct:jar:1.3.1.Final:runtime - omitted for duplicate)
+[INFO]    |  +- io.springfox:springfox-swagger-ui:jar:3.0.0:compile
+[INFO]    |  |  \- (io.springfox:springfox-spring-webmvc:jar:3.0.0:runtime - omitted for duplicate)
+[INFO]    |  +- com.fasterxml:classmate:jar:1.5.1:compile
+[INFO]    |  +- (org.slf4j:slf4j-api:jar:1.7.25:compile - omitted for conflict with 1.7.36)
+[INFO]    |  +- org.springframework.plugin:spring-plugin-core:jar:2.0.0.RELEASE:compile
+[INFO]    |  |  +- (org.springframework:spring-beans:jar:5.2.0.RELEASE:compile - omitted for conflict with 5.3.27)
+[INFO]    |  |  +- (org.springframework:spring-context:jar:5.2.0.RELEASE:compile - omitted for conflict with 5.3.27)
+[INFO]    |  |  +- (org.springframework:spring-aop:jar:5.2.0.RELEASE:compile - omitted for conflict with 5.3.27)
+[INFO]    |  |  \- (org.slf4j:slf4j-api:jar:1.7.25:compile - omitted for conflict with 1.7.36)
+[INFO]    |  \- org.springframework.plugin:spring-plugin-metadata:jar:2.0.0.RELEASE:compile
+[INFO]    |     +- (org.springframework.plugin:spring-plugin-core:jar:2.0.0.RELEASE:compile - omitted for duplicate)
+[INFO]    |     \- (org.slf4j:slf4j-api:jar:1.7.25:compile - omitted for conflict with 1.7.36)
+[INFO]    +- org.projectlombok:lombok:jar:1.18.20:compile
+[INFO]    +- cn.hutool:hutool-all:jar:5.8.3:compile
+[INFO]    +- com.google.guava:guava:jar:32.1.2-jre:compile
+[INFO]    |  +- com.google.guava:failureaccess:jar:1.0.1:compile
+[INFO]    |  +- com.google.guava:listenablefuture:jar:9999.0-empty-to-avoid-conflict-with-guava:compile
+[INFO]    |  +- com.google.code.findbugs:jsr305:jar:3.0.2:compile
+[INFO]    |  +- org.checkerframework:checker-qual:jar:3.33.0:compile
+[INFO]    |  +- com.google.errorprone:error_prone_annotations:jar:2.18.0:compile
+[INFO]    |  \- com.google.j2objc:j2objc-annotations:jar:2.8:compile
+[INFO]    +- jakarta.validation:jakarta.validation-api:jar:2.0.2:compile
+[INFO]    +- org.hibernate.validator:hibernate-validator:jar:6.2.5.Final:compile
+[INFO]    |  +- (jakarta.validation:jakarta.validation-api:jar:2.0.2:compile - omitted for duplicate)
+[INFO]    |  +- org.jboss.logging:jboss-logging:jar:3.4.1.Final:compile
+[INFO]    |  \- (com.fasterxml:classmate:jar:1.5.1:compile - omitted for duplicate)
+[INFO]    +- org.mapstruct:mapstruct:jar:1.4.1.Final:compile
+[INFO]    +- io.jsonwebtoken:jjwt:jar:0.12.3:compile
+[INFO]    |  +- io.jsonwebtoken:jjwt-api:jar:0.12.3:compile
+[INFO]    |  +- io.jsonwebtoken:jjwt-impl:jar:0.12.3:runtime
+[INFO]    |  |  \- (io.jsonwebtoken:jjwt-api:jar:0.12.3:runtime - omitted for duplicate)
+[INFO]    |  \- io.jsonwebtoken:jjwt-jackson:jar:0.12.3:runtime
+[INFO]    |     +- (io.jsonwebtoken:jjwt-api:jar:0.12.3:runtime - omitted for duplicate)
+[INFO]    |     \- (com.fasterxml.jackson.core:jackson-databind:jar:2.12.7.1:runtime - omitted for conflict with 2.13.4)
+[INFO]    \- com.alibaba:easyexcel:jar:3.3.2:compile (version managed from 3.0.5)
+[INFO]       +- com.alibaba:easyexcel-core:jar:3.3.2:compile
+[INFO]       |  +- com.alibaba:easyexcel-support:jar:3.3.2:compile
+[INFO]       |  |  \- (org.slf4j:slf4j-api:jar:1.7.32:compile - omitted for conflict with 1.7.36)
+[INFO]       |  +- org.apache.poi:poi:jar:4.1.2:compile
+[INFO]       |  |  +- (commons-codec:commons-codec:jar:1.13:compile - omitted for conflict with 1.11)
+[INFO]       |  |  +- org.apache.commons:commons-collections4:jar:4.4:compile
+[INFO]       |  |  +- org.apache.commons:commons-math3:jar:3.6.1:compile
+[INFO]       |  |  \- com.zaxxer:SparseBitSet:jar:1.2:compile
+[INFO]       |  +- org.apache.poi:poi-ooxml:jar:4.1.2:compile
+[INFO]       |  |  +- (org.apache.poi:poi:jar:4.1.2:compile - omitted for duplicate)
+[INFO]       |  |  +- (org.apache.poi:poi-ooxml-schemas:jar:4.1.2:compile - omitted for duplicate)
+[INFO]       |  |  +- org.apache.commons:commons-compress:jar:1.19:compile
+[INFO]       |  |  \- com.github.virtuald:curvesapi:jar:1.06:compile
+[INFO]       |  +- org.apache.poi:poi-ooxml-schemas:jar:4.1.2:compile
+[INFO]       |  |  \- org.apache.xmlbeans:xmlbeans:jar:3.1.0:compile
+[INFO]       |  +- org.apache.commons:commons-csv:jar:1.8:compile
+[INFO]       |  +- org.ehcache:ehcache:jar:3.9.9:compile
+[INFO]       |  |  \- (org.slf4j:slf4j-api:jar:1.7.25:compile - omitted for conflict with 1.7.36)
+[INFO]       |  +- commons-io:commons-io:jar:2.11.0:compile
+[INFO]       |  \- (org.slf4j:slf4j-api:jar:1.7.32:compile - omitted for conflict with 1.7.36)
+[INFO]       \- (org.slf4j:slf4j-api:jar:1.7.32:compile - omitted for conflict with 1.7.36)
+[INFO] 
+[INFO] ------------------< com.bmos.lims:bmos-lims2-server >-------------------
+[INFO] Building bmos-lims2-server 1.0-SNAPSHOT                            [4/5]
+[INFO] --------------------------------[ jar ]---------------------------------
+[WARNING] The POM for com.bmos:bmos-mes-feign:jar:1.0.1.20250218-SNAPSHOT is missing, no dependency information available
+[WARNING] The POM for com.bmos:bmos-starter-file:jar:1.15.2-SNAPSHOT is invalid, transitive dependencies (if any) will not be available, enable debug logging for more details
+[WARNING] The POM for com.bmos:bmos-platform-facade:jar:1.0.1.20251020-SNAPSHOT is missing, no dependency information available
+[WARNING] The POM for com.bmos:bmos-scheduler-core:jar:1.0.0.20240411-SNAPSHOT is missing, no dependency information available
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary for bmos-lims2 1.0-SNAPSHOT:
+[INFO] 
+[INFO] bmos-lims2 ......................................... SUCCESS [  0.481 s]
+[INFO] bmos-lims2-common .................................. SUCCESS [  0.711 s]
+[INFO] bmos-lims2-feign ................................... SUCCESS [  0.697 s]
+[INFO] bmos-lims2-server .................................. FAILURE [  0.463 s]
+[INFO] bmos-lims2-web ..................................... SKIPPED
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  2.542 s
+[INFO] Finished at: 2026-02-05T18:06:01+08:00
+[INFO] ------------------------------------------------------------------------
+[WARNING] The requested profile "nexus" could not be activated because it does not exist.
+[ERROR] Failed to execute goal on project bmos-lims2-server: Could not resolve dependencies for project com.bmos.lims:bmos-lims2-server:jar:1.0-SNAPSHOT: The following artifacts could not be resolved: com.bmos:bmos-mes-feign:jar:1.0.1.20250218-SNAPSHOT, com.bmos:bmos-platform-facade:jar:1.0.1.20251020-SNAPSHOT, com.bmos:bmos-scheduler-core:jar:1.0.0.20240411-SNAPSHOT: com.bmos:bmos-mes-feign:jar:1.0.1.20250218-SNAPSHOT was not found in https://maven.aliyun.com/repository/public during a previous attempt. This failure was cached in the local repository and resolution is not reattempted until the update interval of aliyunmaven has elapsed or updates are forced -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/DependencyResolutionException
+[ERROR] 
+[ERROR] After correcting the problems, you can resume the build with the command
+[ERROR]   mvn <args> -rf :bmos-lims2-server

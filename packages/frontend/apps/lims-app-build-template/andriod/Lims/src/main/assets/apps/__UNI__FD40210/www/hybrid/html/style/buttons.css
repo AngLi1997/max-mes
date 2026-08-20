@@ -1,0 +1,111 @@
+			.back-box {
+				background: rgba(48, 49, 51, 0.8);
+				width: 60px;
+				height: 60px;
+				position: fixed;
+				top: 20px;
+				left: 20px;
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			.back-image {
+				width: 17px;
+				height: 28px;
+			}
+
+			.action-buttons {
+				background: rgba(48, 49, 51, 0.8);
+				width: 70px;
+				height: 262px;
+				padding: 18px;
+				box-sizing: border-box;
+				position: fixed;
+				bottom: 30px;
+				right: 30px;
+				border-radius: 40px;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: space-around;
+				font-size: 18px;
+				font-weight: 500;
+				color: #fff;
+			}
+
+			.line {
+				width: 23px;
+				height: 1px;
+				background-color: #fff;
+			}
+
+			#save-button,
+			#finish-button,
+			#menu-button {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+			}
+
+			.save-image,
+			.finish-image,
+			.menu-image {
+				width: 40px;
+				height: 40px;
+				margin-bottom: 4px;
+			}
+
+			.save-image,
+			.finish-image {
+				margin-bottom: 4px;
+			}
+
+			.pagination-class {
+				min-width: 154px;
+				height: 60px;
+				box-sizing: border-box;
+				padding: 20px;
+				border-radius: 60px;
+				background: rgba(48, 49, 51, 0.8);
+				position: fixed;
+				left: 20px;
+				bottom: 30px;
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				color: #B6B9BF;
+				font-size: 22px;
+			}
+
+			.pagination-image {
+				width: 20px;
+				height: 20px;
+			}
+
+			.mark-box-class {
+				display: flex;
+				position: fixed;
+				top: 20px;
+				right: 20px;
+			}
+
+			.copy-class {
+				color: #2871FF;
+				border: 2px solid #2871FF;
+				padding: 8px 16px 8px 16px;
+				border-radius: 8px;
+				margin-left: 16px;
+				font-size: 26px;
+				font-weight: 500;
+			}
+
+			.obsolete-class {
+				color: #FF4C26;
+				border: 2px solid #FF4C26;
+				padding: 8px 16px 8px 16px;
+				border-radius: 8px;
+				font-size: 26px;
+				font-weight: 500;
+			}

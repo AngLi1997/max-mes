@@ -1,0 +1,64 @@
+<!-- 批量发布/核对 -->
+<template>
+  <BMModalForm
+    ref="modalFormRef"
+    v-model:open="open"
+    :title="actionType == 'publish' ? t('检验结果批量发布') : t('检验结果批量核对')"
+    :formProps="formProps"
+    wrapClassName="modalSizeMedium"
+    :submit="submit"></BMModalForm>
+</template>
+
+<script setup lang="ts">
+  import { t } from '@bmos/i18n';
+  import { useForm } from './hooks';
+  import { message } from 'ant-design-vue';
+  import { batchPublishTiter, batchCheckTiter } from '@/services';
+  import { BMModalForm } from '@bmos/components';
+
+  const open = ref(false);
+  const emits = defineEmits(['submitSuccess']);
+
+  const { modalFormRef, formProps } = useForm();
+
+  const actionType = ref<'publish' | 'check'>('publish');
+
+  const openModal = async (type: 'publish' | 'check') => {
+    actionType.value = type;
+    open.value = true;
+  };
+
+  const cancel = () => {
+    open.value = false;
+    // tableRef.value?.fetchData();
+  };
+
+  const request = async (formModal: any) => {
+    try {
+      if (actionType.value == 'publish') {
+        return await batchPublishTiter(formModal);
+      } else {
+        return await batchCheckTiter(formModal);
+      }
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  // 提交
+  const submit = async () => {
+    try {
+      const { data } = await modalFormRef.value.submit(request);
+      message.success(t('操作成功'));
+      emits('submitSuccess', data, actionType.value);
+      cancel();
+    } catch (error: any) {
+      console.log('error', error);
+      error.message && message.error(error.message);
+    }
+  };
+
+  defineExpose({ openModal });
+</script>
+
+<style scoped></style>

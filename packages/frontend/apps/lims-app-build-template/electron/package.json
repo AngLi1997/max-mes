@@ -1,0 +1,36 @@
+{
+  "name": "Bmos-Lims",
+  "version": "24.3.1",
+  "appVersion": "BM2.0.2.1.20240301_beta",
+  "description": "",
+  "main": "main.js",
+  "win": {
+    "icon": "__dirname + 'logo.ico'"
+  },
+  "scripts": {
+    "start": "electron .",
+    "electron:start": "electron .",
+    "electron:build": "electron-builder --win --x64"
+  },
+  "build": {
+    "productName": "Bmos-Lims",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "icon": "./logo.ico"
+    }
+  },
+  "author": "Bmos",
+  "license": "ISC",
+  "devDependencies": {
+    "@electron/rebuild": "^3.7.1",
+    "electron": "28.2.0",
+    "electron-builder": "^24.9.1"
+  },
+  "dependencies": {
+    "axios": "^1.6.8",
+    "node-gyp-build": "^4.8.4",
+    "serialport": "^12.0.0"
+  }
+}

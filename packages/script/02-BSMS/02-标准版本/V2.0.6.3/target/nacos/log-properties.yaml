@@ -1,0 +1,10 @@
+log-properties:
+  localeMap:
+    zh-CN: #{id: 主键id, processId: 工艺id}
+      #reportId: 报告id
+      #reportName: 报告名称
+      #reportNo: 报告编码
+      id: 23423423
+      processId: 2342342
+
+    # en-US: {id: 主键id, processId: 工艺id}

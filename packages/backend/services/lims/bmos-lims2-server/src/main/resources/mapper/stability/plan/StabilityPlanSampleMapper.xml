@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.stability.plan.mapper.StabilityPlanSampleMapper">
+
+    <select id="selectByPlanId" resultType="com.bmos.lims2.server.stability.plan.entity.StabilityPlanSample">
+        SELECT *
+        FROM lm_stability_plan_sample
+        WHERE plan_id = #{planId}
+          AND is_deleted = 0
+        ORDER BY batch_id ASC, scheme_plan_id ASC
+    </select>
+
+    <select id="selectByBatchId" resultType="com.bmos.lims2.server.stability.plan.entity.StabilityPlanSample">
+        SELECT *
+        FROM lm_stability_plan_sample
+        WHERE batch_id = #{batchId}
+          AND is_deleted = 0
+        ORDER BY scheme_plan_id ASC
+    </select>
+
+    <delete id="deleteByPlanId">
+        DELETE FROM lm_stability_plan_sample
+        WHERE plan_id = #{planId}
+    </delete>
+
+    <select id="selectPendingBatchIds" resultType="java.lang.Long">
+        SELECT batch_id
+        FROM lm_stability_plan_sample
+        WHERE is_deleted = 0
+        GROUP BY batch_id
+        HAVING SUM(CASE WHEN status = 'PENDING' THEN 1 ELSE 0 END) > 0
+    </select>
+
+    <select id="selectSampledBatchIds" resultType="java.lang.Long">
+        SELECT batch_id
+        FROM lm_stability_plan_sample
+        WHERE is_deleted = 0
+        GROUP BY batch_id
+        HAVING SUM(CASE WHEN status = 'PENDING' THEN 1 ELSE 0 END) = 0
+           AND SUM(CASE WHEN status = 'SAMPLED' THEN 1 ELSE 0 END) > 0
+    </select>
+    <update id="updateSampleStatusByPlanId">
+        UPDATE lm_stability_plan_sample
+        SET status = #{toStatus.value}
+        WHERE plan_id = #{planId}
+          AND status = #{fromStatus.value}
+          AND is_deleted = 0
+    </update>
+
+</mapper>

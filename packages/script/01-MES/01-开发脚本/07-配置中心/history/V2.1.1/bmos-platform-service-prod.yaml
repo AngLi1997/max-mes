@@ -1,0 +1,87 @@
+db:
+  schema: bmos_platform
+xxlJobExecutorPort: 9100
+# Mybatis配置
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true # 虽然默认为 true ，但是还是显示去指定下。
+    default-enum-type-handler: com.baomidou.mybatisplus.core.handlers.MybatisEnumTypeHandler
+  global-config:
+    db-config:
+      logic-delete-value: true # 逻辑已删除值(默认为 true)
+      logic-not-delete-value: false # 逻辑未删除值(默认为 false)
+  mapper-locations: classpath*:mapper/**/*.xml
+parameter:
+  product:
+    plan:
+      discard:
+        code: mes.schedule.plan-invalid
+  record:
+    error-data: mes.record.error-data
+  release:
+    over-level-data: mes.release.over-level-data
+
+logging:
+  config: classpath:log4j2.xml
+
+bmos:
+  secret-key: Bmos1018
+  application:
+    code: bmos-${spring.application.name}
+  i18n:
+    locations:
+      - i18n/exception_platform
+      - i18n/message_platform
+      - i18n/validate_platform
+      - i18n/menu
+  auth:
+    exclude-urls:
+      - ${server.servlet.context-path}/user/login
+      - ${server.servlet.context-path}/swagger-ui/**
+      - ${server.servlet.context-path}/swagger-resources/**
+      - ${server.servlet.context-path}/api-docs
+      - ${server.servlet.context-path}/v3/api-docs
+      - ${server.servlet.context-path}/param/app/version
+      - ${server.servlet.context-path}/user/loginNoValidate
+      - ${server.servlet.context-path}/unit/getAllUnit
+      - ${server.servlet.context-path}/equipment/feign/list
+      - ${server.servlet.context-path}/feign/factory/room/selectByRoomIds
+    activeUrls:
+      - ${server.servlet.context-path}/user/active
+      - ${server.servlet.context-path}/user/actived
+      - ${server.servlet.context-path}/user/mac
+      - ${server.servlet.context-path}/system/active/valid
+    enable: true
+  services:
+    mes: bmos-mes-service
+    lims: bmos-lims-service
+    wms: bmos-wms-service
+
+business:
+  platforms:
+    - platformName: ${bmos.services.mes}
+      children:
+        - childName: 原辅包信息
+          childCode: 0
+        - childName: 中间品信息
+          childCode: 1
+        - childName: 产品信息
+          childCode: 2
+    - platformName: ${bmos.services.lims}
+      children:
+        - childName: 检品信息
+          childCode: 0
+    - platformName: ${bmos.services.wms}
+      children:
+        - childName: 货品信息
+          childCode: 0
+  app:
+    version: 2024020301
+
+minio:
+  endpoint: http://127.0.0.1:9000
+  accessKey: minio
+  secretKey: Bmos1018
+  bucket: bmos-product
+  buckets:
+    sign: bmos-platform-sign

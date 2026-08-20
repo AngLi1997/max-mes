@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.plan.template.mapper.PlanTemplateMapper">
+
+    <update id="batchConfirmTemplate">
+        UPDATE bm_plan_template t1
+        SET confirmed = true
+        WHERE t1.id IN
+        (
+        SELECT t2.plan_template_id
+        FROM bm_plan_template_batch t2
+        JOIN bm_process t3 ON t2.process_id = t3.id
+        WHERE t2.is_deleted = 0 and t2.plan_template_id IN
+        <foreach collection="ids" open="(" separator="," close=")" item="id">
+            #{id}
+        </foreach>
+        GROUP BY t2.plan_template_id
+        HAVING COUNT(DISTINCT t2.process_version) = 1
+        AND MAX(t2.process_version) = MAX(t3.active_version)
+        );
+
+    </update>
+
+    <update id="batchCancelConfirmTemplate">
+        update bm_plan_template t1 set confirmed = false
+        where
+        t1.id in
+        (SELECT DISTINCT
+        t2.plan_template_id
+        FROM
+        bm_plan_template_batch t2
+        JOIN bm_process t3 ON t2.process_id = t3.id
+        WHERE t2.is_deleted = 0 and t1.is_deleted = 0
+        and (t2.process_version != t3.active_version or ISNULL(t3.active_version))
+        and t2.plan_template_id in
+        <foreach collection="ids" open="(" separator="," close=")" item="id">
+            #{id}
+        </foreach>)
+    </update>
+</mapper>

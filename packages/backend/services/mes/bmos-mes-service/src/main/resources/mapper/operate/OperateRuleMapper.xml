@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.operate.mapper.OperateRuleMapper">
+
+    <select id="getRecordPage" resultType="com.bmos.mes.service.operate.vo.OperateRulePageVO">
+        SELECT
+            rule.id,
+            rule.`name`,
+            rule.`code`
+        FROM
+            bm_operate_rule AS rule
+            JOIN bm_resource_permission bm ON rule.id = bm.resource_id
+        where
+            rule.is_deleted = 0
+        and bm.dept_id in
+        <foreach collection="deptIdList" open="(" close=")" separator="," item="item">
+            #{item}
+        </foreach>
+        <if test="categoryIdList != null and categoryIdList.size() > 0">
+            and rule.category_id in
+            <foreach collection="categoryIdList" open="(" close=")" separator="," item="item">
+                #{item}
+            </foreach>
+        </if>
+        <if test="name != null and name != '' ">
+            and rule.`name` like concat('%',#{name},'%')
+        </if>
+        <if test="code != null and code != '' ">
+            and rule.`code` like concat('%',#{code},'%')
+        </if>
+        GROUP BY rule.id
+        order by rule.`code` asc
+    </select>
+
+    <select id="getAuditBusinessKey" resultType="java.lang.String">
+        SELECT DISTINCT
+            version.id
+        FROM
+            bm_operate_rule AS rule
+        JOIN bm_resource_permission bm ON rule.id = bm.resource_id
+        JOIN bm_operate_rule_version AS version ON version.operate_id = rule.id
+        WHERE
+            rule.is_deleted = 0
+        AND version.is_deleted = 0
+        AND version.state = 'audit'
+        and bm.dept_id in
+        <foreach collection="deptIdList" open="(" close=")" separator="," item="item">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="queryListByIdsAndDeptIds" resultType="com.bmos.mes.service.operate.model.OperateRule">
+        SELECT
+            rule.*,
+            version.version,
+            version.url,
+            version.id as versionId
+        FROM
+            bm_operate_rule AS rule
+        JOIN bm_resource_permission bm ON rule.id = bm.resource_id
+        join bm_operate_rule_version as version on rule.id = version.operate_id
+        WHERE
+            rule.is_deleted = 0
+            and version.is_deleted = 0
+            and version.state =#{state}
+            and bm.dept_id in
+        <foreach collection="deptIds" open="(" close=")" separator="," item="item">
+            #{item}
+        </foreach>
+            and rule.id in
+        <foreach collection="ruleIds" open="(" close=")" separator="," item="ruleId">
+            #{ruleId}
+        </foreach>
+        group by rule.id
+    </select>
+</mapper>

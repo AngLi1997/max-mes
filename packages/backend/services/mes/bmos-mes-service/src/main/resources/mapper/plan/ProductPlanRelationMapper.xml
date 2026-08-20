@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.plan.info.mapper.ProductPlanRelationMapper">
+    <select id="detail" resultType="com.bmos.mes.service.plan.info.vo.ProductPlanRelationListVO">
+        select distinct
+            t2.id as productPlanId,
+            t2.process_id,
+            t2.process_name,
+            t2.process_version,
+            t2.batch_no,
+            t2.start_time,
+            t2.archive_status,
+            t2.is_relation as related
+        from bm_product_plan_relation t1
+        left join bm_product_plan t2 on t1.relation_product_plan_id = t2.id
+        where t1.product_plan_id = #{productPlanId} and t1.is_direct_relation = 'TRUE'
+    </select>
+</mapper>

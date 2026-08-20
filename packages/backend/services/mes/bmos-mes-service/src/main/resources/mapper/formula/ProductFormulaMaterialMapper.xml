@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.formula.mapper.ProductFormulaMaterialMapper">
+    <select id="selectByProcedureId" resultType="com.bmos.mes.service.formula.model.ProductFormulaMaterial">
+        select m.* from bm_procedure_model_material p
+        left join bm_product_formula_material m on p.product_formula_material_id = m.id
+        where p.procedure_model_id = #{procedureModelId}
+    </select>
+    <select id="selectProcedureMaterial"
+            resultType="com.bmos.mes.service.formula.model.ProductFormulaMaterial">
+        select m.* from bm_procedure_model_material p
+        left join bm_product_formula_material m on p.product_formula_material_id = m.id
+        where p.procedure_model_id = #{procedureModelId}
+        <if test="categoryType != null">
+            and m.material_type = #{categoryType}
+        </if>
+    </select>
+
+    <select id="selectListByDisabledIds"
+            resultType="com.bmos.mes.service.formula.model.ProductFormulaMaterial">
+        select p.* from bm_product_formula_material p
+        where p.id in
+        <foreach collection="idList" separator="," open="(" close=")" item="id">
+            #{id}
+        </foreach>
+    </select>
+</mapper>

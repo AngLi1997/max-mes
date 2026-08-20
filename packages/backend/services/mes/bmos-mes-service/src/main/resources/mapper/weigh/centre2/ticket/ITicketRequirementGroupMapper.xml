@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.weigh.centre2.requirement.mapper.ITicketRequirementGroupMapper">
+    <select id="queryGroupPage"
+            resultType="com.bmos.mes.service.weigh.centre2.requirement.vo.TicketRequirementGroupPageVO">
+        select bm_weigh_ticket_requirement_group.id,
+               bm_material.name                                 as material_name,
+               bm_material.merge_code                           as merge_code,
+               bm_weigh_ticket_requirement_group.batch_no       as batchno,
+               bm_product_formula.name                          as bom_name,
+               bm_weigh_ticket_requirement_group.plan_date      as plandate,
+               bm_weigh_centre.name                             as weigh_centre_name,
+               bm_weigh_ticket_requirement_group.release_status as releasestatus,
+               bm_weigh_ticket_requirement_group.remark
+        from bm_weigh_ticket_requirement_group
+                 left join bm_weigh_centre on bm_weigh_ticket_requirement_group.weigh_centre_id = bm_weigh_centre.id and
+                                              bm_weigh_centre.is_deleted = 0
+                 left join bm_material
+                           on bm_weigh_ticket_requirement_group.material_id = bm_material.id and
+                              bm_material.is_deleted = 0
+                 left join bm_product_formula_version
+                           on bm_weigh_ticket_requirement_group.bom_version_id = bm_product_formula_version.id and
+                              bm_product_formula_version.is_deleted = 0
+                 left join bm_product_formula
+                           on bm_product_formula_version.product_formula_id = bm_product_formula.id and
+                              bm_product_formula.is_deleted = 0
+        WHERE bm_weigh_ticket_requirement_group.is_deleted = 0
+        and bm_weigh_ticket_requirement_group.weigh_centre_id in
+        <foreach collection="weighCentreIds" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        <if test="page.batchNo != null and page.batchNo != ''">
+            AND bm_weigh_ticket_requirement_group.batch_no LIKE CONCAT('%', #{page.batchNo}, '%')
+        </if>
+        <if test="page.materialName != null and page.materialName != ''">
+            AND bm_material.name LIKE CONCAT('%', #{page.materialName}, '%')
+        </if>
+        <if test="page.mergeCode != null and page.mergeCode != ''">
+            AND bm_material.merge_code LIKE CONCAT('%', #{page.mergeCode}, '%')
+        </if>
+        <if test="page.bomName != null and page.bomName != ''">
+            AND bm_product_formula.name LIKE CONCAT('%', #{page.bomName}, '%')
+        </if>
+        order by bm_weigh_ticket_requirement_group.create_time desc
+    </select>
+</mapper>

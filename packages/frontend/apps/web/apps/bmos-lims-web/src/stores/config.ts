@@ -1,0 +1,19 @@
+import { reactive } from 'vue'
+import { defineStore } from 'pinia'
+import { getParameterDetailByCode } from '@/services'
+import { message } from 'ant-design-vue'
+
+export const useConfig = defineStore('counter', () => {
+  const configs = reactive<Record<string,any>>({})
+
+  const findConfigByCode = async (code:string='mes.record.margin') => {
+    try {
+      const { data } = await getParameterDetailByCode(code);
+      configs[code] = data
+    } catch (error: any) {
+      message.error(error.message);
+    }
+  };
+
+  return { findConfigByCode,configs }
+})

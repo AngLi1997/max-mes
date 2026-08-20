@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0,minimum-scale=0.33,maximum-scale=3">
+		<title>Document</title>
+		<link type="text/css" rel="stylesheet" href="./style/radioStyle.css">
+		<link type="text/css" rel="stylesheet" href="./style/checkboxStyle.css">
+		<link type="text/css" rel="stylesheet" href="./style/buttons.css">
+		<link type="text/css" rel="stylesheet" href="./style/record.css">
+		<link type="text/css" rel="stylesheet" href="./style/textareaStyle.css">
+	</head>
+	<body id="body">
+		<form id="form-box"></form>
+		<!-- 页面上悬浮的按钮 -->
+		<div class="mark-box-class">
+			<div class='obsolete-class'>
+				已作废
+			</div>
+			<div class='copy-class'>
+				副本
+			</div>
+		</div>
+	</body>
+	<!-- 工具方法 -->
+	<script type="text/javascript" src="./js/utils.js" ></script>
+	<!-- uni 的 SDK，必须引用。 -->
+	<script type="text/javascript" src="./js/uni.webview.1.5.5.js"></script>
+	<!-- Vconsole -->
+	<!-- <script type="text/javascript" src="https://cdn.bootcss.com/vConsole/3.2.2/vconsole.min.js"></script> -->
+	<!-- Jquery -->
+	<script src="./js/jquery-3.4.1.min.js.js"></script>
+
+	<script src="./js/event.js"></script>
+	<script type="text/javascript">
+		$(function() {
+			// 隐藏复制和作废标识
+			$('.copy-class').hide()
+			$('.obsolete-class').hide()
+		})
+		document.addEventListener("UniAppJSBridgeReady", function() {
+			console.log('UniAppJSBridgeReady-RENDER');
+			uni.getEnv(function(res) {
+				console.log('uni.getEnv', JSON.stringify(res));
+			})
+			uni.postMessage({
+				data: {
+					type: 'RENDER'
+				}
+			});
+		});
+		window.addEventListener('message', (msg) => {
+			eval(msg.data)
+		})
+	</script>
+</html>

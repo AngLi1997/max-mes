@@ -1,0 +1,46 @@
+.formula-container {
+  height: 100%;
+  background-color: #fff;
+  width: 800px;
+  margin: 0 auto;
+  overflow-y: auto;
+}
+
+.formula-container .node-actived {
+  /* border: 1px solid #2871ff;
+   box-sizing: border-box; */
+  border-color: #2871ff !important;
+  background-color: #ebf1ff !important;
+}
+
+.formula {
+  background-color: #e6e6e6;
+}
+
+.formula-container .formula-param {
+  border-color: #ffcb37;
+  background-color: #fff5d9;
+}
+
+.formula-container .formula-node {
+  background-image: url('../../../assets/images//formula.png');
+  background-repeat: no-repeat;
+  background-position-x: calc(100% - 2px);
+  background-position-y: 2px;
+}
+
+.formula-container .record-component {
+  background-color: #f2f3f4;
+  border-color: #909398;
+  border-radius: 2px;
+  resize: none;
+  user-select: none;
+  cursor: pointer;
+  box-sizing: content-box;
+  font-family: revert;
+  line-height: normal;
+}
+
+.formula-container textarea:focus {
+  outline: none;
+}

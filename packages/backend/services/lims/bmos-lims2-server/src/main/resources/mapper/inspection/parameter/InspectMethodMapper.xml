@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.inspect.parameter.mapper.InspectMethodMapper">
+
+    <resultMap id="InspectMethodEffectiveResultMap"
+               type="com.bmos.lims2.server.inspect.parameter.dto.InspectMethodEffectiveDTO">
+        <result column="record_id" property="recordId"/>
+        <result column="record_code" property="recordCode"/>
+        <result column="record_name" property="recordName"/>
+        <result column="record_version_id" property="recordVersionId"/>
+        <result column="version" property="version"/>
+    </resultMap>
+
+    <select id="selectEffectiveMethodsByParameterId" resultMap="InspectMethodEffectiveResultMap">
+        SELECT
+            br.id          AS record_id,
+            br.code        AS record_code,
+            br.name        AS record_name,
+            brv.id         AS record_version_id,
+            brv.version    AS version
+        FROM bm_batch_record br
+        JOIN lm_inspect_parameter_record r
+            ON r.record_id = br.id
+           AND r.is_deleted = 0
+        JOIN bm_batch_record_version brv
+            ON brv.record_id = br.id
+           AND brv.is_deleted = 0
+           AND brv.state ='3'
+        WHERE r.parameter_id = #{parameterId}
+          AND br.is_deleted = 0
+    </select>
+
+</mapper>
+
+

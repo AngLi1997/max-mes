@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.process.mapper.ProcedureModelMaterialMapper">
+
+
+    <select id="selectByProcessVersionId"
+            resultType="com.bmos.mes.service.process.model.ProcedureModelMaterial">
+        select bm_procedure_model_material.* from bm_procedure_model_material left join bm_procedure_model on
+            bm_procedure_model_material.procedure_model_id = bm_procedure_model.id
+        where bm_procedure_model.process_version_id = #{processVersionId}
+    </select>
+
+    <select id="getMaterialListByProcedureModelIds"
+            resultType="com.bmos.mes.service.process.vo.ProcedureModelMaterialVO">
+        SELECT
+            material.procedure_model_id as procedureModelId,
+            material.product_formula_material_id as productFormulaMaterialId,
+            model.name as procedureModelName
+        FROM
+            bm_procedure_model_material as material
+            LEFT JOIN bm_procedure_model as model ON material.procedure_model_id = model.id
+        WHERE
+            material.procedure_model_id in
+        <foreach collection="procedureModelIdList" separator="," open="(" close=")" item="procedureModelId">
+            #{procedureModelId}
+        </foreach>
+    </select>
+
+</mapper>

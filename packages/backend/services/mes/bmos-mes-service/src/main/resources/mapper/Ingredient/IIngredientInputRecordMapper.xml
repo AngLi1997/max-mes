@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.ingredient.input.mapper.IIngredientInputRecordMapper">
+    <select id="queryInputListByPlanId"
+            resultType="com.bmos.mes.service.ingredient.input.vo.IngredientInputRecordVO">
+        select bm_ingredient_weigh_record.storage_material_id,
+               bm_material.name                                                           as material_name,
+               bm_material.merge_code                                                     as material_merge_code,
+               bm_storage_material_batch.material_batch_no                                as storage_material_batch_no,
+               bm_storage_material.no                                                     as storage_material_no,
+               ifnull(if(bm_ingredient_input_record.id is null,
+                         ifnull(bm_storage_material.available_quantity, 0) +
+                         ifnull(bm_storage_material.reserve_quantity, 0),
+                         bm_ingredient_input_record.quantity), 0)                         as quantity,
+               if(bm_ingredient_input_record.id is null,
+                  bm_ingredient_weigh_record.unit_id, bm_ingredient_input_record.unit_id) as unit_id,
+               bm_ingredient_input_record.importer_id,
+               bm_ingredient_input_record.input_time,
+               bm_ingredient_input_record.device_id,
+               bm_ingredient_input_record.device_code,
+               bm_ingredient_input_record.device_name,
+               bm_ingredient_weigh_record.sign_status                                     as weighSignStatus,
+               bm_ingredient_input_record.component_instance_id
+        from bm_ingredient_weigh_record
+                 left join bm_storage_material_batch
+                           on bm_ingredient_weigh_record.storage_material_batch_id = bm_storage_material_batch.id and
+                              bm_storage_material_batch.is_deleted = 0
+                 left join bm_storage_material
+                           on bm_ingredient_weigh_record.storage_material_id = bm_storage_material.id and
+                              bm_storage_material.is_deleted = 0
+                 left join bm_material
+                           on bm_storage_material.material_id = bm_material.id and bm_material.is_deleted = 0
+                 left join bm_ingredient_input_record on bm_ingredient_weigh_record.storage_material_id =
+                                                         bm_ingredient_input_record.storage_material_id and
+                                                         bm_ingredient_input_record.is_deleted = 0
+        where bm_ingredient_weigh_record.weigh_type = 1
+          and bm_ingredient_weigh_record.ingredient_plan_id = #{ingredientPlanId}
+          <if test="materialIds != null and materialIds.size() != 0">
+              and bm_material.id in
+              <foreach collection="materialIds" item="materialId" separator="," open="(" close=")">
+                  #{materialId}
+              </foreach>
+          </if>
+    </select>
+    <select id="queryInputedDetailListByPlanId"
+            resultType="com.bmos.mes.service.ingredient.input.model.IngredientInputRecordDetail">
+        select bm_ingredient_input_record.*,
+               bm_storage_material.material_id,
+               bm_material.specification,
+               bm_material.name                            as material_name,
+               bm_material.merge_code                      as material_merge_code,
+               bm_storage_material_batch.material_batch_no as storage_material_batch_no
+        from bm_ingredient_input_record
+                 left join bm_storage_material
+                           on bm_ingredient_input_record.storage_material_id = bm_storage_material.id
+                 left join bm_storage_material_batch
+                           on bm_storage_material.storage_material_batch_id = bm_storage_material_batch.id
+                 left join bm_material on bm_material.id = bm_storage_material.material_id
+        where bm_ingredient_input_record.ingredient_plan_id = #{ingredientPlanId}
+    </select>
+    <select id="queryInputedDetailListByComponentInstanceId"
+            resultType="com.bmos.mes.service.ingredient.input.model.IngredientInputRecordDetail">
+        select bm_ingredient_input_record.*,
+               bm_storage_material.material_id,
+               bm_material.specification,
+               bm_material.name                            as material_name,
+               bm_material.merge_code                      as material_merge_code,
+               bm_storage_material_batch.material_batch_no as storage_material_batch_no
+        from bm_ingredient_input_record
+                 left join bm_storage_material
+                           on bm_ingredient_input_record.storage_material_id = bm_storage_material.id
+                 left join bm_storage_material_batch
+                           on bm_storage_material.storage_material_batch_id = bm_storage_material_batch.id
+                 left join bm_material on bm_material.id = bm_storage_material.material_id
+        where bm_ingredient_input_record.component_instance_id = #{componentInstanceId}
+    </select>
+</mapper>

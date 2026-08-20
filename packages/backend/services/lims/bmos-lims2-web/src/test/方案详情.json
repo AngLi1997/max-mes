@@ -1,0 +1,106 @@
+{
+  "code": 0,
+  "message": "success",
+  "data": {
+    "id": "1956237192800112640",
+    "schemeId": "1956237192703643648",
+    "schemeCode": null,
+    "schemeName": "ygh测试方案1-",
+    "description": "ygh测试方案1",
+    "effectiveDate": null,
+    "versionNo": "v1.0.0",
+    "status": {
+      "value": "EDITING",
+      "label": "编辑中",
+      "name": "编辑中"
+    },
+    "parentVersionId": null,
+    "parentVersionNo": null,
+    "createTime": "2025-08-15 14:11:07",
+    "createBy": null,
+    "createByName": null,
+    "material": {
+      "materialId": "1952624796852424704",
+      "materialName": "ygh测试检品",
+      "materialCode": "ygh测试检品"
+    },
+    "packageInfo": {
+      "packageId": "1952623807105732608",
+      "packageName": "ygh测试实验包",
+      "packageCode": "ygh测试实验包"
+    },
+    "inspectionItems": [
+      {
+        "itemConfigId": "1956237193525727232",
+        "schemeId": "1956237192703643648",
+        "versionId": "1956237192800112640",
+        "packageId": "1952623807105732608",
+        "inspectItemId": "1952621960177520640",
+        "isRequired": true,
+        "sort": 1,
+        "remark": null,
+        "duration": null,
+        "timeUnit": null,
+        "inspectionParameters": [
+          {
+            "parameterConfigId": "1956237193706082304",
+            "schemeId": "1956237192703643648",
+            "versionId": "1956237192800112640",
+            "packageId": "1952623807105732608",
+            "inspectItemId": "1952621960177520640",
+            "itemConfigId": "1956237193525727232",
+            "parameterId": "1952620617715027968",
+            "parameterName": "ygh测试分析项1",
+            "parameterCode": "ygh测试分析项1",
+            "standardRule": "elit occaecat",
+            "isReportable": true,
+            "isExecutable": true,
+            "finalExpression": null,
+            "dataPoints": [
+              {
+                "dataPointConfigId": "1956237193836105728",
+                "dataPointId": "1952619525421797376",
+                "parameterConfigId": "1956237193706082304",
+                "parameterId": "1952620617715027968",
+                "schemeId": "1956237192703643648",
+                "versionId": "1956237192800112640",
+                "packageId": "1952623807105732608",
+                "inspectItemId": "1952621960177520640",
+                "name": "ygh测试数据点2",
+                "pointType": {
+                  "value": "NUMBER",
+                  "label": "数值",
+                  "name": "数值"
+                },
+                "trendLineConfig": "[{\"dataPointId\":1952619525421797376,\"maxOperator\":\"LESS_THAN\",\"maxValue\":73.00,\"minOperator\":\"LESS_THAN\",\"minValue\":44.00,\"parameterId\":1952620617715027968,\"rangeName\":\"文格电明组\"}]",
+                "options": null,
+                "reportDisplay": true
+              },
+              {
+                "dataPointConfigId": "1956237193869660160",
+                "dataPointId": "1952620618583248896",
+                "parameterConfigId": "1956237193706082304",
+                "parameterId": "1952620617715027968",
+                "schemeId": "1956237192703643648",
+                "versionId": "1956237192800112640",
+                "packageId": "1952623807105732608",
+                "inspectItemId": "1952621960177520640",
+                "name": "ygh测试数据点1",
+                "pointType": {
+                  "value": "OPTION",
+                  "label": "选项",
+                  "name": "选项"
+                },
+                "trendLineConfig": null,
+                "options": "[{\"dataPointId\":1952620618583248896,\"optionValue\":\"ygh测试选项4\",\"parameterId\":1952620617715027968},{\"dataPointId\":1952620618583248896,\"optionValue\":\"ygh测试选项3\",\"parameterId\":1952620617715027968}]",
+                "reportDisplay": true
+              }
+            ],
+            "judgments": []
+          }
+        ]
+      }
+    ],
+    "samplingConfigs": null
+  }
+}

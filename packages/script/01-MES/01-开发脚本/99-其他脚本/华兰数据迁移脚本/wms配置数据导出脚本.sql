@@ -1,0 +1,1 @@
+mysqldump -uroot -pIsysc0re123 --databases bmos_wms --tables bw_cargo bw_cargo_category bw_cargo_position bw_inventory bw_inventory_batch bw_inventory_reserve bw_resource_permission bw_storage > /root/db_back/wms.sql

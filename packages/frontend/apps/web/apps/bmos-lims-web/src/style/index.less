@@ -1,0 +1,49 @@
+.node-content-container {
+  display: flex;
+  column-gap: 8px;
+  align-items: center;
+  line-height: 1;
+}
+
+.node-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-inline: 10px;
+  padding-block: 8px;
+  transition: all linear 0.2s;
+  font-size: 14px;
+  cursor: pointer;
+  box-sizing: border-box;
+  margin-bottom: 8px;
+
+  &:hover {
+    border-color: #2871ff;
+    background-color: #ebf1ff;
+
+    .node-content-type {
+      color: #2871ff;
+    }
+
+    .node-content-title {
+      color: #2871ff;
+    }
+
+    .node-opeartion {
+      .icon-edit {
+        display: block;
+      }
+      
+      .icon-delete {
+        display: block;
+      }
+    }
+  }
+}
+
+.innner-check {
+  color: #FF9A2F;
+  box-shadow: 0px 0px 0px 2px #FF9A2F33;
+  border-radius: 4px;
+  cursor: url('../assets/images/cursor.png') auto;
+}

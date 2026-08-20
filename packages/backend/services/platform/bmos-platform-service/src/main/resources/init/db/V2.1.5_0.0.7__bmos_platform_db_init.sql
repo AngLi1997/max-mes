@@ -1,0 +1,2 @@
+ALTER TABLE `bp_equipment_operate_log` ADD COLUMN  `fill_status` int unsigned DEFAULT '0' COMMENT '填报状态' AFTER `operate_content`;
+ALTER TABLE `bp_equipment_operate_log` ADD COLUMN  `template_id` bigint DEFAULT NULL COMMENT '模板id' AFTER `fill_status`;

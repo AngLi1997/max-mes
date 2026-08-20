@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.task.mapper.TaskStatusHistoryMapper">
+
+    <!-- 查询任务状态变更历史 -->
+    <select id="selectByTaskId" resultType="com.bmos.lims2.server.task.entity.TaskStatusHistory">
+        SELECT *
+        FROM lm_task_status_history
+        WHERE task_id = #{taskId}
+        AND is_deleted = 0
+        ORDER BY operate_time DESC
+    </select>
+
+</mapper>

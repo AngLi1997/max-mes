@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.inspect.parameter.mapper.InspectParameterOptionMapper">
+
+    <select id="selectByDataPointId" resultType="com.bmos.lims2.server.inspect.parameter.entity.InspectParameterOption">
+        select *
+        from lm_inspect_parameter_option
+        where data_point_id = #{dataPointId}
+          and is_deleted = 0
+    </select>
+
+    <update id="deleteByDataPointId">
+        update lm_inspect_parameter_option
+        set is_deleted = 1
+        where data_point_id = #{dataPointId}
+    </update>
+
+    <select id="existByDataPointIdAndValue" resultType="boolean">
+        select count(1) > 0
+        from lm_inspect_parameter_option
+        where data_point_id = #{dataPointId}
+          and option_value = #{optionValue}
+          and is_deleted = 0
+    </select>
+</mapper> 

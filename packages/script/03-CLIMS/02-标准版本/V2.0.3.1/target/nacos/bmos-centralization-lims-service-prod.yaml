@@ -1,0 +1,107 @@
+db:
+  schema: bmos_centralization_lims
+#xxl-job执行器端口
+xxlJobExecutorPort: 9103
+server:
+  servlet:
+    context-path: /api/${api-module}/
+  port: 58280
+api-module: centralized-lims
+spring:
+  application:
+    name: bmos-centralization-lims-service
+  mvc:
+    pathMatch:
+      matching-strategy: ANT_PATH_MATCHER
+  # mqtt:
+    #server-uri: tcp://emqx-service:11883
+    #server-uri: tcp://emqx-service:1883
+    # server-uri: tcp://emqx@192.168.200.27:1883
+    # enable: true
+    # user-name: admin
+    # password: 1Sysc0re!
+
+mybatis-plus:
+  mapper-locations: classpath:mapper/**/*.xml
+  global-config:
+    db-config:
+      logic-delete-field: delFlag
+      logic-delete-value: true # 逻辑已删除值(默认为 1)
+      logic-not-delete-value: false # 逻辑未删除值(默认为 0)
+      update-strategy: not_null
+  # configuration:
+  #   log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+bmos:
+  i18n:
+    locations:
+      - i18n/message_centralization_lims
+      - i18n/validate_plasma
+  auth:
+    exclude-urls:
+      - ${server.servlet.context-path}/user/login
+      - ${server.servlet.context-path}/swagger-ui/**
+      - ${server.servlet.context-path}/swagger-resources/**
+      - ${server.servlet.context-path}/api-docs
+      - ${server.servlet.context-path}/v3/api-docs
+    activeUrls:
+      - ${server.servlet.context-path}/license/active
+      - ${server.servlet.context-path}/license/activated
+    enable: true
+minio:
+  server: http://127.0.0.1
+  port: 9000
+  endpoint: ${minio.server}:${minio.port}
+  accessKey: minio
+  secretKey: Bmos1018
+  buckets:
+    lims: bmos-centralization-lims
+    signature: bmos-platform-sign
+lims:
+  protein_elec_remote_file_path: smb://192.168.8.181/Export/
+
+# 编码规则key
+code:
+  rules:
+    config:
+      # 静态参数编码
+      staticData: lims.config.static.data
+      # 领用库编码
+      receiveStore: lims.config.receive.store
+      # 文件模版编号
+      docTemplateNo: lims.config.docTemplateNo
+      # 文件编号
+      docFileNo: lims.config.docFileNo
+      # 报告编号
+    inspect:
+      # 检验报告编号
+      reportNo: lims.inspect.reportNo
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
+config:
+  inspect-param: CT0004,CT0005
+
+# 酶免仪读取数据相关配置
+ai-kang:
+  # 接口请求超时时间
+  timeout: 3000
+  # 加密密钥
+  key: ZZIK9mdkgHIYkNSJ
+  # 功能编号
+  funcNo:
+    - "01000001"
+    - "01000002"
+    - "01000003"
+    - "01000004"
+    - "01000005"
+  # 设备信息
+  info:
+    - ip: 10.18.7.41
+      port: 4000
+      userName: HLSWGCGFYXGS
+      password: qLnIHRbw
+      authorCode: 10081406D5A91517F1B0C14D0DF6E255
+

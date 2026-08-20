@@ -1,0 +1,209 @@
+:where(.css-dev-only-do-not-override-akhys3).lims-layout .lims-layout-header {
+  padding-inline: 8px;
+}
+
+.header-tabs .lims-tabs-nav::before {
+  border-bottom: none;
+}
+
+.lims-tabs-tab:not(.lims-tabs-tab-active) .lims-tabs-tab-remove {
+  opacity: 0;
+}
+
+.lims-tabs-tab:hover .lims-tabs-tab-remove {
+  opacity: 1;
+}
+
+.operation-area {
+  display: flex;
+  column-gap: 12px;
+  align-items: center;
+}
+
+.operation-area button {
+  padding: 0;
+}
+
+.save-confirm .save-confirm-btn {
+  display: flex;
+  justify-content: flex-end;
+  column-gap: 16px;
+  padding-top: 20px;
+}
+
+.record-area::before {
+  content: '111';
+}
+
+.template-edit {
+  height: inherit;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  justify-content: space-between;
+  position: relative;
+}
+
+.template-edit-opeartion {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 9px 9px 16px;
+  height: 60px;
+}
+
+.template-edit-opeartion .opeartion-container {
+  display: flex;
+  column-gap: 16px;
+}
+
+.template-edit-content {
+  flex: 1;
+  height: inherit;
+  display: flex;
+  height: calc(100% - 92px);
+}
+
+.lims-modal-confirm-content {
+  width: 100%;
+  max-width: 100%;
+}
+
+:where(.css-dev-only-do-not-override-czxzu3).lims-modal-confirm
+  .lims-modal-confirm-body
+  .lims-modal-confirm-title
+  + .lims-modal-confirm-content {
+  max-width: 100%;
+}
+
+.lims-break-line-container {
+  height: 0;
+  width: 100%;
+}
+
+.lims-break-line {
+  width: 100% !important;
+  position: absolute;
+  height: 0;
+  border-bottom: 1px solid #ff5633;
+  left: 0;
+  top: 0;
+}
+
+/* 二级页面返回 */
+.config-return-modal {
+  .lims-modal-content {
+    .lims-modal-body {
+      .footer-btns {
+        width: 100%;
+        margin-top: 20px;
+        justify-content: end;
+      }
+    }
+  }
+}
+
+.common {
+  height: 100%;
+}
+
+.right-container {
+  .lims-table-placeholder {
+    height: 174px;
+  }
+}
+
+.crumb {
+  line-height: 36px;
+
+  .crumb-allow-click {
+    cursor: pointer;
+  }
+}
+
+.tab-page-header {
+  padding-top: 15px;
+}
+
+.tab-page-header .lims-tabs-nav {
+  margin-bottom: 0;
+}
+
+.tab-page-header .lims-tabs-nav-wrap {
+  padding-left: 16px;
+}
+
+.review-table {
+  padding-top: 26px;
+}
+
+.luckysheet-scrollbar-ltr {
+  z-index: 1000;
+}
+
+@media print {
+  @page {
+    /* 纵向打印 */
+
+    /* size: portrait; */
+
+    /* 横向打印 */
+    size: landscape;
+
+    /* 去掉页眉页脚 */
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  /* 浏览器在渲染时不要对框进行颜色或样式调整 */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    -moz-print-color-adjust: exact !important;
+    -ms-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .print-layout__view-entity {
+    display: none !important;
+  }
+
+  .print-layout__print-entity {
+    visibility: visible !important;
+    height: 100%;
+  }
+
+  .formula-print-preview p .record-component {
+    box-shadow: none !important;
+    background: #fff !important;
+    border: none;
+    border-bottom: 1px solid red;
+  }
+
+  .formula-print-preview p:only-child .record-component {
+    border: none;
+    border-bottom: 0 !important;
+  }
+
+  .record-component :only-child {
+    border: none;
+    border-bottom: none;
+  }
+}
+
+div.footer {
+  display: block !important;
+}
+
+.formula-print-preview textarea {
+  height: auto !important;
+}
+
+.delete-btn {
+  color: var(--bmos-danger-color);
+  cursor: pointer;
+}
+
+.lims-tree-select-dropdown .lims-select-tree .lims-select-tree-checkbox {
+  margin-block-start: 0;
+}

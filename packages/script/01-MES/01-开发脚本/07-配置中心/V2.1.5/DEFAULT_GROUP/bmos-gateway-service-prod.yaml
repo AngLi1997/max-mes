@@ -1,0 +1,69 @@
+spring:
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOriginPatterns: "*" # spring boot2.4以后的配置
+           # allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: bmos-mes-route
+          uri: lb://bmos-mes-service
+          predicates:
+            - Path=/api/app/mes/**
+        - id: bmos-platform-route
+          uri: lb://bmos-platform-service
+          predicates:
+            - Path=/api/app/platform/**
+        - id: bmos-lims-route
+          uri: lb://bmos-lims-service
+          predicates:
+            - Path=/api/app/lims/**
+        - id: bmos-wms-route
+          uri: lb://bmos-wms-service
+          predicates:
+            - Path=/api/app/wms/**
+        - id: bmos-query-route
+          uri: lb://bmos-query-service
+          predicates:
+            - Path=/api/app/query/**
+bmos:
+  auth:
+    exclude-urls:
+      - /api/app/mes/swagger-ui/**
+      - /api/app/mes/swagger-resources/**
+      - /api/app/mes/api-docs
+      - /api/app/mes/v3/api-docs
+      - /api/app/platform/swagger-ui/**
+      - /api/app/platform/swagger-resources/**
+      - /api/app/platform/api-docs
+      - /api/app/platform/v3/api-docs
+      - /api/app/platform/user/login
+      - /api/app/platform/user/resetPassword2
+      - /api/app/platform/user/loginNoValidate
+      - /api/app/platform/user/active
+      - /api/app/platform/user/actived
+      - /api/app/lims/active/active
+      - /api/app/lims/active/actived
+      - /api/app/mes/user/active
+      - /api/app/mes/user/actived
+      - /api/app/mes/user/mac
+      - /api/app/platform/user/mac
+      - /api/app/platform/param/app/version
+      - /api/app/mes/log/esToMysql
+      - /api/app/mes/storage/log/esToMysql
+      - /api/app/mes/material/log/esToMysql
+      - /api/app/platform/signature/esToMysql
+      - /api/app/platform/log/operation/esToMysql
+      - /api/app/platform/log/login/esToMysql
+      - /api/app/platform/business/parameter/detailByCode/**
+      - /api/app/wms/user/actived
+      - /api/app/platform/feign/menu/getAllChildMenuIdList
+      - /api/app/platform/i18n/config
+      - /api/app/platform/notifyMessage/feign/materialExpireForeWarning
+    enable: true

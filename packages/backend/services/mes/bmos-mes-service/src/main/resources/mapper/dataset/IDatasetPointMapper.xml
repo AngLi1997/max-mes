@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.dataset.mapper.IDatasetPointMapper">
+    <select id="previewDatasetPointData" resultType="com.bmos.mes.service.dataset.vo.DatasetPointDataPreviewPageVO">
+        select
+        JSON_ARRAYAGG(JSON_OBJECT('field_id', field_id, 'procedure_step_id', procedure_step_id, 'value', value)) as data_json,
+        product_plan_id as plan_id,
+        batch_no,
+        process_version
+        from bm_execute_form_data where id in (select max(id) from bm_execute_form_data
+        where
+        process_id = #{dto.processId}
+        and field_id in
+        <foreach collection="dto.points" open="(" separator="," close=")" item="item">
+            #{item.fieldId}
+        </foreach>
+        and procedure_step_id in
+        <foreach collection="dto.points" open="(" separator="," close=")" item="item">
+            #{item.procedureStepId}
+        </foreach>
+        and product_plan_id in (select id
+        from bm_product_plan
+        where bm_product_plan.is_deleted = false
+        and bm_product_plan.status != 'DISCARD'
+        and bm_product_plan.is_start != 'TERMINATION'
+        and bm_product_plan.process_id = #{dto.processId}
+        <if test="dto.batchNos != null and dto.batchNos.size() > 0">
+            and bm_product_plan.batch_no in
+            <foreach collection="dto.batchNos" open="(" separator="," close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
+        <if test="dto.startDate != null and dto.endDate != null and dto.startDate != '' and dto.endDate != ''">
+            and bm_product_plan.start_time between concat(#{dto.startDate}, ' 00:00:00') and concat(#{dto.endDate}, ' 23:59:59')
+        </if>)
+        group by product_plan_id, field_id, procedure_step_id) group by product_plan_id
+    </select>
+
+    <select id="previewDatasetPointDataTitle"
+            resultType="com.bmos.mes.service.dataset.vo.DatasetPointDataPreviewTitleVO">
+        select distinct bm_batch_record_component.field_id,
+               if(bm_procedure_step_model.reusable, 0, bm_procedure_step_model.procedure_step_id) as procedure_step_id
+        from bm_batch_record_component
+                 left join bm_procedure_step_model
+                           on bm_procedure_step_model.record_item_id = bm_batch_record_component.record_item_id
+                               and
+                              bm_procedure_step_model.record_version_id = bm_batch_record_component.record_version_id
+                               and bm_procedure_step_model.is_deleted = 0
+        where bm_batch_record_component.is_deleted = 0
+          and bm_batch_record_component.field_id in
+        <foreach collection="dto.points" open="(" separator="," close=")" item="item">
+            #{item.fieldId}
+        </foreach>
+        and (bm_procedure_step_model.procedure_step_id in
+        <foreach collection="dto.points" open="(" separator="," close=")" item="item">
+            #{item.procedureStepId}
+        </foreach>
+        <if test="dto.hasReuse">
+            or bm_procedure_step_model.reusable = true
+        </if>
+        )
+          and bm_procedure_step_model.process_id = #{dto.processId}
+          and process_version = #{latestProcessVersion}
+    </select>
+</mapper>

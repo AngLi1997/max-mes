@@ -1,0 +1,7 @@
+log-properties:
+  localeMap:
+    zh-CN: #{id: 主键id, processId: 工艺id}
+      id: 主键id
+      processId: 工艺id
+
+    # en-US: {id: 主键id, processId: 工艺id}

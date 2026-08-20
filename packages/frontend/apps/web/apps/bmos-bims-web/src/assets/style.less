@@ -1,0 +1,149 @@
+.bims-layout .bims-layout-header {
+  padding-inline: 8px;
+}
+
+.header-tabs .bims-tabs-nav::before {
+  border-bottom: none;
+}
+
+.bims-tabs-tab:not(.bims-tabs-tab-active) .bims-tabs-tab-remove {
+  opacity: 0;
+}
+
+.bims-tabs-tab:hover .bims-tabs-tab-remove {
+  opacity: 1;
+}
+
+.operation-area {
+  display: flex;
+  column-gap: 12px;
+  align-items: center;
+}
+
+.operation-area button {
+  padding: 0;
+}
+
+.save-confirm .save-confirm-btn {
+  display: flex;
+  justify-content: flex-end;
+  column-gap: 16px;
+  padding-top: 20px;
+}
+
+.template-edit {
+  height: inherit;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  justify-content: space-between;
+  position: relative;
+}
+
+.template-edit-opeartion {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 9px 9px 16px;
+  height: 60px;
+}
+
+.template-edit-opeartion .opeartion-container {
+  display: flex;
+  column-gap: 16px;
+}
+
+.template-edit-content {
+  flex: 1;
+  height: inherit;
+  display: flex;
+  height: calc(100% - 92px);
+}
+
+.bims-modal-confirm-content {
+  width: 100%;
+  max-width: 100%;
+}
+
+.bims-break-line-container {
+  height: 0;
+  width: 100%;
+}
+
+.bims-break-line {
+  width: 100% !important;
+  position: absolute;
+  height: 0;
+  border-bottom: 1px solid #ff5633;
+  left: 0;
+  top: 0;
+}
+
+/* 二级页面返回 */
+.config-return-modal {
+  .bims-modal-content {
+    .bims-modal-body {
+      .footer-btns {
+        width: 100%;
+        margin-top: 20px;
+        justify-content: end;
+      }
+    }
+  }
+}
+
+.common {
+  height: 100%;
+}
+
+.right-container {
+  .bims-table-placeholder {
+    height: 174px;
+  }
+}
+
+.crumb {
+  line-height: 36px;
+
+  .crumb-allow-click {
+    cursor: pointer;
+  }
+}
+
+.tab-page-header {
+  padding-top: 15px;
+}
+
+.tab-page-header .bims-tabs-nav {
+  margin-bottom: 0;
+}
+
+.tab-page-header .bims-tabs-nav-wrap {
+  padding-left: 16px;
+}
+
+.review-table {
+  padding-top: 26px;
+}
+
+div.footer {
+  display: block !important;
+}
+
+.delete-btn {
+  color: var(--bmos-danger-color);
+  cursor: pointer;
+}
+
+.bims-tree-select-dropdown .bims-select-tree .bims-select-tree-checkbox {
+  margin-block-start: 0;
+}
+
+.bims-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 8px;
+  padding-top: 0;
+}

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.lotrelease.template.mapper.ILotReleaseTemplateCategoryMapper">
+
+    <select id="listAllChildren" resultType="com.bmos.mes.service.lotrelease.template.model.LotReleaseTemplateCategory">
+        select *
+        from bm_lot_release_template_category
+        where bm_lot_release_template_category.is_deleted = 0
+        <if test="parentId != null">
+            and id_path like concat((select id_path from bm_lot_release_template_category where id = #{parentId}), ',', '%')
+        </if>
+    </select>
+
+    <select id="getNamePath" resultType="com.bmos.mes.service.lotrelease.template.vo.LotReleaseTemplateCategoryPath">
+        select b1.id,
+        b1.name,
+        b1.id_path,
+        group_concat(b2.name order by b2.id separator '/') as name_path
+        from bm_lot_release_template_category b1
+        left join bm_lot_release_template_category b2 on find_in_set(b2.id, b1.id_path) and b2.is_deleted = 0
+        where b1.is_deleted = 0 and b1.id in
+        <foreach collection="ids" separator="," open="(" close=")" item="id">
+            #{id}
+        </foreach>
+        group by b1.id
+    </select>
+</mapper>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.process.mapper.ProcessConfirmMapper">
+
+   <select id="getProcessConfirmPageList" resultType="com.bmos.mes.service.process.vo.ProcessConfirmVO">
+        SELECT
+           id as id,
+           product_name as productName,
+           product_code as productCode,
+           product_specification as productSpecification,
+           process_name as processName,
+           plan_batch_no as planBatchNo,
+           start_time as startTime,
+           end_time as endTime,
+           confirm_opinion as confirmOpinion,
+           remark as remark
+         FROM
+             bm_process_confirm
+         WHERE
+             is_deleted = 0
+        <if test="productId != null ">
+            and product_id=#{productId}
+        </if>
+        <if test="productIdList != null and productIdList.size() >0 ">
+           and product_id in
+           <foreach collection="productIdList" open="(" separator="," close=")" item="id">
+              #{id}
+           </foreach>
+        </if>
+        <if test="processName != null and processName != ''">
+           and process_name =#{processName}
+        </if>
+        <if test="planBatchNo != null and planBatchNo != ''">
+           and plan_batch_no like concat('%',#{planBatchNo},'%')
+        </if>
+        <if test="confirmOpinion != null and confirmOpinion != ''">
+           and confirm_opinion =#{confirmOpinion}
+        </if>
+        order by start_time desc
+   </select>
+
+    <select id="listProcedureOpinionPage" resultType="com.bmos.mes.service.process.vo.AuditOpinionVO">
+        SELECT
+            t1.product_name as productName,
+            t1.product_code as productCode,
+            t1.product_specification as productSpecification,
+            t1.process_name as processName,
+            t1.plan_batch_no as planBatchNo,
+            t1.start_time as startTime,
+            t1.end_time as endTime,
+            t2.procedure_name as procedureName,
+            t2.procedure_time as procedureTime,
+            t2.remark as remark,
+            t2.confirm_opinion as confirmOpinion
+        FROM
+            bm_process_confirm AS t1
+            JOIN bm_procedure_confirm AS t2 ON t1.id = t2.process_confirm_id
+        WHERE
+            t1.is_deleted = 0
+            AND t2.is_deleted = 0
+            and t2.confirm_opinion IS NOT NULL
+            and t1.process_id =#{processId}
+            and t2.procedure_name =#{procedureName}
+            <if test="confirmOpinion != null and confirmOpinion != '' ">
+                and t2.confirm_opinion =#{confirmOpinion}
+            </if>
+            <if test="startTime != null and startTime != '' and endTime != null and endTime != ''">
+                and t1.confirm_time between concat(#{startTime}, ' 00:00:00') and concat(#{endTime}, ' 23:59:59')
+            </if>
+    </select>
+
+    <select id="listProcessOpinionPage" resultType="com.bmos.mes.service.process.vo.AuditOpinionVO">
+        SELECT
+            product_name as productName,
+            product_code as productCode,
+            product_specification as productSpecification,
+            process_name as processName,
+            plan_batch_no as planBatchNo,
+            start_time as startTime,
+            end_time as endTime,
+            remark as remark,
+            confirm_opinion as confirmOpinion
+        FROM
+            bm_process_confirm
+        WHERE
+            is_deleted = 0
+        and confirm_opinion IS NOT NULL
+        and process_id =#{processId}
+        <if test="confirmOpinion != null and confirmOpinion != '' ">
+            and confirm_opinion =#{confirmOpinion}
+        </if>
+        <if test="startTime != null and startTime != '' and endTime != null and endTime != ''">
+            and confirm_time between concat(#{startTime}, ' 00:00:00') and concat(#{endTime}, ' 23:59:59')
+        </if>
+    </select>
+
+</mapper>

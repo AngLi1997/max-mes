@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.eln.record.mapper.SchemeParameterComponentConfigMapper">
+
+    <!-- 基础列片段 -->
+    <sql id="BASE_COLUMN">
+        id,
+        parameter_id,
+        parameter_config_id,
+        node_id,
+        scheme_id,
+        scheme_version_id,
+        record_item_id,
+        record_version_id,
+        config_info,
+        component_id,
+        field_id,
+        create_time,
+        update_time,
+        create_by,
+        update_by,
+        is_deleted
+    </sql>
+    <select id="getListByInspectionSchemeParameter"
+            resultType="com.bmos.lims2.server.eln.record.entity.SchemeParameterComponentConfig">
+        select * from lm_scheme_parameter_component_config
+        <where>
+            scheme_id = #{schemeId}
+            and scheme_version_id = #{versionId}
+            and record_item_id = #{recordItemId}
+            and record_version_id = #{recordVersionId}
+            and is_deleted = 0
+        </where>
+    </select>
+    <select id="selectComponentWithComponentConfig"
+            resultType="com.bmos.lims2.server.inspect.scheme.dto.response.ComponentConfigDetailDTO">
+        select distinct
+        t1.id,
+        t1.parent_id,
+        t1.used,
+        t1.record_item_id,
+        t1.record_version_id,
+        t1.record_version,
+        t1.record_id,
+        t1.component_type,
+        t1.component_name,
+        t1.field_id,
+        t1.formula_precision,
+        t1.component_detail,
+        t1.is_result,
+        t1.formula_id,
+        t1.formula_field,
+        t1.formula_expression,
+        t1.formula_type,
+        t1.round_code,
+        t3.config_info
+        from bm_batch_record_component t1
+        inner join lm_inspection_scheme_parameter t2 on t1.record_item_id = t2.record_item_id
+        and t1.record_version_id = t2.record_version_id
+        and t2.is_deleted = 0
+        left join lm_scheme_parameter_component_config t3 on t3.component_id = t1.id
+        and t3.scheme_id = t2.scheme_id and t3.scheme_version_id = t2.version_id
+        and t3.is_deleted = 0
+        <where>
+            t2.scheme_id = #{schemeId}
+            and t2.version_id = #{versionId}
+            and t1.is_deleted = 0
+            and t2.id = #{id}
+            and t2.record_item_id = #{recordItemId}
+            and t2.record_version_id = #{recordVersionId}
+        </where>
+    </select>
+
+    <!-- 查询稳定性方案分析项配置关联的组件及配置 -->
+    <select id="selectStabilityComponentWithComponentConfig"
+            resultType="com.bmos.lims2.server.inspect.scheme.dto.response.ComponentConfigDetailDTO">
+        select distinct
+        t1.id,
+        t1.parent_id,
+        t1.used,
+        t1.record_item_id,
+        t1.record_version_id,
+        t1.record_version,
+        t1.record_id,
+        t1.component_type,
+        t1.component_name,
+        t1.field_id,
+        t1.formula_precision,
+        t1.component_detail,
+        t1.is_result,
+        t1.formula_id,
+        t1.formula_field,
+        t1.formula_expression,
+        t1.formula_type,
+        t1.round_code,
+        t3.config_info
+        from bm_batch_record_component t1
+        inner join lm_stability_scheme_parameter t2 on t1.record_item_id = t2.record_item_id
+        and t1.record_version_id = t2.record_version_id
+        and t2.is_deleted = 0
+        left join lm_scheme_parameter_component_config t3 on t3.component_id = t1.id
+        and t3.scheme_id = t2.scheme_id and t3.scheme_version_id = t2.version_id
+        and t3.is_deleted = 0
+        <where>
+            t2.scheme_id = #{schemeId}
+            and t2.version_id = #{versionId}
+            and t1.is_deleted = 0
+            and t2.id = #{id}
+            and t2.record_item_id = #{recordItemId}
+            and t2.record_version_id = #{recordVersionId}
+        </where>
+    </select>
+
+    <!-- 基础结果映射 -->
+    <resultMap id="BaseResultMap" type="com.bmos.lims2.server.eln.record.entity.SchemeParameterComponentConfig">
+        <id property="id" column="id"/>
+        <result property="parameterId" column="parameter_id"/>
+        <result property="parameterConfigId" column="parameter_config_id"/>
+        <result property="schemeId" column="scheme_id"/>
+        <result property="schemeVersionId" column="scheme_version_id"/>
+        <result property="recordItemId" column="record_item_id"/>
+        <result property="recordVersionId" column="record_version_id"/>
+        <result property="configInfo" column="config_info"/>
+        <result property="componentId" column="component_id"/>
+        <result property="fieldId" column="field_id"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+    </resultMap>
+
+</mapper>
+
+

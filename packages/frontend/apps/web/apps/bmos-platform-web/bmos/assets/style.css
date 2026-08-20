@@ -1,0 +1,15 @@
+:where(.css-dev-only-do-not-override-akhys3).plat-layout .plat-layout-header {
+  padding-inline: 8px;
+}
+
+.header-tabs .plat-tabs-nav::before {
+  border-bottom: none;
+}
+
+.plat-tabs-tab:not(.plat-tabs-tab-active) .plat-tabs-tab-remove {
+  opacity: 0;
+}
+
+.plat-tabs-tab:hover .plat-tabs-tab-remove {
+  opacity: 1;
+}

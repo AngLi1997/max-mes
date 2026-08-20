@@ -1,0 +1,9 @@
+alter table bm_storage_material_charge_recycle modify `quantity` varchar(128) null comment '物料量(基本量)';
+alter table bm_requisition_plan_reserved modify `planned_quantity` varchar(128) null comment '计划量';
+alter table bm_requisition_plan_reserved modify `theoretical_quantity` varchar(128) null comment '理论量';
+alter table bm_requisition_plan_reserved modify `hydration` varchar(128) null comment '水分';
+alter table bm_requisition_plan_reserved modify `no_hydration_content` varchar(128) null comment '无水含量';
+alter table bm_requisition_received_batch modify `quantity` varchar(128) null comment '发料总量';
+alter table bm_requisition_received_batch modify `hydration` varchar(128) null comment '水分';
+alter table bm_requisition_received_batch modify `no_hydration_content` varchar(128) null comment '无水含量';
+alter table bm_requisition_received_material modify `quantity` varchar(128) null comment '发放物料量';

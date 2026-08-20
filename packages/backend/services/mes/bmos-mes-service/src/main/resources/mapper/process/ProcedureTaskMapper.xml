@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.process.mapper.task.ProcedureTaskMapper">
+
+    <select id="getHistoricList" resultType="com.bmos.mes.service.process.model.task.ProcedureTask">
+        select
+            *
+        from
+            bm_procedure_task
+        where
+            procedure_model_id =#{procedureModelId}
+        <if test="name != null and name != ''">
+            and `name` like concat('%',#{materialBatchNo},'%')
+        </if>
+    </select>
+
+</mapper>

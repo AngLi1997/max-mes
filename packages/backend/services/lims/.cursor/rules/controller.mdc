@@ -1,0 +1,339 @@
+---
+description:
+globs:*.java
+alwaysApply:true
+---
+
+# 注解与文档
+- 使用 @RestController、@RequestMapping、@Api、@ApiOperation、@Validated。
+- VO/DTO/Param/Req/Resp 对象使用 @ApiModel、@ApiModelProperty 注解。
+
+# 参数校验
+- 使用 @Valid、@NotBlank、@Length 等 Bean Validation 注解。
+- 支持自定义校验器。
+
+# 职责
+- controller 只做参数接收和简单分发，业务逻辑全部下沉到 service 层。
+
+# 异常处理
+- 统一异常处理，controller 层不直接抛出异常。
+
+# 日志与操作记录
+- 重要操作加 @OperationLog 注解。
+
+# Controller层基本规范
+
+## 基本注解
+- @RestController：标识REST控制器
+- @RequestMapping：定义请求路径
+- @Api：Swagger文档类注解
+- @ApiOperation：Swagger文档方法注解
+- @Validated：开启参数校验
+
+## 请求映射规范
+- GET：查询操作
+- POST：新增操作
+- PUT：更新操作
+- DELETE：删除操作
+- 路径使用kebab-case命名法
+- 路径要体现业务含义
+
+## 参数校验规范
+- 请求对象必须使用@Validated注解
+- 必填字段使用@NotNull、@NotBlank等注解
+- 字符串长度使用@Length注解
+- 数值范围使用@Min、@Max注解
+- 自定义校验使用@Validated + 自定义校验器
+
+## 返回值规范
+- 统一使用ResponseInfo<T>封装返回结果
+- 成功操作返回ResponseInfo.success()
+- 失败操作返回ResponseInfo.fail()
+- 分页查询返回ResponseInfo<CommonPage<T>>
+
+## API文档规范
+- 类上必须添加@Api注解，说明模块功能
+- 方法上必须添加@ApiOperation注解，说明接口用途
+- 参数必须添加@ApiParam或@ApiModelProperty注解
+- 响应对象必须添加@ApiModel注解
+- 文档注释要简洁清晰
+
+## 代码示例
+```java
+/**
+ * @Description: 检品管理控制器
+ * @Author: yigaohui
+ * @Date: 2024/02/26 20:14
+ */
+@RestController
+@RequestMapping("/material")
+@Api(tags = "检品管理-接口")
+@Validated
+public class MaterialController {
+
+    @Autowired
+    private MaterialService materialService;
+
+    @PostMapping("/save")
+    @ApiOperation("新增检品")
+    public ResponseInfo<Void> saveInspectionProduct(@RequestBody @Validated MaterialSaveVO vo) {
+        materialService.saveInspectionProduct(BeanUtil.copyProperties(vo, MaterialSaveDTO.class));
+        return ResponseInfo.success();
+    }
+
+    @GetMapping("/page")
+    @ApiOperation("检品列表分页查询")
+    public ResponseInfo<CommonPage<MaterialDTO>> inspectionProductsPage(@Validated MaterialPageReqVO reqVO) {
+        return ResponseInfo.success(materialService.inspectionProductsPage(
+            BeanUtil.copyProperties(reqVO, MaterialPageQueryDTO.class)));
+    }
+
+    @DeleteMapping("/delete/{id}")
+    @ApiOperation("删除检品")
+    @ApiParam(name = "id", value = "检品id", required = true)
+    public ResponseInfo<Void> deleteProducts(@PathVariable Long id) {
+        materialService.deleteProducts(id);
+        return ResponseInfo.success();
+    }
+}
+```
+
+## 请求对象规范
+```java
+@Data
+@ApiModel("检品保存请求")
+public class MaterialSaveVO {
+    
+    @ApiModelProperty(value = "物料名称", required = true)
+    @NotBlank(message = "物料名称不能为空")
+    private String name;
+    
+    @ApiModelProperty(value = "分类ID", required = true)
+    @NotNull(message = "分类ID不能为空")
+    private Long categoryId;
+}
+```
+
+## 异常处理规范
+- Controller层只做简单的参数校验
+- 业务异常由Service层处理
+- 统一使用全局异常处理器
+- 不要在Controller中捕获异常
+
+## 日志规范
+- 不要在Controller层打印业务日志
+- 可以打印请求参数和响应结果的DEBUG日志
+- 使用注解记录操作日志
+- 敏感信息不要打印到日志中
+
+## 数据转换规范
+- 使用BeanUtil进行对象转换
+- 复杂转换使用MapStruct
+- VO对象与DTO对象字段要一致
+- 日期格式要统一处理
+
+## 权限控制
+- 使用@PreAuthorize注解控制接口权限
+- 重要操作要进行权限校验
+- 敏感数据要进行权限过滤
+- 记录重要操作的操作人
+
+## 接口版本控制
+- 使用@ApiVersion注解标识接口版本
+- 废弃接口使用@Deprecated注解
+- 版本号要在路径中体现
+- 保持向下兼容
+
+## 性能优化
+- 合理使用分页查询
+- 避免大量数据传输
+- 请求参数要简化
+- 响应结果要精简
+
+## 安全规范
+- 防止SQL注入
+- 防止XSS攻击
+- 敏感数据加密
+- 接口访问频率限制
+
+## 参数传递规范
+
+### 强制约束
+1. Controller层必须使用VO类型作为请求参数和响应参数
+2. Controller层与Service层交互时:
+   - 请求参数必须从VO转换为DTO
+   - 响应参数必须从DTO转换为VO
+3. 唯一例外：列表查询接口可以直接返回DTO类型参数
+4. 对象封装形式的传参也必须遵循VO/DTO规范:
+   - 方法参数超过3个时，必须使用对象封装
+   - 封装对象必须使用VO类型，不允许直接使用DTO
+   - 示例：
+   ```java
+   // 错误示例
+   @PostMapping("/save")
+   public ResponseInfo<Void> save(String name, String code, Integer type, 
+       String remark, Long categoryId) {
+       // 参数过多，应该封装
+   }
+   
+   // 错误示例
+   @PostMapping("/save")
+   public ResponseInfo<Void> save(@RequestBody MaterialDTO dto) {
+       // 不允许直接使用DTO
+   }
+   
+   // 正确示例
+   @PostMapping("/save")
+   public ResponseInfo<Void> save(@RequestBody @Validated MaterialSaveReqVO reqVO) {
+       MaterialDTO dto = BeanUtil.copyProperties(reqVO, MaterialDTO.class);
+       materialService.save(dto);
+       return ResponseInfo.success();
+   }
+   ```
+
+### VO类型定义
+1. 请求VO
+   - 命名规范：以ReqVO结尾
+   - 位置：web模块下的vo.req包
+   - 用途：接收前端请求参数
+   - 示例：
+   ```java
+   @Getter
+   @Setter
+   @ApiModel("分析项选项请求VO")
+   public class InspectParameterOptionReqVO {
+       @ApiModelProperty(value = "选项值", required = true)
+       @NotBlank(message = "选项值不能为空")
+       private String optionValue;
+   }
+   ```
+
+2. 响应VO
+   - 命名规范：以RespVO结尾
+   - 位置：web模块下的vo.resp包
+   - 用途：返回给前端的响应数据
+   - 示例：
+   ```java
+   @Getter
+   @Setter
+   @ApiModel("分析项选项响应VO")
+   public class InspectParameterOptionRespVO {
+       @ApiModelProperty(value = "选项id")
+       private Long id;
+       @ApiModelProperty(value = "选项值")
+       private String optionValue;
+   }
+   ```
+
+### 对象封装规范
+1. 新增/修改场景
+   ```java
+   @Data
+   @ApiModel("物料保存请求VO")
+   public class MaterialSaveReqVO {
+       @ApiModelProperty(value = "物料名称", required = true)
+       @NotBlank(message = "物料名称不能为空")
+       private String name;
+       
+       @ApiModelProperty(value = "物料编码", required = true)
+       @NotBlank(message = "物料编码不能为空")
+       private String code;
+       
+       @ApiModelProperty(value = "物料类型", required = true)
+       @NotNull(message = "物料类型不能为空")
+       private Integer type;
+       
+       @ApiModelProperty("备注")
+       private String remark;
+       
+       @ApiModelProperty(value = "分类ID", required = true)
+       @NotNull(message = "分类ID不能为空")
+       private Long categoryId;
+   }
+   ```
+
+2. 查询场景
+   ```java
+   @Data
+   @ApiModel("物料查询请求VO")
+   public class MaterialQueryReqVO {
+       @ApiModelProperty("物料名称")
+       private String name;
+       
+       @ApiModelProperty("物料编码")
+       private String code;
+       
+       @ApiModelProperty("物料类型")
+       private Integer type;
+       
+       @ApiModelProperty("分类ID")
+       private Long categoryId;
+       
+       @ApiModelProperty("创建时间范围-开始")
+       @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+       private LocalDateTime createTimeStart;
+       
+       @ApiModelProperty("创建时间范围-结束")
+       @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+       private LocalDateTime createTimeEnd;
+   }
+   ```
+
+3. 批量操作场景
+   ```java
+   @Data
+   @ApiModel("物料批量操作请求VO")
+   public class MaterialBatchReqVO {
+       @ApiModelProperty(value = "物料ID列表", required = true)
+       @NotEmpty(message = "物料ID列表不能为空")
+       private List<Long> ids;
+       
+       @ApiModelProperty(value = "操作类型", required = true)
+       @NotNull(message = "操作类型不能为空")
+       private Integer operationType;
+       
+       @ApiModelProperty("操作备注")
+       private String remark;
+   }
+   ```
+
+### 数据转换
+1. 单个对象转换
+   ```java
+   // VO转DTO
+   InspectParameterDTO dto = BeanUtil.copyProperties(reqVO, InspectParameterDTO.class);
+   
+   // DTO转VO
+   InspectParameterRespVO respVO = BeanUtil.copyProperties(dto, InspectParameterRespVO.class);
+   ```
+
+2. 列表转换
+   ```java
+   // VO列表转DTO列表
+   List<InspectParameterDTO> dtos = BeanUtil.copyToList(reqVOs, InspectParameterDTO.class);
+   
+   // DTO列表转VO列表
+   List<InspectParameterRespVO> respVOs = BeanUtil.copyToList(dtos, InspectParameterRespVO.class);
+   ```
+
+3. 分页数据转换
+   ```java
+   // 分页对象转换
+   CommonPage<InspectParameterDTO> dtoPage = service.page(pageReqDTO);
+   CommonPage<InspectParameterRespVO> voPage = BeanUtil.copyProperties(dtoPage, CommonPage.class);
+   
+   // 分页记录转换
+   List<InspectParameterRespVO> records = BeanUtil.copyToList(dtoPage.getRecords(), InspectParameterRespVO.class);
+   voPage.setRecords(records);
+   ```
+
+### 最佳实践
+1. VO类应该只包含与前端交互必要的字段
+2. 请求VO应该包含必要的参数校验注解
+3. 响应VO应该包含完整的Swagger文档注解
+4. 避免在Controller中直接修改DTO的数据
+5. 分页查询时，应该在转换完成后再返回数据
+
+# 日志与操作记录
+- 重要操作加 @OperationLog 注解。
+

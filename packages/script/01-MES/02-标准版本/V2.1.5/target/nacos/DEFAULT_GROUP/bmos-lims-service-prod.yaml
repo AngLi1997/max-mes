@@ -1,0 +1,65 @@
+db:
+  schema: bmos_lims
+# Mybatis配置
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true # 虽然默认为 true ，但是还是显示去指定下。
+    default-enum-type-handler: com.baomidou.mybatisplus.core.handlers.MybatisEnumTypeHandler
+  global-config:
+    db-config:
+      logic-delete-value: true # 逻辑已删除值(默认为 true)
+      logic-not-delete-value: false # 逻辑未删除值(默认为 false)
+  mapper-locations: classpath*:mapper/**/*.xml
+  type-handlers-package: com.bmos.mybatis.handler
+
+  
+upload-path:
+
+bmos:
+  adaptor:
+    permission: isc-permission-service:32100
+    register: isc-rc-application-service:34200
+    route: isc-route-service:31000
+    common: isc-common-service:31300
+    platform: bmos-platform-service:60100
+  application:
+    code: bmos-${spring.application.name}
+    name: 佰墨思LIMS
+    service-list:
+      - service-id: ${bmos.application.code}
+        service-name: ${bmos.application.code}
+        service-path: /api/app/${spring.application.name}/**
+        service-url: http://bmos-${spring.application.name}-service:${server.port}
+        service-enable: false
+        exclude-urls:
+          -
+#        special-urls:
+#          - /api/app/lims/record/fileUpload
+  auth:
+    exclude-urls:
+      - ${server.servlet.context-path}/swagger-ui/**
+      - ${server.servlet.context-path}/swagger-resources/**
+      - ${server.servlet.context-path}/api-docs
+      - ${server.servlet.context-path}/v3/api-docs
+    activeUrls:
+      - ${server.servlet.context-path}/active/active
+      - ${server.servlet.context-path}/active/actived
+    enable: true
+  services:
+    platform: bmos-platform-service:60100
+parameter:
+  product:
+    plan:
+      discard:
+        code: lims.schedule.plan-invalid
+  record:
+    error-data: lims.record.error-data
+
+logging:
+  config: classpath:log4j2.xml
+
+minio:
+  endpoint: http://127.0.0.1:9000
+  accessKey: minio
+  secretKey: Bmos1018
+  bucket: bmos-product

@@ -1,0 +1,192 @@
+/* stylelint-disable no-descending-specificity */
+/* stylelint-disable selector-class-pattern */
+/* stylelint-disable rule-empty-line-before */
+.formula-container {
+  position: relative;
+  height: 100%;
+  margin: 0 auto;
+  overflow-y: auto;
+  background-color: #fff;
+
+  .selectTdClass {
+    background-color: #edf5fa !important;
+  }
+  table.noBorderTable td,
+  table.noBorderTable th,
+  table.noBorderTable caption {
+    border: 1px dashed #ddd !important;
+  }
+  table {
+    display: table;
+    margin-bottom: 10px;
+    border-collapse: collapse;
+  }
+  td,
+  th {
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+  }
+  caption {
+    padding: 3px;
+    border: 1px dashed #ddd;
+    border-bottom: 0;
+    text-align: center;
+  }
+  th {
+    border-top: 1px solid #bbb;
+    background-color: #f7f7f7;
+  }
+  table tr.firstRow th {
+    border-top-width: 2px;
+  }
+  .ue-table-interlace-color-single {
+    background-color: #fcfcfc;
+  }
+  .ue-table-interlace-color-double {
+    background-color: #f7faff;
+  }
+  td p {
+    margin: 0;
+    padding: 0;
+  }
+}
+
+.attachment-image {
+  width: 100%;
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+.formula-container .record-component {
+  box-sizing: content-box;
+  border-radius: 2px;
+  border-color: #909398;
+  background-color: #f2f3f4;
+  font-family: revert;
+  line-height: normal;
+  resize: none;
+  user-select: none;
+}
+
+.record-component:hover {
+  cursor: pointer;
+}
+
+.formula-container .node-actived {
+  border: 1px solid #2871ff !important;
+  border-color: #2871ff !important;
+  background-color: #ebf1ff !important;
+}
+
+.formula-container .node-actived.business-button-class {
+  border: 1px solid #2871ff !important;
+  color: #2871ff !important;
+  /* stylelint-disable-next-line order/properties-order */
+  background: #d9e5ff !important;
+}
+
+.formula {
+  display: flex;
+  position: relative;
+  height: 100%;
+  overflow-y: auto;
+  background-color: #e6e6e6;
+}
+
+.formula-container .formula-param {
+  border-color: #ffcb37 !important;
+  background-color: #fff5d9 !important;
+}
+
+.formula-container .data-bind {
+  background-image: url('../../../assets/images//relation.png') !important;
+  background-repeat: no-repeat !important;
+  background-position-x: calc(100% - 6px) !important;
+  background-position-y: 2px !important;
+}
+
+.formula-container .node-config {
+  background-image: url('../../../assets/images//nodeConfig.png') !important;
+  background-repeat: no-repeat !important;
+  background-position-x: calc(100% - 6px) !important;
+  background-position-y: 2px !important;
+}
+
+.formula-container .formula-node {
+  background-image: url('../../../assets/images//formula.png');
+  background-repeat: no-repeat;
+  background-position-x: calc(100% - 2px);
+  background-position-y: 2px;
+}
+
+.formula-container textarea:focus {
+  outline: none;
+}
+
+.formula-print-preview,
+.formula-print-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.copyVersion-discard {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  background-color: #fff;
+  gap: 10px;
+}
+.copy-version {
+  margin-left: 16px;
+  padding: 8px 16px;
+  border: 2px solid #2871ff;
+  border-radius: 8px;
+  color: #2871ff;
+  font-size: 24px;
+  font-weight: 500;
+}
+.obsolete-class {
+  padding: 8px 16px;
+  border: 2px solid #ff4c26;
+  border-radius: 8px;
+  color: #ff4c26;
+  font-size: 24px;
+  font-weight: 500;
+}
+.formula-print-preview {
+  position: relative;
+}
+
+.formula-print-item {
+  height: auto;
+}
+
+.formula-print-item .formula-container {
+  height: auto;
+  overflow: hidden;
+}
+
+.formula-print-preview textarea,
+.formula-print-item textarea {
+  border: none;
+  box-shadow: 2px 2px 3px 0 #0000001f inset;
+}
+
+.formula-print-preview textarea :only-child {
+  border: none !important !important;
+}
+
+.formula-print-item textarea :only-child {
+  border: none !important !important;
+}
+
+.empty-preview {
+  display: flex;
+  position: absolute;
+  inset: 0;
+  left: 20%;
+  align-items: center;
+  justify-content: center;
+  width: 60%;
+  background-color: #fff;
+}

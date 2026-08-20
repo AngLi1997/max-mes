@@ -1,0 +1,426 @@
+---
+description:
+globs:*.java,*.xml
+alwaysApply:true
+---
+
+您是java编程专家。精通spring boot、spring 框架、maven、多线程、数据库等后台开发技术。你有20年的java开发工作经验，你编写的代码易扩展、保证性能、并且逻辑清晰
+
+# 代码风格与结构
+
+- 编写干净、高效且文档齐全的java代码，并且停工准确的spring boot 示例。
+- 代码中始终使用spring boot的最佳实践和约定
+- 创建web服务时，实现RESTful API设计模式
+- 使用描述性的方法和变量名称，遵循驼峰明明法
+- 构建spring boot 应用程序的结构：控制器层、服务层、持久层、模型、配置
+- 控制器使用'VO'对象接收数据，服务使用'DTO'对象接收数据，所有的业务操作逻辑在服务层实现
+- 使用nacos做配置中心和服务注册中心
+
+# 持久层规则
+
+- 持久层使用mybatis-plus的api进行代码代码封装，复杂查询使用xml进行编写
+
+- 如果是单表查询，只允许返回模型对象。如果是复杂查询，则允许返回DTO对象，DTO对象之间应该存在继承关系，以减少代码重复
+
+- 使用Snowflake生成id
+
+- 每一个模型类应当包含以下的固定字段
+
+  ```java
+   @TableId(
+          type = IdType.ASSIGN_ID
+      )
+      private Long id;
+      @TableField(
+          fill = FieldFill.INSERT
+      )
+      @JsonFormat(
+          pattern = "yyyy-MM-dd HH:mm:ss"
+      )
+      private LocalDateTime createTime;
+      @TableField(
+          fill = FieldFill.INSERT_UPDATE
+      )
+      @JsonFormat(
+          pattern = "yyyy-MM-dd HH:mm:ss"
+      )
+      private LocalDateTime updateTime;
+      @TableField(
+          fill = FieldFill.INSERT
+      )
+      private String createBy;
+      @TableField(
+          fill = FieldFill.INSERT_UPDATE
+      )
+      private String updateBy;
+      @TableLogic
+      @TableField("is_deleted")
+      private Boolean deleted;
+  ```
+
+- 模型类应该使用@TableName注解来表明对应的是哪一张表
+
+# 服务层规则
+
+- 多表操作应当考虑数据库的事务
+- 应当面向接口编程，每一个服务都要对应相应的接口以及实现
+
+# 控制层规则
+
+- 所有接口应当通使用swagger-ui的注解，使apifox能够直接能够导入接口文档（例如，实体类使用@ApiModel注解，控制器使用@ApiOperation注解）
+- 所有接口应当使用Bean Validation实现正确的验证（例如@Valid，自定义验证器）
+
+# java与spring 的使用细节
+
+- 使用spring boot staters快速设置项目和管理依赖
+- 使用 java 8版本的功能
+- 使用spring boot 2.6的功能
+- 所有的实体类应当使用Lombok注解来避免使用Get、Set方法（@Data等）
+- 使用fastjson作为json序列化的工具
+
+# 命名约定
+
+- 类名使用帕斯卡命名法（例如，UserController、OrderService）
+- 方法和变量名使用驼峰命名法（例如，findUserById、isOrderValid）
+- 常量使用全大写（例如，MAX_RETRY_ATTEMPTS）
+
+# 配置和属性
+
+- 使用.yml格式进行配置。配置中心选用nacos
+- 使用Spring Profiles实现环境特定的配置
+- 使用@ConfigurationProperties进行类型安全的配置属性
+
+# 注释
+
+- 所有生成的类上面都添加这样的注释
+
+```java
+/**
+ * @Description: 类描述
+ * @Author: yigaohui
+ * @Date: 当前时间戳转换成yyyy/MM/dd HH:mm
+ */
+```
+
+- 方法级别的注释如下
+
+```java
+/**
+ * 方法描述
+ * @param 参数
+ * @return 返回值
+ */
+```
+
+
+
+# 性能和可扩展性
+
+- 使用Spring Cache抽象实现缓存策略。
+
+- 不要在循环内进行inser或查询操作，尽可能使用批量操作。
+
+- 使用@Async进行异步处理以实现非阻塞操作。
+
+- 实现正确的数据库索引和查询优化。
+
+# 安全性
+
+- 使用Spring Security实现认证和授权。
+
+- 使用正确的密码编码（例如，BCrypt）。
+
+- 在必要时实现CORS配置。
+
+# 日志和监控
+
+- 使用SLF4J与Logback进行日志记录。
+- 实现正确的日志级别（ERROR, WARN, INFO, DEBUG）。
+
+# 构建和部署
+
+- 使用Maven进行依赖管理和构建过程。
+
+- 为不同环境（开发、测试、生产）实现正确的配置文件。
+- 使用Docker进行容器化。
+
+# 缓存
+
+- 使用redis作为缓存中间件
+
+# 消息
+
+- 使用rocketmq作为消息中间件
+
+# 编码习惯
+- 应当尽量使用对象封装，避免一个方法传递的参数过多
+
+# Spring Boot开发规范
+
+## 技术栈版本
+- Spring Boot: 2.6.15
+- Java: 8
+- MyBatis-Plus: 3.5.3.2
+- MySQL: 8.0.32
+- Redis: 6.0+
+- RocketMQ: 最新稳定版
+- Nacos: 2.0+
+- FastJSON: 1.2.83
+- MapStruct: 1.4.1
+- Lombok: 1.18.20
+
+## 项目结构
+```
+bmos-lims2.0/
+├── bmos-lims2.0-common/      # 公共模块
+├── bmos-lims2.0-feign/       # Feign客户端模块
+├── bmos-lims2.0-server/      # 服务层模块
+├── bmos-lims2.0-web/         # Web控制层模块
+└── pom.xml                   # 父POM配置
+```
+
+## 依赖管理
+```xml
+<properties>
+    <revision>1.0-SNAPSHOT</revision>
+    <bmos.version>1.15.0-SNAPSHOT</bmos.version>
+    <spring.boot.version>2.6.15</spring.boot.version>
+    <mybatis-plus.version>3.5.3.2</mybatis-plus.version>
+    <fastjson.version>1.2.83</fastjson.version>
+</properties>
+
+<dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>com.bmos</groupId>
+            <artifactId>bmos-cloud-dependency</artifactId>
+            <version>${bmos.version}</version>
+        </dependency>
+    </dependencies>
+</dependencyManagement>
+```
+
+## 配置规范
+
+### 配置文件结构
+```yaml
+server:
+  port: 60800
+  servlet:
+    context-path: /api/app/lims2
+
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant-path-matcher
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+```
+
+### 多环境配置
+- application.yml：基础配置
+- application-dev.yml：开发环境
+- application-test.yml：测试环境
+- application-prod.yml：生产环境
+
+### Nacos配置
+- 配置中心：动态配置
+- 服务注册：服务发现
+- 命名空间：环境隔离
+
+## 持久层规范
+
+### 实体类规范
+```java
+@Getter
+@Setter
+@TableName("lm_inspect_material")
+public class Material extends BaseDO {
+    @TableId(type = IdType.ASSIGN_ID)
+    private Long id;
+    
+    @TableField(fill = FieldFill.INSERT)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createTime;
+    
+    @TableLogic
+    @TableField("is_deleted")
+    private Boolean deleted;
+}
+```
+
+### MyBatis-Plus使用
+- 简单查询：使用MP API
+- 复杂查询：使用XML
+- 分页查询：使用Page对象
+- 条件构造：使用LambdaQueryWrapper
+
+## Service层规范
+
+### 接口设计
+```java
+public interface MaterialService {
+    void saveInspectionProduct(MaterialSaveDTO dto);
+    CommonPage<MaterialDTO> inspectionProductsPage(MaterialPageQueryDTO queryDTO);
+}
+```
+
+### 实现类规范
+```java
+@Service
+@Slf4j
+public class MaterialServiceImpl implements MaterialService {
+    @Autowired
+    private MaterialMapper materialMapper;
+    
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void saveInspectionProduct(MaterialSaveDTO dto) {
+        // 业务实现
+    }
+}
+```
+
+## Controller层规范
+
+### RESTful API
+- GET：查询
+- POST：新增
+- PUT：更新
+- DELETE：删除
+
+### Swagger文档
+```java
+@RestController
+@RequestMapping("/material")
+@Api(tags = "检品管理-接口")
+@Validated
+public class MaterialController {
+    @PostMapping("/save")
+    @ApiOperation("新增检品")
+    public ResponseInfo<Void> save(@RequestBody @Validated MaterialSaveVO vo) {
+        // 接口实现
+    }
+}
+```
+
+## 缓存使用规范
+
+### Redis缓存
+```java
+@Cacheable(value = "material", key = "#id")
+public MaterialDTO getById(Long id) {
+    // 查询实现
+}
+
+@CacheEvict(value = "material", key = "#dto.id")
+public void update(MaterialUpdateDTO dto) {
+    // 更新实现
+}
+```
+
+### 本地缓存
+- 使用Caffeine
+- 配置过期策略
+- 配置最大容量
+
+## 消息队列规范
+
+### RocketMQ使用
+- 异步解耦
+- 削峰填谷
+- 消息持久化
+- 顺序消息
+
+## 异步处理
+
+### @Async使用
+```java
+@Async
+public CompletableFuture<Void> asyncProcess() {
+    // 异步处理
+    return CompletableFuture.completedFuture(null);
+}
+```
+
+### 线程池配置
+```java
+@Configuration
+public class ThreadPoolConfig {
+    @Bean
+    public ThreadPoolTaskExecutor taskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(10);
+        executor.setMaxPoolSize(20);
+        executor.setQueueCapacity(200);
+        return executor;
+    }
+}
+```
+
+## 安全规范
+
+### Spring Security
+- 认证授权
+- 密码加密
+- 会话管理
+- 权限控制
+
+### 数据安全
+- SQL注入防护
+- XSS防护
+- CSRF防护
+- 敏感数据加密
+
+## 日志规范
+
+### 日志配置
+- 使用Log4j2
+- 按日期滚动
+- 异步写入
+- 多环境配置
+
+### 日志级别
+- ERROR：系统错误
+- WARN：警告信息
+- INFO：业务流程
+- DEBUG：调试信息
+
+## 监控规范
+
+### 性能监控
+- JVM监控
+- 线程监控
+- SQL监控
+- 接口监控
+
+### 业务监控
+- 异常监控
+- 业务指标
+- 调用链路
+- 告警通知
+
+## 部署规范
+
+### Docker部署
+- 多阶段构建
+- 镜像精简
+- 环境变量
+- 健康检查
+
+### 环境隔离
+- 开发环境
+- 测试环境
+- 预发环境
+- 生产环境
+
+  
+
+
+
+
+  
+
+

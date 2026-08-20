@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.inspect.pack.mapper.InspectPackageMapper">
+
+
+    <select id="selectByParam"
+            resultType="com.bmos.lims2.server.inspect.pack.entity.InspectPackage">
+        SELECT DISTINCT
+            bp.*
+        FROM
+            lm_inspect_package bp
+        <if test="param.inspectItemName != null and param.inspectItemName != ''">
+            LEFT JOIN lm_package_item pi ON bp.id = pi.inspect_package_id AND pi.is_deleted = 0
+            LEFT JOIN lm_inspect_item ii ON pi.inspect_item_id = ii.id AND ii.is_deleted = 0
+        </if>
+        <where>
+            <if test="param.name != null and param.name != ''">
+                AND bp.name LIKE CONCAT('%', #{param.name},'%')
+            </if>
+            <if test="param.code != null and param.code != ''">
+                AND bp.code LIKE CONCAT('%', #{param.code}, '%')
+            </if>
+            <if test="param.keyword != null and param.keyword != ''">
+                AND (bp.code like CONCAT('%', #{param.keyword}, '%') OR bp.name like CONCAT('%', #{param.keyword}, '%'))
+            </if>
+            <if test="param.inspectItemName != null and param.inspectItemName != ''">
+                AND (ii.name LIKE CONCAT('%', #{param.inspectItemName}, '%') OR ii.code LIKE CONCAT('%', #{param.inspectItemName}, '%'))
+            </if>
+            <if test="param.excludeIdList != null and param.excludeIdList.size > 0" >
+                AND bp.id  NOT IN
+                <foreach collection="param.excludeIdList" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+            AND bp.is_deleted = 0
+        </where>
+        ORDER BY bp.code ASC
+        ORDER BY bp.code ASC
+    </select>
+
+    <!-- 仅分页查询实验包ID，用于两步分页的第一步 -->
+    <select id="selectIdsByParam" resultType="java.lang.Long">
+        SELECT DISTINCT
+            bp.id
+        FROM
+            lm_inspect_package bp
+        <if test="param.inspectItemName != null and param.inspectItemName != ''">
+            LEFT JOIN lm_package_item pi ON bp.id = pi.inspect_package_id AND pi.is_deleted = 0
+            LEFT JOIN lm_inspect_item ii ON pi.inspect_item_id = ii.id AND ii.is_deleted = 0
+        </if>
+        <where>
+            <if test="param.name != null and param.name != ''">
+                AND bp.name LIKE CONCAT('%', #{param.name},'%')
+            </if>
+            <if test="param.code != null and param.code != ''">
+                AND bp.code LIKE CONCAT('%', #{param.code}, '%')
+            </if>
+            <if test="param.keyword != null and param.keyword != ''">
+                AND (bp.code like CONCAT('%', #{param.keyword}, '%') OR bp.name like CONCAT('%', #{param.keyword}, '%'))
+            </if>
+            <if test="param.inspectItemName != null and param.inspectItemName != ''">
+                AND (ii.name LIKE CONCAT('%', #{param.inspectItemName}, '%') OR ii.code LIKE CONCAT('%', #{param.inspectItemName}, '%'))
+            </if>
+            <if test="param.excludeIdList != null and param.excludeIdList.size > 0" >
+                AND bp.id  NOT IN
+                <foreach collection="param.excludeIdList" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+            AND bp.is_deleted = 0
+        </where>
+        ORDER BY bp.code ASC
+    </select>
+
+    <!-- 结果映射：实验包及其关联的检验项目 -->
+    <resultMap id="PackageWithItemsResultMap" type="com.bmos.lims2.server.inspect.pack.dto.InspectPackageWithItemsDTO">
+        <!-- 实验包字段 -->
+        <id property="id" column="package_id"/>
+        <result property="code" column="package_code"/>
+        <result property="name" column="package_name"/>
+        <result property="remark" column="package_remark"/>
+        <result property="createBy" column="package_create_by"/>
+        <result property="updateBy" column="package_update_by"/>
+        <result property="createTime" column="package_create_time"/>
+        <result property="updateTime" column="package_update_time"/>
+        <result property="deleted" column="package_is_deleted"/>
+        <!-- 关联的检验项目列表 -->
+        <collection property="packageItemList" ofType="com.bmos.lims2.server.inspect.pack.dto.InspectPackageItemDTO">
+            <result property="inspectItemId" column="inspect_item_id"/>
+            <result property="code" column="inspect_item_code"/>
+            <result property="name" column="inspect_item_name"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectWithItemsByParam" resultMap="PackageWithItemsResultMap">
+        SELECT DISTINCT
+            bp.id as package_id,
+            bp.code as package_code,
+            bp.name as package_name,
+            bp.remark as package_remark,
+            bp.create_by as package_create_by,
+            bp.update_by as package_update_by,
+            bp.create_time as package_create_time,
+            bp.update_time as package_update_time,
+            bp.is_deleted as package_is_deleted,
+            ii.id as inspect_item_id,
+            ii.code as inspect_item_code,
+            ii.name as inspect_item_name
+        FROM
+            lm_inspect_package bp
+        LEFT JOIN lm_package_item pi ON bp.id = pi.inspect_package_id AND pi.is_deleted = 0
+        LEFT JOIN lm_inspect_item ii ON pi.inspect_item_id = ii.id AND ii.is_deleted = 0
+        <where>
+            <if test="param.name != null and param.name != ''">
+                AND bp.name LIKE CONCAT('%', #{param.name},'%')
+            </if>
+            <if test="param.code != null and param.code != ''">
+                AND bp.code LIKE CONCAT('%', #{param.code}, '%')
+            </if>
+            <if test="param.keyword != null and param.keyword != ''">
+                AND (bp.code like CONCAT('%', #{param.keyword}, '%') OR bp.name like CONCAT('%', #{param.keyword}, '%'))
+            </if>
+            <if test="param.inspectItemName != null and param.inspectItemName != ''">
+                AND (ii.name LIKE CONCAT('%', #{param.inspectItemName}, '%') OR ii.code LIKE CONCAT('%', #{param.inspectItemName}, '%'))
+            </if>
+            <if test="param.excludeIdList != null and param.excludeIdList.size > 0" >
+                AND bp.id  NOT IN
+                <foreach collection="param.excludeIdList" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+            AND bp.is_deleted = 0
+        </where>
+        ORDER BY bp.code ASC
+    </select>
+
+    <!-- 根据ID集合查询实验包及其关联的检验项目信息（不分页） -->
+    <select id="selectWithItemsByIds" resultMap="PackageWithItemsResultMap">
+        SELECT DISTINCT
+            bp.id as package_id,
+            bp.code as package_code,
+            bp.name as package_name,
+            bp.remark as package_remark,
+            bp.create_by as package_create_by,
+            bp.update_by as package_update_by,
+            bp.create_time as package_create_time,
+            bp.update_time as package_update_time,
+            bp.is_deleted as package_is_deleted,
+            ii.id as inspect_item_id,
+            ii.code as inspect_item_code,
+            ii.name as inspect_item_name
+        FROM
+            lm_inspect_package bp
+        LEFT JOIN lm_package_item pi ON bp.id = pi.inspect_package_id AND pi.is_deleted = 0
+        LEFT JOIN lm_inspect_item ii ON pi.inspect_item_id = ii.id AND ii.is_deleted = 0
+        <where>
+            <if test="ids != null and ids.size > 0">
+                AND bp.id IN
+                <foreach collection="ids" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="ids == null or ids.size == 0">
+                AND 1 = 0
+            </if>
+            AND bp.is_deleted = 0
+        </where>
+        ORDER BY bp.code ASC
+    </select>
+
+    <!-- 结果映射：实验包完整配置信息 -->
+    <resultMap id="PackageFullConfigResultMap" type="com.bmos.lims2.server.inspect.pack.dto.InspectPackageFullConfigDTO">
+        <!-- 实验包字段 -->
+        <id property="packageId" column="package_id"/>
+        <result property="packageCode" column="package_code"/>
+        <result property="packageName" column="package_name"/>
+        <result property="remark" column="package_remark"/>
+        <!-- 检验项目列表 -->
+        <collection property="inspectionItems" ofType="com.bmos.lims2.server.inspect.pack.dto.InspectPackageFullConfigDTO$InspectionItemDTO">
+            <id property="inspectItemId" column="inspect_item_id"/>
+            <result property="inspectItemCode" column="inspect_item_code"/>
+            <result property="inspectItemName" column="inspect_item_name"/>
+            <result property="isRequired" column="is_required"/>
+            <result property="sort" column="sort"/>
+            <result property="remark" column="item_remark"/>
+            <!-- 分析项列表 -->
+            <collection property="inspectionParameters" ofType="com.bmos.lims2.server.inspect.pack.dto.InspectPackageFullConfigDTO$AnalysisItemDTO">
+                <id property="parameterId" column="parameter_id"/>
+                <result property="parameterCode" column="parameter_code"/>
+                <result property="parameterName" column="parameter_name"/>
+                <result property="standard" column="standard"/>
+                <result property="isReportable" column="is_reportable"/>
+                <result property="isExecutable" column="is_executable"/>
+                <!-- 数据点列表 -->
+                <collection property="dataPoints" ofType="com.bmos.lims2.server.inspect.pack.dto.InspectPackageFullConfigDTO$DataPointDTO">
+                    <id property="dataPointId" column="data_point_id"/>
+                    <result property="name" column="data_point_name"/>
+                    <result property="pointType" column="point_type"/>
+                    <result property="reportDisplay" column="report_display"/>
+                    <result property="timeFormat" column="time_format"/>
+                </collection>
+            </collection>
+        </collection>
+    </resultMap>
+
+    <select id="selectFullConfigByPackageId" resultMap="PackageFullConfigResultMap">
+        SELECT DISTINCT
+            pkg.id as package_id,
+            pkg.code as package_code,
+            pkg.name as package_name,
+            pkg.remark as package_remark,
+
+            item.id as inspect_item_id,
+            item.code as inspect_item_code,
+            item.name as inspect_item_name,
+
+            param.id as parameter_id,
+            param.code as parameter_code,
+            param.name as parameter_name,
+            param.standard as standard,
+
+
+            data_point.id as data_point_id,
+            data_point.name as data_point_name,
+            data_point.result_type as point_type,
+            data_point.report_display as report_display,
+            data_point.time_format as time_format
+
+
+        FROM lm_inspect_package pkg
+        LEFT JOIN lm_package_item pkg_item ON pkg.id = pkg_item.inspect_package_id AND pkg_item.is_deleted = 0
+        LEFT JOIN lm_inspect_item item ON pkg_item.inspect_item_id = item.id AND item.is_deleted = 0
+        LEFT JOIN lm_item_parameter item_param ON item.id = item_param.inspect_item_id AND item_param.is_deleted = 0
+        LEFT JOIN lm_inspect_parameter param ON item_param.inspect_parameter_id = param.id AND param.is_deleted = 0
+        LEFT JOIN lm_inspect_parameter_data_point data_point ON param.id = data_point.parameter_id AND data_point.is_deleted = 0
+
+        WHERE pkg.id = #{packageId} AND pkg.is_deleted = 0
+        ORDER BY
+            pkg.create_time DESC,
+            pkg.id ASC,
+            pkg_item.id ASC,
+            item_param.id ASC,
+            data_point.id ASC
+    </select>
+</mapper>

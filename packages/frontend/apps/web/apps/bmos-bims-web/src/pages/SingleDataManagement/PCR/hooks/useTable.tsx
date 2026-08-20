@@ -1,0 +1,203 @@
+import type { FormProps, TableColumn } from '@bmos/components';
+import { t } from '@bmos/i18n';
+
+export const useTable = () => {
+  const { pcrResultCheckTypeDict, publishStatusDict, qualifiedStatusDict } = getDicts();
+  const pageRef = ref<any>(null);
+
+  const columnsFirst: TableColumn[] = [
+    {
+      title: t('检验项目'),
+      dataIndex: 'checkItem',
+      width: 120,
+      resizable: true,
+      customRender: ({ record }) => {
+        return record?.checkItem?.name;
+      },
+    },
+    {
+      title: t('检验方式'),
+      dataIndex: 'checkType',
+      width: 160,
+      resizable: true,
+      // customRender: ({ record }) => {
+      //   return record?.checkMethod?.name;
+      // },
+    },
+    {
+      title: t('标本编号'),
+      dataIndex: 'sampleNo',
+      hideInSearch: true,
+      width: 190,
+      resizable: true,
+    },
+    {
+      title: t('标本批号'),
+      dataIndex: 'sampleBatchNo',
+      hideInSearch: true,
+      width: 120,
+      resizable: true,
+    },
+    {
+      title: t('检验结果类型'),
+      dataIndex: 'checkResultType',
+      hideInSearch: true,
+      width: 160,
+      resizable: true,
+      customRender: ({ record }) => {
+        return record?.checkResultType?.name;
+      },
+    },
+    {
+      title: t('检验结果'),
+      dataIndex: 'checkResult',
+      width: 100,
+      resizable: true,
+      customRender: ({ record }) => {
+        return record?.checkResult?.name;
+      },
+    },
+    {
+      title: t('CT值'),
+      dataIndex: 'ct',
+      hideInSearch: true,
+      width: 90,
+      sorter: true,
+      resizable: true,
+    },
+    {
+      title: t('内标'),
+      dataIndex: 'internalLabel',
+      width: 90,
+      sorter: true,
+      resizable: true,
+    },
+    {
+      title: t('试剂批号'),
+      dataIndex: 'reagentBatchNo',
+      width: 190,
+      resizable: true,
+    },
+    {
+      title: t('质控品批号'),
+      dataIndex: 'qualityControllerBatchNo',
+      width: 190,
+      resizable: true,
+    },
+    {
+      title: t('检验人'),
+      dataIndex: 'checkBy',
+      width: 100,
+      resizable: true,
+    },
+    {
+      title: t('检验日期'),
+      dataIndex: 'checkDate',
+      width: 150,
+      sorter: true,
+      resizable: true,
+    },
+    {
+      title: t('发布状态'),
+      dataIndex: 'publishStatus',
+      width: 120,
+      resizable: true,
+      customRender: ({ record }) => {
+        return record?.publishStatus?.name;
+      },
+    },
+    {
+      title: t('复核人'),
+      dataIndex: 'reCheckBy',
+      width: 100,
+      resizable: true,
+    },
+    {
+      title: t('复核日期'),
+      dataIndex: 'reCheckDate',
+      width: 150,
+      sorter: true,
+      resizable: true,
+    },
+  ];
+
+  const formFirstProps: Partial<FormProps> = {
+    showAdvancedButton: true,
+    schemas: [
+      {
+        label: t('标本批号'),
+        field: 'sampleBatchNo',
+        component: 'Input',
+      },
+      {
+        label: t('标本编号'),
+        field: 'sampleNo',
+        component: 'Input',
+      },
+      {
+        label: t('检验类型'),
+        field: 'checkResultType',
+        component: 'Select',
+        componentProps: {
+          options: pcrResultCheckTypeDict,
+        },
+      },
+      {
+        label: t('检验结果'),
+        field: 'checkResult',
+        component: 'Select',
+        componentProps: {
+          options: qualifiedStatusDict,
+        },
+      },
+      {
+        label: t('试剂批号'),
+        field: 'reagentBatchNo',
+        component: 'Input',
+      },
+      {
+        label: t('质控品批号'),
+        field: 'qualityControllerBatchNo',
+        component: 'Input',
+      },
+      {
+        label: t('发布状态'),
+        field: 'publishStatus',
+        component: 'Select',
+        componentProps: {
+          options: publishStatusDict,
+        },
+      },
+      {
+        label: t('复核日期'),
+        field: 'reCheckDate',
+        component: 'RangePicker',
+        componentProps: {
+          format: 'YYYY-MM-DD',
+          picker: 'date',
+          valueFormat: 'YYYY-MM-DD',
+        },
+      },
+      {
+        label: t('检验日期'),
+        field: 'checkDate',
+        component: 'RangePicker',
+        componentProps: {
+          format: 'YYYY-MM-DD',
+          picker: 'date',
+          valueFormat: 'YYYY-MM-DD',
+        },
+      },
+    ],
+    fieldMapToTime: [
+      ['checkDate', ['checkDateUp', 'checkDateDown'], 'YYYY-MM-DD'],
+      ['reCheckDate', ['reCheckDateUp', 'reCheckDateDown'], 'YYYY-MM-DD'],
+    ],
+  };
+
+  return {
+    pageRef,
+    columnsFirst,
+    formFirstProps,
+  };
+};

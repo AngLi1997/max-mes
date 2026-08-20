@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.mcp.mapper.McpDataMapper">
+    <select id="getFormulaData" resultType="com.bmos.mes.service.mcp.vo.FormulaDataVO">
+        select bm_product_formula.name               as bom_name,
+               bm_product_formula_version.version_no as bom_version,
+               bm_product_formula.product_name,
+               bm_product_formula.product_merge_code as product_code,
+               bm_product_formula_version.batch_quantity,
+               bm_product_formula_version.unit_id    as batch_unit_id
+        from bm_product_formula_version
+                 left join bm_product_formula on bm_product_formula.id = bm_product_formula_version.product_formula_id
+        where bm_product_formula_version.is_deleted = 0
+          and bm_product_formula.is_deleted = 0
+        <if test="bomName != null and bomName != ''">
+            and bm_product_formula.name = #{bomName}
+        </if>
+        <if test="bomVersion != null and bomVersion != ''">
+            and bm_product_formula_version.version_no = #{bomVersion}
+        </if>
+        <if test="productName != null and productName != ''">
+            and bm_product_formula.product_name = #{productName}
+        </if>
+        <if test="productCode != null and productCode != ''">
+            and bm_product_formula.product_merge_code = #{productCode}
+        </if>
+    </select>
+
+    <select id="getFormulaMaterialData" resultType="com.bmos.mes.service.mcp.vo.FormulaMaterialDataVO">
+        select bm_product_formula_material.material_name,
+               bm_product_formula_material.material_merge_code as material_code,
+               bm_product_formula_material.quantity_type,
+               bm_product_formula_material.quantity,
+               bm_product_formula_material.unit_id
+        from bm_product_formula_material
+                 left join bm_product_formula_version
+                           on bm_product_formula_version.id = bm_product_formula_material.version_id
+                 left join bm_product_formula on bm_product_formula.id = bm_product_formula_version.product_formula_id
+        where bm_product_formula_material.is_deleted = 0
+          and bm_product_formula_version.is_deleted = 0
+          and bm_product_formula.is_deleted = 0
+        <if test="bomName != null and bomName != ''">
+            and bm_product_formula.name = #{bomName}
+        </if>
+        <if test="bomVersion != null and bomVersion != ''">
+            and bm_product_formula_version.version_no = #{bomVersion}
+        </if>
+    </select>
+
+    <select id="getProcessData" resultType="com.bmos.mes.service.mcp.vo.ProcessDataVO">
+        select bm_process.name                       as process_name,
+               bm_process_version.version            as process_version,
+               bm_material.name                      as product_name,
+               bm_material.merge_code                as product_code,
+               bm_product_formula.name               as bom_name,
+               bm_product_formula_version.version_no as bom_version
+        from bm_process
+                 left join bm_material on bm_material.id = bm_process.product_id
+                 left join bm_process_version
+                           on bm_process_version.process_id = bm_process.id
+                               and bm_process_version.version = bm_process.active_version
+                 left join bm_product_formula_version
+                           on bm_process_version.product_formula_version_id = bm_product_formula_version.id
+                 left join bm_product_formula on bm_product_formula.id = bm_product_formula_version.product_formula_id
+        where bm_process.is_deleted = 0
+          and bm_material.is_deleted = 0
+          and bm_process_version.is_deleted = 0
+          and bm_process_version.state = 1
+          and bm_process.active_version is not null
+        <if test="processName != null and processName != ''">
+            and bm_process.name = #{processName}
+        </if>
+        <if test="processVersion != null and processVersion != ''">
+            and bm_process_version.version = #{processVersion}
+        </if>
+        <if test="productName != null and productName != ''">
+            and bm_material.name = #{productName}
+        </if>
+        <if test="productCode != null and productCode != ''">
+            and bm_material.merge_code = #{productCode}
+        </if>
+        <if test="bomName != null and bomName != ''">
+            and bm_product_formula.name = #{bomName}
+        </if>
+        <if test="bomVersion != null and bomVersion != ''">
+            and bm_product_formula_version.version_no = #{bomVersion}
+        </if>
+        order by bm_process.create_time desc
+    </select>
+
+    <select id="getMesStorageInventoryData" resultType="com.bmos.mes.service.mcp.vo.MesStorageInventoryDataVO">
+        select bm_material.name                            as material_name,
+               bm_material.merge_code                      as material_code,
+               bm_storage_material_batch.material_batch_no as material_batch_no,
+               bm_storage_material_batch.expired_date      as expired_date,
+               bm_storage_material_batch.quality_status    as quality_status,
+               a.quantity                                  as available_quantity,
+               bm_storage_material_batch.unit_id           as base_unit_id,
+               bm_storage_material_batch.unit_extend_id    as extend_unit_id
+        from (select bm_storage_material.material_id,
+                     bm_storage_material.storage_material_batch_id,
+                     sum(bm_storage_material.available_quantity) as quantity
+              from bm_storage_material
+              where bm_storage_material.is_deleted = 0 and (bm_storage_material.sign_status is null or bm_storage_material.sign_status = 1)
+              group by material_id, storage_material_batch_id) a
+            left join bm_material on a.material_id = bm_material.id
+            left join bm_storage_material_batch on a.storage_material_batch_id = bm_storage_material_batch.id
+            where bm_material.is_deleted = 0
+            and bm_storage_material_batch.is_deleted = 0
+            and bm_storage_material_batch.quality_status = 'QUALIFIED'
+        <if test="materialName != null and materialName != ''">
+            and bm_material.name = #{materialName}
+        </if>
+        <if test="materialCode != null and materialCode != ''">
+            and bm_material.merge_code = #{materialCode}
+        </if>
+        <if test="materialBatchNo != null and materialBatchNo != ''">
+            and bm_storage_material_batch.material_batch_no = #{materialBatchNo}
+        </if>
+        <if test="includeExpired == null or includeExpired == false">
+            and bm_storage_material_batch.expired_date >= now()
+        </if>
+        order by bm_material.create_time desc;
+    </select>
+</mapper>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.material.mapper.MaterialCategoryMapper">
+
+    <sql id="BASE_COLUM">
+        id,
+        parent_id,
+        code,
+        name,
+        merge_code,
+        platform_category_id,
+        category_type,
+        create_by,
+        update_by,
+        create_time,
+        update_time,
+        is_deleted
+    </sql>
+
+    <select id="selectByParam" resultType="com.bmos.lims2.server.material.entity.MaterialCategory">
+        SELECT
+            <include refid="BASE_COLUM" />
+        FROM
+            lm_inspect_material_category
+        <where>
+            <if test="param.categoryType != null">
+                AND lm_inspect_material_category.category_type = #{param.categoryType}
+            </if>
+            <if test="param.platformCategoryIdList != null">
+                AND lm_inspect_material_category.platform_category_id in
+                <foreach collection="param.platformCategoryIdList" open="(" separator="," close=")" item="item">
+                    #{item}
+                </foreach>
+            </if>
+            AND is_deleted = 0
+        </where>
+        <if test="param.order != null and param.order != ''">
+            ORDER BY ${param.order}
+        </if>
+    </select>
+    <select id="selectChildCategoryId"
+            resultType="com.bmos.lims2.server.material.entity.MaterialCategory">
+        WITH RECURSIVE category_tree AS (
+            -- 查询初始节点
+            SELECT *
+            FROM lm_inspect_material_category
+            WHERE id = #{parentId}
+            UNION ALL
+            -- 递归查询子节点
+            SELECT c.*
+            FROM lm_inspect_material_category c
+                     INNER JOIN category_tree ct ON c.parent_id = ct.id
+        )
+        SELECT *
+        FROM category_tree;
+    </select>
+</mapper>

@@ -1,0 +1,37 @@
+package com.bmos.lims2.server.platform.system.code.dto;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.With;
+import lombok.experimental.Tolerate;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
+import java.util.Map;
+
+@Getter
+@Setter
+@With
+@Builder
+@ApiModel("ConfirmNextUseCodeDTO:确认下一个使用的编码数据")
+public class ConfirmNextUseCodeDTO {
+    @Tolerate
+    public ConfirmNextUseCodeDTO() {}
+    @NotEmpty
+    @ApiModelProperty("编码规则code")
+    private String code;
+    @NotEmpty
+    @ApiModelProperty("完整标号")
+    private String fullNo;
+
+    @ApiModelProperty("公式申请时的日期 -- 规则中没有日期字段可不传")
+    private LocalDate codeApplyTime;
+
+    @NotNull
+    @ApiModelProperty("编码规则详情传参")
+    private Map fields;
+}

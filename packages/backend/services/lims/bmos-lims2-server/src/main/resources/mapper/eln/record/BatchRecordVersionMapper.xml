@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.eln.record.mapper.BatchRecordVersionMapper">
+
+    <select id="listVersion" resultType="com.bmos.lims2.server.eln.record.vo.RecordVersionVO">
+        select
+            version,
+            `id` as versionId
+        from
+            bm_batch_record_version
+        where
+            record_id =#{recordId}
+        and is_deleted = 0
+        and state in ('3','4')
+        order by create_time asc
+    </select>
+
+    <select id="queryByProductId" resultType="com.bmos.lims2.server.eln.record.vo.RecordVersionVO">
+        SELECT
+            t1.NAME as version,
+            t1.id as versionId
+        FROM
+            bm_batch_record AS t1
+            JOIN bm_batch_record_product AS t2 ON t1.id = t2.record_id
+        WHERE
+            t1.is_deleted = 0
+            AND t2.is_deleted = 0
+            AND t2.product_id =#{productId}
+    </select>
+
+    <select id="queryByVersionIdList" resultType="com.bmos.lims2.server.eln.record.vo.PageRecordAuditVO">
+        SELECT
+            t1.`name` as name,
+            t1.`code` as code,
+            t2.id as versionId,
+            t2.record_id as recordId,
+            t2.version as version,
+            t2.remark as remark,
+            t2.create_by as createBy,
+            t2.instance_id as processInstanceId
+        FROM
+            bm_batch_record AS t1
+            JOIN bm_batch_record_version AS t2 on t1.id = t2.record_id
+        where
+            t1.is_deleted = 0
+            and t2.is_deleted = 0
+            and t2.state = 2
+        <if test="recordName != null and recordName != ''">
+            and t1.`name` like concat('%',#{recordName},'%')
+        </if>
+        <if test="recordCode != null and recordCode != ''">
+            and t1.`code` like concat('%',#{recordCode},'%')
+        </if>
+    </select>
+
+    <select id="getRecordName" resultType="java.lang.String">
+        SELECT
+            `name`
+        FROM
+            bm_batch_record
+        WHERE
+            is_deleted = 0
+        and id=#{recordId}
+    </select>
+
+    <select id="getRecordCode" resultType="java.lang.String">
+        SELECT
+            `code`
+        FROM
+            bm_batch_record
+        WHERE
+            is_deleted = 0
+        and id=#{recordId}
+    </select>
+
+    <select id="getAuditBusinessKey" resultType="java.lang.String">
+        SELECT DISTINCT
+            t3.id
+        FROM
+            bm_batch_record AS t1
+        JOIN lm_resource_permission t2 ON t1.id = t2.resource_id
+        JOIN bm_batch_record_version AS t3 ON t1.id = t3.record_id
+        WHERE
+            t1.is_deleted = 0
+        AND t3.is_deleted = 0
+        AND t3.state = '2'
+        and t2.dept_id in
+        <foreach collection="deptIdList" open="(" close=")" separator="," item="item">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="selectDeleteListByIds" resultType="com.bmos.lims2.server.eln.record.entity.BatchRecordVersion">
+        SELECT
+            CONCAT(t1.`name`,'-',t2.version) as recordName,
+            t2.version,
+            t2.is_deleted as deleted,
+            t2.state
+        FROM
+            bm_batch_record AS t1
+            JOIN bm_batch_record_version AS t2 ON t1.id = t2.record_id
+            where
+                t2. id in
+        <foreach collection="ids" open="(" close=")" separator="," item="id">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="selectOneById" resultType="com.bmos.lims2.server.eln.record.entity.BatchRecordVersion">
+         SELECT
+            CONCAT(t1.`name`,'-',t2.version) as recordName,
+            t2.version,
+            t2.is_deleted as deleted,
+            t2.state,
+            t2.record_id,
+            t1.`name` as name
+        FROM
+            bm_batch_record AS t1
+            JOIN bm_batch_record_version AS t2 ON t1.id = t2.record_id
+            where
+                t2. id =#{id}
+    </select>
+</mapper>

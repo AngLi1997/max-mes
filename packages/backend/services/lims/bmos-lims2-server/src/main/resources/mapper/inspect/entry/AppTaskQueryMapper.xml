@@ -1,0 +1,1358 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.inspect.entry.mapper.AppTaskQueryMapper">
+
+    <!-- APP-分析项-记录分组（母列表）：按分析项ID + 记录版本ID 分组 -->
+    <select id="appSelectAnalysisItemMethodEntryList" resultType="com.bmos.lims2.server.inspect.entry.dto.AppAnalysisItemMethodGroupDTO">
+        SELECT
+            ip.id   AS inspectParameterId,
+            ip.name AS inspectParameterName,
+            ip.code AS inspectParameterCode,
+            t.record_id AS recordId,
+            t.record_version_id AS recordVersionId,
+            br.name AS recordName,
+            br.code AS recordCode,
+            brv.version AS recordVersionNo
+        FROM lm_task t
+        INNER JOIN lm_inspect_parameter ip ON ip.id = t.parameter_id
+        INNER JOIN lm_inspection_order io ON io.id = t.inspection_order_id
+        INNER JOIN lm_inspect_item ii ON ii.id = t.inspect_item_id
+        LEFT JOIN bm_batch_record br ON br.id = t.record_id AND br.is_deleted = 0
+        LEFT JOIN bm_batch_record_version brv ON brv.id = t.record_version_id AND brv.is_deleted = 0
+        WHERE t.is_deleted = 0
+          AND ip.is_deleted = 0
+          AND ii.is_deleted = 0
+          AND io.is_deleted = 0
+        <if test="query.executeMethod != null">
+            AND t.execute_method = #{query.executeMethod}
+        </if>
+        <!-- APP: 按分析项ID过滤（单个/批量） -->
+        <if test="query.parameterId != null">
+            AND t.parameter_id = #{query.parameterId}
+        </if>
+        <if test="query.parameterIds != null and query.parameterIds.size() > 0">
+            AND t.parameter_id IN
+            <foreach collection="query.parameterIds" item="pid" open="(" separator="," close=")">
+                #{pid}
+            </foreach>
+        </if>
+        <choose>
+            <when test="query.unreviewedOnly != null and query.unreviewedOnly">
+                AND t.status = 'TO_REVIEW'
+            </when>
+            <otherwise>
+                AND t.status NOT IN ('PENDING_ASSIGNMENT','RETURN_PENDING_APPROVAL')
+            </otherwise>
+        </choose>
+        AND t.owner_id = #{query.currentUserId}
+        <!-- APP: 按分析项ID过滤（单个/批量） -->
+        <if test="query.parameterId != null">
+            AND t.parameter_id = #{query.parameterId}
+        </if>
+        <if test="query.parameterIds != null and query.parameterIds.size() > 0">
+            AND t.parameter_id IN
+            <foreach collection="query.parameterIds" item="pid" open="(" separator="," close=")">
+                #{pid}
+            </foreach>
+        </if>
+        <if test="query.inspectItemName != null and query.inspectItemName != ''">
+            AND ii.name LIKE CONCAT('%', #{query.inspectItemName}, '%')
+        </if>
+        <if test="query.parameterName != null and query.parameterName != ''">
+            AND ip.name LIKE CONCAT('%', #{query.parameterName}, '%')
+        </if>
+        <if test="query.inspectionOrderNo != null and query.inspectionOrderNo != ''">
+            AND io.order_no LIKE CONCAT('%', #{query.inspectionOrderNo}, '%')
+        </if>
+        <if test="query.batchNo != null and query.batchNo != ''">
+            AND io.batch_no LIKE CONCAT('%', #{query.batchNo}, '%')
+        </if>
+        <if test="query.requestStartTime != null">
+            AND io.create_time &gt;= #{query.requestStartTime}
+        </if>
+        <if test="query.requestEndTime != null">
+            AND io.create_time &lt;= #{query.requestEndTime}
+        </if>
+        <if test="query.materialIds != null and query.materialIds.size() > 0">
+            AND io.material_id IN
+            <foreach collection="query.materialIds" item="materialId" open="(" separator="," close=")">
+                #{materialId}
+            </foreach>
+        </if>
+        <if test="query.taskStatuses != null and query.taskStatuses.size() > 0">
+            AND t.status IN
+            <foreach collection="query.taskStatuses" item="st" open="(" separator="," close=")">
+                #{st}
+            </foreach>
+        </if>
+        <if test="query.abnormal != null">
+            <if test="query.abnormal == true">
+                AND ((t.judged_abnormal = 1 AND t.status != 'TERMINATED') OR t.status IN ('REVIEW_REJECTED','SAMPLE_AUDIT_REJECTED'))
+            </if>
+            <if test="query.abnormal == false">
+                AND t.judged_abnormal = 0
+            </if>
+        </if>
+        GROUP BY ip.id, ip.name, ip.code, t.record_id, t.record_version_id, br.name, br.code, brv.version
+        ORDER BY ii.code ASC, ip.code ASC, recordCode ASC, recordVersionNo ASC
+    </select>
+
+    <!-- APP-检验单录入母列表 -->
+    <select id="appSelectInspectionOrderEntryList" resultType="com.bmos.lims2.server.inspect.entry.dto.AppInspectionOrderEntryDTO">
+        SELECT
+            io.id as inspectionOrderId,
+            io.order_no,
+            io.batch_no,
+            io.create_time as requestTime,
+            io.create_by as requestUserId,
+            m.name as materialName,
+            m.code as materialCode,
+            m.specification as materialSpec
+        FROM lm_inspection_order io
+        INNER JOIN lm_task t ON io.id = t.inspection_order_id
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        WHERE io.is_deleted = 0
+          AND t.is_deleted = 0
+        <if test="query.executeMethod != null">
+            AND t.execute_method = #{query.executeMethod}
+        </if>
+        <choose>
+            <when test="query.unreviewedOnly != null and query.unreviewedOnly">
+                AND t.status = 'TO_REVIEW'
+            </when>
+            <otherwise>
+                AND t.status NOT IN ('PENDING_ASSIGNMENT','RETURN_PENDING_APPROVAL')
+            </otherwise>
+        </choose>
+        AND t.owner_id = #{query.currentUserId}
+        <if test="query.parameterId != null">
+            AND t.parameter_id = #{query.parameterId}
+        </if>
+        <if test="query.parameterName != null and query.parameterName != ''">
+            AND EXISTS (
+                SELECT 1 FROM lm_inspect_parameter ip
+                WHERE ip.id = t.parameter_id
+                  AND ip.name LIKE CONCAT('%', #{query.parameterName}, '%')
+                  AND ip.is_deleted = 0
+            )
+        </if>
+        <if test="query.inspectItemName != null and query.inspectItemName != ''">
+            AND EXISTS (
+                SELECT 1 FROM lm_inspect_item ii
+                WHERE ii.id = t.inspect_item_id
+                  AND ii.name LIKE CONCAT('%', #{query.inspectItemName}, '%')
+                  AND ii.is_deleted = 0
+            )
+        </if>
+        <if test="query.materialIds != null and query.materialIds.size() > 0">
+            AND io.material_id IN
+            <foreach collection="query.materialIds" item="mid" open="(" separator="," close=")">
+                #{mid}
+            </foreach>
+        </if>
+        <if test="query.inspectionOrderId != null">
+            AND io.id = #{query.inspectionOrderId}
+        </if>
+        <if test="query.inspectionOrderNo != null and query.inspectionOrderNo != ''">
+            AND io.order_no LIKE CONCAT('%', #{query.inspectionOrderNo}, '%')
+        </if>
+        <if test="query.batchNo != null and query.batchNo != ''">
+            AND io.batch_no LIKE CONCAT('%', #{query.batchNo}, '%')
+        </if>
+        <if test="query.requestStartTime != null">
+            AND io.create_time &gt;= #{query.requestStartTime}
+        </if>
+        <if test="query.requestEndTime != null">
+            AND io.create_time &lt;= #{query.requestEndTime}
+        </if>
+        <if test="query.taskStatuses != null and query.taskStatuses.size() > 0">
+            AND t.status IN
+            <foreach collection="query.taskStatuses" item="st" open="(" separator="," close=")">
+                #{st}
+            </foreach>
+        </if>
+        <if test="query.abnormal != null">
+            <if test="query.abnormal == true">
+                AND ((t.judged_abnormal = 1 AND t.status != 'TERMINATED') OR t.status IN ('REVIEW_REJECTED','SAMPLE_AUDIT_REJECTED'))
+            </if>
+            <if test="query.abnormal == false">
+                AND t.judged_abnormal = 0
+            </if>
+        </if>
+        GROUP BY io.id
+        ORDER BY io.create_time ASC, io.order_no ASC
+    </select>
+
+    <!-- APP-检验单子列表（字段与“分析项查询”的任务子列表一致） -->
+    <select id="appSelectTasksByInspectionOrderPage" resultType="com.bmos.lims2.server.inspect.entry.dto.AppTaskEntryItemDTO">
+        SELECT
+            t.id,
+            t.inspection_order_id AS inspectionOrderId,
+            COALESCE(sv.scheme_id, ssv.scheme_id) AS schemeId,
+            t.scheme_version_id AS schemeVersionId,
+            t.record_item_id AS recordItemId,
+            t.inspect_item_id AS inspectItemId,
+            ii.name AS inspectItemName,
+            t.inspect_item_code AS inspectItemCode,
+            t.item_config_id AS itemConfigId,
+            t.parameter_id AS parameterId,
+            ip.name AS parameterName,
+            t.parameter_code AS parameterCode,
+            t.parameter_config_id AS parameterConfigId,
+            t.record_id AS recordId,
+            t.record_version_id AS recordVersionId,
+            br.name AS recordName,
+            br.code AS recordCode,
+            brv.version AS recordVersionNo,
+            COALESCE(isp.standard_rule, sssp.standard_rule) AS standardRule,
+            t.is_executable AS isExecutable,
+            t.is_reportable AS isReportable,
+            t.execute_method AS executeMethod,
+            t.status,
+            t.judged_abnormal AS abnormal,
+            t.judged_result AS judgedResult,
+            t.judged_time AS judgedTime,
+            t.test_time AS testTime,
+            t.owner_id AS ownerId,
+            t.owner_name AS ownerName,
+            le.entry_time AS entryTime,
+            t.reviewed_by AS reviewedBy,
+            t.reviewed_time AS reviewedTime,
+            t.reviewed_abnormal_reason AS reviewRejectReason,
+            io.order_no AS orderNo,
+            m.name AS materialName,
+            m.code AS materialCode,
+            m.specification AS materialSpec,
+            io.batch_no AS batchNo,
+            io.create_time AS requestTime,
+            io.create_by AS requestUserId,
+            t.assigner_id AS assignerId,
+            t.assigner_name AS assignerName,
+            t.assign_time AS assignTime,
+            t.claim_time AS claimTime,
+            t.complete_time AS completeTime,
+            t.terminate_time AS terminateTime,
+            t.terminate_reason AS terminateReason,
+            t.return_reason AS returnReason,
+            t.reject_reason AS rejectReason,
+            t.remark AS remark
+        FROM lm_task t
+        LEFT JOIN lm_inspection_order io ON io.id = t.inspection_order_id
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        LEFT JOIN lm_inspection_scheme_version sv ON sv.id = io.scheme_version_id AND sv.is_deleted = 0
+        LEFT JOIN lm_stability_scheme_version ssv ON ssv.id = io.scheme_version_id AND ssv.is_deleted = 0
+        INNER JOIN lm_inspect_item ii ON t.inspect_item_id = ii.id
+        INNER JOIN lm_inspect_parameter ip ON t.parameter_id = ip.id
+        LEFT JOIN lm_inspection_scheme_parameter isp ON isp.id = t.parameter_config_id AND isp.is_deleted = 0
+        LEFT JOIN lm_stability_scheme_parameter sssp ON sssp.id = t.parameter_config_id AND sssp.is_deleted = 0
+        LEFT JOIN bm_batch_record br ON br.id = t.record_id AND br.is_deleted = 0
+        LEFT JOIN bm_batch_record_version brv ON brv.id = t.record_version_id AND brv.is_deleted = 0
+        LEFT JOIN (
+            SELECT ier.task_id, MAX(COALESCE(ier.update_time, ier.create_time)) AS entry_time
+            FROM lm_inspection_entry_record ier
+            WHERE ier.is_deleted = 0
+            GROUP BY ier.task_id
+        ) le ON le.task_id = t.id
+        WHERE t.inspection_order_id = #{inspectionOrderId}
+          AND t.is_deleted = 0
+        <if test="query.executeMethod != null">
+            AND t.execute_method = #{query.executeMethod}
+        </if>
+        <choose>
+            <when test="query.unreviewedOnly != null and query.unreviewedOnly">
+                AND t.status = 'TO_REVIEW'
+            </when>
+            <otherwise>
+                AND t.status NOT IN ('PENDING_ASSIGNMENT','RETURN_PENDING_APPROVAL')
+            </otherwise>
+        </choose>
+        AND t.owner_id = #{query.currentUserId}
+        <if test="query.parameterId != null">
+            AND t.parameter_id = #{query.parameterId}
+        </if>
+        <if test="query.inspectItemName != null and query.inspectItemName != ''">
+            AND ii.name LIKE CONCAT('%', #{query.inspectItemName}, '%')
+        </if>
+        <if test="query.parameterName != null and query.parameterName != ''">
+            AND ip.name LIKE CONCAT('%', #{query.parameterName}, '%')
+        </if>
+        <if test="query.materialIds != null and query.materialIds.size() > 0">
+            AND EXISTS (
+                SELECT 1 FROM lm_inspection_order io
+                WHERE io.id = t.inspection_order_id
+                  AND io.is_deleted = 0
+                  AND io.material_id IN
+                <foreach collection="query.materialIds" item="mid" open="(" separator="," close=")">#{mid}</foreach>
+            )
+        </if>
+        <if test="query.requestStartTime != null">
+            AND EXISTS (
+                SELECT 1 FROM lm_inspection_order io2
+                WHERE io2.id = t.inspection_order_id
+                  AND io2.is_deleted = 0
+                  AND io2.create_time &gt;= #{query.requestStartTime}
+            )
+        </if>
+        <if test="query.requestEndTime != null">
+            AND EXISTS (
+                SELECT 1 FROM lm_inspection_order io3
+                WHERE io3.id = t.inspection_order_id
+                  AND io3.is_deleted = 0
+                  AND io3.create_time &lt;= #{query.requestEndTime}
+            )
+        </if>
+        <if test="query.taskStatuses != null and query.taskStatuses.size() > 0">
+            AND t.status IN
+            <foreach collection="query.taskStatuses" item="st" open="(" separator="," close=")">
+                #{st}
+            </foreach>
+        </if>
+        <if test="query.abnormal != null">
+            <if test="query.abnormal == true">
+                AND ((t.judged_abnormal = 1 AND t.status != 'TERMINATED') OR t.status IN ('REVIEW_REJECTED','SAMPLE_AUDIT_REJECTED'))
+            </if>
+            <if test="query.abnormal == false">
+                AND t.judged_abnormal = 0
+            </if>
+        </if>
+        ORDER BY t.inspect_item_code ASC, t.parameter_code ASC
+    </select>
+
+    <!-- APP-根据方案ID与检验单ID查询任务（仅ELN），用于树形返回（按检验项目分组） -->
+    <select id="selectElnTasksByInspectionOrderForTree" resultType="com.bmos.lims2.server.inspect.entry.dto.AppTaskEntryItemDTO">
+        SELECT
+            t.id,
+            t.inspection_order_id AS inspectionOrderId,
+            COALESCE(sv.scheme_id, ssv.scheme_id) AS schemeId,
+            t.scheme_version_id AS schemeVersionId,
+            t.record_item_id AS recordItemId,
+            t.inspect_item_id AS inspectItemId,
+            ii.name AS inspectItemName,
+            t.inspect_item_code AS inspectItemCode,
+            t.item_config_id AS itemConfigId,
+            t.parameter_id AS parameterId,
+            ip.name AS parameterName,
+            t.parameter_code AS parameterCode,
+            t.parameter_config_id AS parameterConfigId,
+            t.record_id AS recordId,
+            t.record_version_id AS recordVersionId,
+            br.name AS recordName,
+            br.code AS recordCode,
+            brv.version AS recordVersionNo,
+            COALESCE(isp.standard_rule, sssp.standard_rule) AS standardRule,
+            t.is_executable AS isExecutable,
+            t.is_reportable AS isReportable,
+            t.execute_method AS executeMethod,
+            t.status,
+            t.judged_abnormal AS abnormal,
+            t.judged_result AS judgedResult,
+            t.judged_time AS judgedTime,
+            t.test_time AS testTime,
+            t.owner_id AS ownerId,
+            t.owner_name AS ownerName,
+            le.entry_time AS entryTime,
+            t.reviewed_by AS reviewedBy,
+            t.reviewed_time AS reviewedTime,
+            t.reviewed_abnormal_reason AS reviewRejectReason,
+            io.order_no AS orderNo,
+            m.name AS materialName,
+            m.code AS materialCode,
+            m.specification AS materialSpec,
+            io.batch_no AS batchNo,
+            io.create_time AS requestTime,
+            io.create_by AS requestUserId,
+            t.assigner_id AS assignerId,
+            t.assigner_name AS assignerName,
+            t.assign_time AS assignTime,
+            t.claim_time AS claimTime,
+            t.complete_time AS completeTime,
+            t.terminate_time AS terminateTime,
+            t.terminate_reason AS terminateReason,
+            t.return_reason AS returnReason,
+            t.reject_reason AS rejectReason,
+            t.remark AS remark
+        FROM lm_task t
+        LEFT JOIN lm_inspection_order io ON io.id = t.inspection_order_id
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        LEFT JOIN lm_inspection_scheme_version sv ON sv.id = io.scheme_version_id AND sv.is_deleted = 0
+        LEFT JOIN lm_stability_scheme_version ssv ON ssv.id = io.scheme_version_id AND ssv.is_deleted = 0
+        INNER JOIN lm_inspect_item ii ON t.inspect_item_id = ii.id
+        INNER JOIN lm_inspect_parameter ip ON t.parameter_id = ip.id
+        LEFT JOIN lm_inspection_scheme_parameter isp ON isp.id = t.parameter_config_id AND isp.is_deleted = 0
+        LEFT JOIN lm_stability_scheme_parameter sssp ON sssp.id = t.parameter_config_id AND sssp.is_deleted = 0
+        LEFT JOIN bm_batch_record br ON br.id = t.record_id AND br.is_deleted = 0
+        LEFT JOIN bm_batch_record_version brv ON brv.id = t.record_version_id AND brv.is_deleted = 0
+        LEFT JOIN (
+            SELECT ier.task_id, MAX(COALESCE(ier.update_time, ier.create_time)) AS entry_time
+            FROM lm_inspection_entry_record ier
+            WHERE ier.is_deleted = 0
+            GROUP BY ier.task_id
+        ) le ON le.task_id = t.id
+        WHERE t.is_deleted = 0
+          AND io.is_deleted = 0
+          AND ii.is_deleted = 0
+          AND ip.is_deleted = 0
+          AND t.inspection_order_id = #{inspectionOrderId}
+          AND t.execute_method = 'ELN'
+        AND t.status = 'REVIEW_PASSED'
+        ORDER BY t.inspect_item_code ASC, t.parameter_code ASC
+    </select>
+
+    <!-- APP-根据任务ID查询单个任务（仅ELN），用于确保当前任务包含在返回结果中 -->
+    <select id="selectElnTaskByIdForTree" resultType="com.bmos.lims2.server.inspect.entry.dto.AppTaskEntryItemDTO">
+        SELECT
+            t.id,
+            t.inspection_order_id AS inspectionOrderId,
+            COALESCE(sv.scheme_id, ssv.scheme_id) AS schemeId,
+            t.scheme_version_id AS schemeVersionId,
+            t.record_item_id AS recordItemId,
+            t.inspect_item_id AS inspectItemId,
+            ii.name AS inspectItemName,
+            t.inspect_item_code AS inspectItemCode,
+            t.item_config_id AS itemConfigId,
+            t.parameter_id AS parameterId,
+            ip.name AS parameterName,
+            t.parameter_code AS parameterCode,
+            t.parameter_config_id AS parameterConfigId,
+            t.record_id AS recordId,
+            t.record_version_id AS recordVersionId,
+            br.name AS recordName,
+            br.code AS recordCode,
+            brv.version AS recordVersionNo,
+            COALESCE(isp.standard_rule, sssp.standard_rule) AS standardRule,
+            t.is_executable AS isExecutable,
+            t.is_reportable AS isReportable,
+            t.execute_method AS executeMethod,
+            t.status,
+            t.judged_abnormal AS abnormal,
+            t.judged_result AS judgedResult,
+            t.judged_time AS judgedTime,
+            t.test_time AS testTime,
+            t.owner_id AS ownerId,
+            t.owner_name AS ownerName,
+            le.entry_time AS entryTime,
+            t.reviewed_by AS reviewedBy,
+            t.reviewed_time AS reviewedTime,
+            t.reviewed_abnormal_reason AS reviewRejectReason,
+            io.order_no AS orderNo,
+            m.name AS materialName,
+            m.code AS materialCode,
+            m.specification AS materialSpec,
+            io.batch_no AS batchNo,
+            io.create_time AS requestTime,
+            io.create_by AS requestUserId,
+            t.assigner_id AS assignerId,
+            t.assigner_name AS assignerName,
+            t.assign_time AS assignTime,
+            t.claim_time AS claimTime,
+            t.complete_time AS completeTime,
+            t.terminate_time AS terminateTime,
+            t.terminate_reason AS terminateReason,
+            t.return_reason AS returnReason,
+            t.reject_reason AS rejectReason,
+            t.remark AS remark
+        FROM lm_task t
+        LEFT JOIN lm_inspection_order io ON io.id = t.inspection_order_id
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        LEFT JOIN lm_inspection_scheme_version sv ON sv.id = io.scheme_version_id AND sv.is_deleted = 0
+        LEFT JOIN lm_stability_scheme_version ssv ON ssv.id = io.scheme_version_id AND ssv.is_deleted = 0
+        INNER JOIN lm_inspect_item ii ON t.inspect_item_id = ii.id
+        INNER JOIN lm_inspect_parameter ip ON t.parameter_id = ip.id
+        LEFT JOIN lm_inspection_scheme_parameter isp ON isp.id = t.parameter_config_id AND isp.is_deleted = 0
+        LEFT JOIN lm_stability_scheme_parameter sssp ON sssp.id = t.parameter_config_id AND sssp.is_deleted = 0
+        LEFT JOIN bm_batch_record br ON br.id = t.record_id AND br.is_deleted = 0
+        LEFT JOIN bm_batch_record_version brv ON brv.id = t.record_version_id AND brv.is_deleted = 0
+        LEFT JOIN (
+            SELECT ier.task_id, MAX(COALESCE(ier.update_time, ier.create_time)) AS entry_time
+            FROM lm_inspection_entry_record ier
+            WHERE ier.is_deleted = 0
+            GROUP BY ier.task_id
+        ) le ON le.task_id = t.id
+        WHERE t.is_deleted = 0
+          AND io.is_deleted = 0
+          AND ii.is_deleted = 0
+          AND ip.is_deleted = 0
+          AND t.id = #{taskId}
+          AND t.execute_method = 'ELN'
+    </select>
+
+    <!-- APP-分析项复核母列表（包含记录字段，便于子列表按 recordVersionId 过滤） -->
+    <select id="appSelectAnalysisItemEntryList" resultType="com.bmos.lims2.server.inspect.entry.dto.AnalysisItemEntryDTO">
+        SELECT
+            ip.id as inspectParameterId,
+            ip.name as inspectParameterName,
+            ip.code as inspectParameterCode,
+            COALESCE(isp.standard_rule, sssp.standard_rule) as standardRule,
+            ii.id as inspectItemId,
+            ii.name as inspectItemName,
+            ii.code as inspectItemCode,
+            t.record_id AS recordId,
+            t.record_version_id AS recordVersionId,
+            br.name AS recordName,
+            br.code AS recordCode,
+            brv.version AS recordVersionNo
+        FROM lm_inspect_parameter ip
+        INNER JOIN lm_task t ON ip.id = t.parameter_id
+        INNER JOIN lm_inspect_item ii ON t.inspect_item_id = ii.id
+        INNER JOIN lm_inspection_order io ON t.inspection_order_id = io.id
+        LEFT JOIN lm_inspection_scheme_parameter isp ON isp.id = t.parameter_config_id AND isp.is_deleted = 0
+        LEFT JOIN lm_stability_scheme_parameter sssp ON sssp.id = t.parameter_config_id AND sssp.is_deleted = 0
+        LEFT JOIN bm_batch_record br ON br.id = t.record_id AND br.is_deleted = 0
+        LEFT JOIN bm_batch_record_version brv ON brv.id = t.record_version_id AND brv.is_deleted = 0
+        WHERE t.is_deleted = 0
+          AND ip.is_deleted = 0
+          AND ii.is_deleted = 0
+          AND io.is_deleted = 0
+        <if test="query.executeMethod != null">
+            AND t.execute_method = #{query.executeMethod}
+        </if>
+        AND t.status NOT IN ('PENDING_ASSIGNMENT','RETURN_PENDING_APPROVAL')
+        AND t.owner_id = #{query.currentUserId}
+        <if test="query.inspectItemName != null and query.inspectItemName != ''">
+            AND ii.name LIKE CONCAT('%', #{query.inspectItemName}, '%')
+        </if>
+        <if test="query.parameterName != null and query.parameterName != ''">
+            AND ip.name LIKE CONCAT('%', #{query.parameterName}, '%')
+        </if>
+        <if test="query.inspectionOrderNo != null and query.inspectionOrderNo != ''">
+            AND io.order_no LIKE CONCAT('%', #{query.inspectionOrderNo}, '%')
+        </if>
+        <if test="query.batchNo != null and query.batchNo != ''">
+            AND io.batch_no LIKE CONCAT('%', #{query.batchNo}, '%')
+        </if>
+        <if test="query.requestStartTime != null">
+            AND io.create_time &gt;= #{query.requestStartTime}
+        </if>
+        <if test="query.requestEndTime != null">
+            AND io.create_time &lt;= #{query.requestEndTime}
+        </if>
+        <if test="query.materialIds != null and query.materialIds.size() > 0">
+            AND io.material_id IN
+            <foreach collection="query.materialIds" item="materialId" open="(" separator="," close=")">
+                #{materialId}
+            </foreach>
+        </if>
+        <if test="query.taskStatuses != null and query.taskStatuses.size() > 0">
+            AND t.status IN
+            <foreach collection="query.taskStatuses" item="st" open="(" separator="," close=")">
+                #{st}
+            </foreach>
+        </if>
+        <if test="query.unreviewedOnly != null and query.unreviewedOnly">
+            AND t.status = 'TO_REVIEW'
+        </if>
+        <if test="query.abnormal != null">
+            <if test="query.abnormal == true">
+                AND ((t.judged_abnormal = 1 AND t.status != 'TERMINATED') OR t.status IN ('REVIEW_REJECTED','SAMPLE_AUDIT_REJECTED'))
+            </if>
+            <if test="query.abnormal == false">
+                AND t.judged_abnormal = 0
+            </if>
+        </if>
+        GROUP BY ip.id, ip.name, ip.code, isp.standard_rule, ii.id, ii.name, ii.code, t.record_id, t.record_version_id, br.name, br.code, brv.version
+        ORDER BY ii.code ASC, ip.code ASC, recordCode ASC, recordVersionNo ASC
+    </select>
+
+    <!-- APP-分析项子列表：按 recordVersionId 过滤 -->
+    <select id="appSelectInspectionOrdersByAnalysisItem" resultType="com.bmos.lims2.server.inspect.entry.dto.AppTaskEntryItemDTO">
+        SELECT DISTINCT
+            t.id,
+            t.inspection_order_id AS inspectionOrderId,
+            COALESCE(sv.scheme_id, ssv.scheme_id) AS schemeId,
+            t.record_item_id AS recordItemId,
+            io.order_no AS orderNo,
+            m.name AS materialName,
+            m.code AS materialCode,
+            m.specification AS materialSpec,
+            io.batch_no AS batchNo,
+            io.create_time AS requestTime,
+            io.create_by AS requestUserId,
+            t.status,
+            t.judged_abnormal AS abnormal,
+            t.judged_result AS judgedResult,
+            t.judged_time AS judgedTime,
+            t.test_time AS testTime,
+            t.owner_id AS ownerId,
+            t.owner_name AS ownerName,
+            t.reviewed_by AS reviewedBy,
+            t.reviewed_time AS reviewedTime,
+            t.reviewed_abnormal_reason AS reviewRejectReason,
+            le.entry_time AS entryTime,
+            t.scheme_version_id AS schemeVersionId,
+            t.inspect_item_id AS inspectItemId,
+            t.inspect_item_code AS inspectItemCode,
+            t.item_config_id AS itemConfigId,
+            t.parameter_id AS parameterId,
+            t.parameter_code AS parameterCode,
+            ip.name AS parameterName,
+            t.parameter_config_id AS parameterConfigId,
+            COALESCE(isp.standard_rule, sssp.standard_rule) AS standardRule,
+            t.is_executable AS isExecutable,
+            t.is_reportable AS isReportable,
+            t.execute_method AS executeMethod,
+            t.record_id AS recordId,
+            t.record_version_id AS recordVersionId,
+            br.name AS recordName,
+            br.code AS recordCode,
+            brv.version AS recordVersionNo,
+            t.assigner_id AS assignerId,
+            t.assigner_name AS assignerName,
+            t.assign_time AS assignTime,
+            t.claim_time AS claimTime,
+            t.complete_time AS completeTime,
+            t.terminate_time AS terminateTime,
+            t.terminate_reason AS terminateReason,
+            t.return_reason AS returnReason,
+            t.reject_reason AS rejectReason,
+            t.remark AS remark
+        FROM lm_task t
+        INNER JOIN lm_inspection_order io ON t.inspection_order_id = io.id
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        LEFT JOIN lm_inspect_parameter ip ON t.parameter_id = ip.id
+        LEFT JOIN lm_inspect_item ii ON t.inspect_item_id = ii.id
+        LEFT JOIN lm_inspection_scheme_parameter isp ON isp.id = t.parameter_config_id AND isp.is_deleted = 0
+        LEFT JOIN lm_stability_scheme_parameter sssp ON sssp.id = t.parameter_config_id AND sssp.is_deleted = 0
+        LEFT JOIN bm_batch_record br ON br.id = t.record_id AND br.is_deleted = 0
+        LEFT JOIN bm_batch_record_version brv ON brv.id = t.record_version_id AND brv.is_deleted = 0
+        LEFT JOIN (
+            SELECT ier.task_id, MAX(COALESCE(ier.update_time, ier.create_time)) AS entry_time
+            FROM lm_inspection_entry_record ier
+            WHERE ier.is_deleted = 0
+            GROUP BY ier.task_id
+        ) le ON le.task_id = t.id
+        LEFT JOIN lm_inspection_scheme_version sv ON sv.id = io.scheme_version_id AND sv.is_deleted = 0
+        LEFT JOIN lm_stability_scheme_version ssv ON ssv.id = io.scheme_version_id AND ssv.is_deleted = 0
+        WHERE t.is_deleted = 0
+          AND io.is_deleted = 0
+          AND ip.is_deleted = 0
+          AND ii.is_deleted = 0
+          AND t.parameter_id = #{inspectParameterId}
+        <if test="inspectItemId != null">
+          AND t.inspect_item_id = #{inspectItemId}
+        </if>
+          AND t.record_version_id = #{recordVersionId}
+        <if test="query.executeMethod != null">
+            AND t.execute_method = #{query.executeMethod}
+        </if>
+        <choose>
+            <when test="query.unreviewedOnly != null and query.unreviewedOnly">
+                AND t.status = 'TO_REVIEW'
+            </when>
+            <otherwise>
+                AND t.status NOT IN ('PENDING_ASSIGNMENT','RETURN_PENDING_APPROVAL')
+            </otherwise>
+        </choose>
+        AND t.owner_id = #{query.currentUserId}
+        <if test="query.inspectItemName != null and query.inspectItemName != ''">
+            AND ii.name LIKE CONCAT('%', #{query.inspectItemName}, '%')
+        </if>
+        <if test="query.inspectionOrderNo != null and query.inspectionOrderNo != ''">
+            AND io.order_no LIKE CONCAT('%', #{query.inspectionOrderNo}, '%')
+        </if>
+        <if test="query.batchNo != null and query.batchNo != ''">
+            AND io.batch_no LIKE CONCAT('%', #{query.batchNo}, '%')
+        </if>
+        <if test="query.requestStartTime != null">
+            AND io.create_time &gt;= #{query.requestStartTime}
+        </if>
+        <if test="query.requestEndTime != null">
+            AND io.create_time &lt;= #{query.requestEndTime}
+        </if>
+        <if test="query.materialIds != null and query.materialIds.size() > 0">
+            AND io.material_id IN
+            <foreach collection="query.materialIds" item="materialId" open="(" separator="," close=")">
+                #{materialId}
+            </foreach>
+        </if>
+        <if test="query.taskStatuses != null and query.taskStatuses.size() > 0">
+            AND t.status IN
+            <foreach collection="query.taskStatuses" item="st" open="(" separator="," close=")">
+                #{st}
+            </foreach>
+        </if>
+        <if test="query.abnormal != null">
+            <if test="query.abnormal == true">
+                AND ((t.judged_abnormal = 1 AND t.status != 'TERMINATED') OR t.status IN ('REVIEW_REJECTED','SAMPLE_AUDIT_REJECTED'))
+            </if>
+            <if test="query.abnormal == false">
+                AND t.judged_abnormal = 0
+            </if>
+        </if>
+        ORDER BY io.create_time ASC, io.order_no ASC
+    </select>
+
+    <!-- 复核场景使用原复核DTO结构 -->
+    <select id="appSelectInspectionOrdersByAnalysisItemForReview" resultType="com.bmos.lims2.server.inspect.entry.dto.AnalysisItemEntryDTO$InspectionOrderEntryItemDTO">
+        SELECT DISTINCT
+            t.id,
+            t.inspection_order_id AS inspectionOrderId,
+            COALESCE(sv.scheme_id, ssv.scheme_id) AS schemeId,
+            t.record_item_id AS recordItemId,
+            io.order_no AS orderNo,
+            m.name AS materialName,
+            m.code AS materialCode,
+            m.specification AS materialSpec,
+            io.batch_no AS batchNo,
+            io.create_time AS requestTime,
+            io.create_by AS requestUserId,
+            t.status,
+            t.judged_abnormal AS abnormal,
+            t.judged_result AS judgedResult,
+            t.judged_time AS judgedTime,
+            t.test_time AS testTime,
+            t.owner_id AS ownerId,
+            t.owner_name AS ownerName,
+            t.reviewed_by AS reviewedBy,
+            t.reviewed_time AS reviewedTime,
+            t.reviewed_abnormal_reason AS reviewRejectReason,
+            le.entry_time AS entryTime,
+            t.scheme_version_id AS schemeVersionId,
+            t.inspect_item_id AS inspectItemId,
+            t.inspect_item_code AS inspectItemCode,
+            t.item_config_id AS itemConfigId,
+            t.parameter_id AS parameterId,
+            t.parameter_code AS parameterCode,
+            ip.name AS parameterName,
+            t.parameter_config_id AS parameterConfigId,
+            COALESCE(isp.standard_rule, sssp.standard_rule) AS standardRule,
+            t.is_executable AS isExecutable,
+            t.is_reportable AS isReportable,
+            t.execute_method AS executeMethod,
+            t.record_id AS recordId,
+            t.record_version_id AS recordVersionId,
+            br.name AS recordName,
+            brv.version AS recordVersionNo,
+            t.assigner_id AS assignerId,
+            t.assigner_name AS assignerName,
+            t.assign_time AS assignTime,
+            t.claim_time AS claimTime,
+            t.complete_time AS completeTime,
+            t.terminate_time AS terminateTime,
+            t.terminate_reason AS terminateReason,
+            t.return_reason AS returnReason,
+            t.reject_reason AS rejectReason,
+            t.remark AS remark
+        FROM lm_task t
+        INNER JOIN lm_inspection_order io ON t.inspection_order_id = io.id
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        LEFT JOIN lm_inspect_parameter ip ON t.parameter_id = ip.id
+        LEFT JOIN lm_inspect_item ii ON t.inspect_item_id = ii.id
+        LEFT JOIN lm_inspection_scheme_parameter isp ON isp.id = t.parameter_config_id AND isp.is_deleted = 0
+        LEFT JOIN lm_stability_scheme_parameter sssp ON sssp.id = t.parameter_config_id AND sssp.is_deleted = 0
+        LEFT JOIN bm_batch_record br ON br.id = t.record_id AND br.is_deleted = 0
+        LEFT JOIN bm_batch_record_version brv ON brv.id = t.record_version_id AND brv.is_deleted = 0
+        LEFT JOIN (
+            SELECT ier.task_id, MAX(COALESCE(ier.update_time, ier.create_time)) AS entry_time
+            FROM lm_inspection_entry_record ier
+            WHERE ier.is_deleted = 0
+            GROUP BY ier.task_id
+        ) le ON le.task_id = t.id
+        LEFT JOIN lm_inspection_scheme_version sv ON sv.id = io.scheme_version_id AND sv.is_deleted = 0
+        LEFT JOIN lm_stability_scheme_version ssv ON ssv.id = io.scheme_version_id AND ssv.is_deleted = 0
+        WHERE t.is_deleted = 0
+          AND io.is_deleted = 0
+          AND ip.is_deleted = 0
+          AND ii.is_deleted = 0
+          AND t.parameter_id = #{inspectParameterId}
+        <if test="inspectItemId != null">
+          AND t.inspect_item_id = #{inspectItemId}
+        </if>
+          AND t.record_version_id = #{recordVersionId}
+        <if test="query.executeMethod != null">
+            AND t.execute_method = #{query.executeMethod}
+        </if>
+        AND t.status NOT IN ('PENDING_ASSIGNMENT','RETURN_PENDING_APPROVAL')
+        AND t.owner_id = #{query.currentUserId}
+        <if test="query.inspectItemName != null and query.inspectItemName != ''">
+            AND ii.name LIKE CONCAT('%', #{query.inspectItemName}, '%')
+        </if>
+        <if test="query.inspectionOrderNo != null and query.inspectionOrderNo != ''">
+            AND io.order_no LIKE CONCAT('%', #{query.inspectionOrderNo}, '%')
+        </if>
+        <if test="query.batchNo != null and query.batchNo != ''">
+            AND io.batch_no LIKE CONCAT('%', #{query.batchNo}, '%')
+        </if>
+        <if test="query.requestStartTime != null">
+            AND io.create_time &gt;= #{query.requestStartTime}
+        </if>
+        <if test="query.requestEndTime != null">
+            AND io.create_time &lt;= #{query.requestEndTime}
+        </if>
+        <if test="query.materialIds != null and query.materialIds.size() > 0">
+            AND io.material_id IN
+            <foreach collection="query.materialIds" item="materialId" open="(" separator="," close=")">
+                #{materialId}
+            </foreach>
+        </if>
+        <if test="query.taskStatuses != null and query.taskStatuses.size() > 0">
+            AND t.status IN
+            <foreach collection="query.taskStatuses" item="st" open="(" separator="," close=")">
+                #{st}
+            </foreach>
+        </if>
+        <if test="query.unreviewedOnly != null and query.unreviewedOnly">
+            AND t.status = 'TO_REVIEW'
+        </if>
+        <if test="query.abnormal != null">
+            <if test="query.abnormal == true">
+                AND ((t.judged_abnormal = 1 AND t.status != 'TERMINATED') OR t.status IN ('REVIEW_REJECTED','SAMPLE_AUDIT_REJECTED'))
+            </if>
+            <if test="query.abnormal == false">
+                AND t.judged_abnormal = 0
+            </if>
+        </if>
+        ORDER BY io.create_time DESC, io.order_no DESC
+    </select>
+
+    <!-- 旧的录入统计SQL已移除，统一使用 appTaskStats -->
+
+    <!-- APP-任务统计（未完成/异常/全部）- 按任务维度统计，仅当前登录人 -->
+    <select id="appTaskStats" resultType="com.bmos.lims2.server.inspect.entry.dto.EntryStatsDTO">
+        SELECT
+            COUNT(DISTINCT t.id) AS allCount,
+            COUNT(DISTINCT CASE WHEN t.status IN ('PENDING_COMPLETION','IN_PROGRESS') THEN t.id END) AS incompleteCount,
+            COUNT(DISTINCT CASE WHEN (t.judged_abnormal = 1 AND t.status != 'TERMINATED') OR t.status IN ('REVIEW_REJECTED','SAMPLE_AUDIT_REJECTED') THEN t.id END) AS abnormalCount
+        FROM lm_task t
+        WHERE t.is_deleted = 0
+        AND t.execute_method = #{executeMethod}
+        AND t.status NOT IN ('PENDING_ASSIGNMENT','RETURN_PENDING_APPROVAL')
+        AND t.owner_id = #{currentUserId}
+    </select>
+
+    <!-- APP-复核任务数量统计 - 班组权限（与web端一致），仅统计待复核 -->
+    <select id="appReviewTaskStats" resultType="java.lang.Long">
+        SELECT COUNT(DISTINCT t.id)
+        FROM lm_task t
+        INNER JOIN lm_inspection_order io ON io.id = t.inspection_order_id AND io.is_deleted = 0
+        WHERE t.is_deleted = 0
+        <if test="query.executeMethod != null">
+            AND t.execute_method = #{query.executeMethod}
+        </if>
+        AND t.status = 'TO_REVIEW'
+        <choose>
+            <when test="query.currentUserTeamIds != null and query.currentUserTeamIds.size() > 0">
+                AND (
+                    EXISTS (
+                        SELECT 1 FROM lm_inspection_scheme_item_teams sit
+                        WHERE sit.inspect_item_id = t.inspect_item_id
+                          AND sit.version_id = io.scheme_version_id
+                          AND sit.is_deleted = 0
+                          AND sit.team_id IN
+                        <foreach collection="query.currentUserTeamIds" item="teamId" open="(" separator="," close=")">
+                            #{teamId}
+                        </foreach>
+                    )
+                    OR EXISTS (
+                        SELECT 1 FROM lm_stability_scheme_item_teams ssit
+                        WHERE ssit.inspect_item_id = t.inspect_item_id
+                          AND ssit.version_id = io.scheme_version_id
+                          AND ssit.is_deleted = 0
+                          AND ssit.team_id IN
+                        <foreach collection="query.currentUserTeamIds" item="teamId" open="(" separator="," close=")">
+                            #{teamId}
+                        </foreach>
+                    )
+                )
+            </when>
+            <otherwise>
+                AND t.owner_id = #{query.currentUserId}
+            </otherwise>
+        </choose>
+    </select>
+
+    <!-- APP-根据任务ID查询任务详情（含审核人信息，不限执行方式） -->
+    <select id="selectTaskDetailById" resultType="com.bmos.lims2.server.inspect.entry.dto.AppTaskDetailDTO">        SELECT
+            t.id,
+            t.inspection_order_id AS inspectionOrderId,
+            COALESCE(sv.scheme_id, ssv.scheme_id) AS schemeId,
+            t.scheme_version_id AS schemeVersionId,
+            t.record_item_id AS recordItemId,
+            t.inspect_item_id AS inspectItemId,
+            ii.name AS inspectItemName,
+            t.inspect_item_code AS inspectItemCode,
+            t.item_config_id AS itemConfigId,
+            t.parameter_id AS parameterId,
+            ip.name AS parameterName,
+            t.parameter_code AS parameterCode,
+            t.parameter_config_id AS parameterConfigId,
+            t.record_id AS recordId,
+            t.record_version_id AS recordVersionId,
+            br.name AS recordName,
+            br.code AS recordCode,
+            brv.version AS recordVersionNo,
+            COALESCE(isp.standard_rule, sssp.standard_rule) AS standardRule,
+            t.is_executable AS isExecutable,
+            t.is_reportable AS isReportable,
+            t.execute_method AS executeMethod,
+            t.status,
+            t.judged_abnormal AS abnormal,
+            t.judged_result AS judgedResult,
+            t.judged_time AS judgedTime,
+            t.test_time AS testTime,
+            t.owner_id AS ownerId,
+            t.owner_name AS ownerName,
+            le.entry_time AS entryTime,
+            t.reviewed_by AS reviewedBy,
+            t.reviewed_time AS reviewedTime,
+            t.reviewed_abnormal_reason AS reviewRejectReason,
+            t.sample_audit_by AS sampleAuditBy,
+            t.sample_audit_time AS sampleAuditTime,
+            io.order_no AS orderNo,
+            m.name AS materialName,
+            m.code AS materialCode,
+            m.specification AS materialSpec,
+            io.batch_no AS batchNo,
+            io.create_time AS requestTime,
+            io.create_by AS requestUserId,
+            t.assigner_id AS assignerId,
+            t.assigner_name AS assignerName,
+            t.assign_time AS assignTime,
+            t.claim_time AS claimTime,
+            t.complete_time AS completeTime,
+            t.terminate_time AS terminateTime,
+            t.terminate_reason AS terminateReason,
+            t.return_reason AS returnReason,
+            t.reject_reason AS rejectReason,
+            t.remark AS remark
+        FROM lm_task t
+        LEFT JOIN lm_inspection_order io ON io.id = t.inspection_order_id
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        LEFT JOIN lm_inspection_scheme_version sv ON sv.id = io.scheme_version_id AND sv.is_deleted = 0
+        LEFT JOIN lm_stability_scheme_version ssv ON ssv.id = io.scheme_version_id AND ssv.is_deleted = 0
+        INNER JOIN lm_inspect_item ii ON t.inspect_item_id = ii.id
+        INNER JOIN lm_inspect_parameter ip ON t.parameter_id = ip.id
+        LEFT JOIN lm_inspection_scheme_parameter isp ON isp.id = t.parameter_config_id AND isp.is_deleted = 0
+        LEFT JOIN lm_stability_scheme_parameter sssp ON sssp.id = t.parameter_config_id AND sssp.is_deleted = 0
+        LEFT JOIN bm_batch_record br ON br.id = t.record_id AND br.is_deleted = 0
+        LEFT JOIN bm_batch_record_version brv ON brv.id = t.record_version_id AND brv.is_deleted = 0
+        LEFT JOIN (
+            SELECT ier.task_id, MAX(COALESCE(ier.update_time, ier.create_time)) AS entry_time
+            FROM lm_inspection_entry_record ier
+            WHERE ier.is_deleted = 0
+            GROUP BY ier.task_id
+        ) le ON le.task_id = t.id
+        WHERE t.is_deleted = 0
+          AND t.id = #{taskId}
+    </select>
+
+    <!-- ==================== 复核视角：班组范围 ==================== -->
+
+    <!-- 复核-分析项+方法分组母列表（班组范围，待复核） -->
+    <select id="appSelectAnalysisItemMethodReviewList" resultType="com.bmos.lims2.server.inspect.entry.dto.AppAnalysisItemMethodGroupDTO">
+        SELECT
+            ip.id   AS inspectParameterId,
+            ip.name AS inspectParameterName,
+            ip.code AS inspectParameterCode,
+            t.record_id AS recordId,
+            t.record_version_id AS recordVersionId,
+            br.name AS recordName,
+            br.code AS recordCode,
+            brv.version AS recordVersionNo
+        FROM lm_task t
+        INNER JOIN lm_inspect_parameter ip ON ip.id = t.parameter_id
+        INNER JOIN lm_inspection_order io ON io.id = t.inspection_order_id
+        INNER JOIN lm_inspect_item ii ON ii.id = t.inspect_item_id
+        LEFT JOIN bm_batch_record br ON br.id = t.record_id AND br.is_deleted = 0
+        LEFT JOIN bm_batch_record_version brv ON brv.id = t.record_version_id AND brv.is_deleted = 0
+        WHERE t.is_deleted = 0
+          AND ip.is_deleted = 0
+          AND ii.is_deleted = 0
+          AND io.is_deleted = 0
+        <if test="query.executeMethod != null">
+            AND t.execute_method = #{query.executeMethod}
+        </if>
+        AND t.status = 'TO_REVIEW'
+        <choose>
+            <when test="query.currentUserTeamIds != null and query.currentUserTeamIds.size() > 0">
+                AND (
+                    EXISTS (
+                        SELECT 1 FROM lm_inspection_scheme_item_teams sit
+                        WHERE sit.inspect_item_id = t.inspect_item_id
+                          AND sit.version_id = io.scheme_version_id
+                          AND sit.is_deleted = 0
+                          AND sit.team_id IN
+                        <foreach collection="query.currentUserTeamIds" item="teamId" open="(" separator="," close=")">
+                            #{teamId}
+                        </foreach>
+                    )
+                    OR EXISTS (
+                        SELECT 1 FROM lm_stability_scheme_item_teams ssit
+                        WHERE ssit.inspect_item_id = t.inspect_item_id
+                          AND ssit.version_id = io.scheme_version_id
+                          AND ssit.is_deleted = 0
+                          AND ssit.team_id IN
+                        <foreach collection="query.currentUserTeamIds" item="teamId" open="(" separator="," close=")">
+                            #{teamId}
+                        </foreach>
+                    )
+                )
+            </when>
+            <otherwise>
+                AND t.owner_id = #{query.currentUserId}
+            </otherwise>
+        </choose>
+        <if test="query.parameterId != null">
+            AND t.parameter_id = #{query.parameterId}
+        </if>
+        <if test="query.parameterIds != null and query.parameterIds.size() > 0">
+            AND t.parameter_id IN
+            <foreach collection="query.parameterIds" item="pid" open="(" separator="," close=")">#{pid}</foreach>
+        </if>
+        <if test="query.inspectItemName != null and query.inspectItemName != ''">
+            AND ii.name LIKE CONCAT('%', #{query.inspectItemName}, '%')
+        </if>
+        <if test="query.parameterName != null and query.parameterName != ''">
+            AND ip.name LIKE CONCAT('%', #{query.parameterName}, '%')
+        </if>
+        <if test="query.inspectionOrderNo != null and query.inspectionOrderNo != ''">
+            AND io.order_no LIKE CONCAT('%', #{query.inspectionOrderNo}, '%')
+        </if>
+        <if test="query.batchNo != null and query.batchNo != ''">
+            AND io.batch_no LIKE CONCAT('%', #{query.batchNo}, '%')
+        </if>
+        <if test="query.requestStartTime != null">
+            AND io.create_time &gt;= #{query.requestStartTime}
+        </if>
+        <if test="query.requestEndTime != null">
+            AND io.create_time &lt;= #{query.requestEndTime}
+        </if>
+        <if test="query.materialIds != null and query.materialIds.size() > 0">
+            AND io.material_id IN
+            <foreach collection="query.materialIds" item="materialId" open="(" separator="," close=")">#{materialId}</foreach>
+        </if>
+        GROUP BY ip.id, ip.name, ip.code, t.record_id, t.record_version_id, br.name, br.code, brv.version
+        ORDER BY ii.code ASC, ip.code ASC, recordCode ASC, recordVersionNo ASC
+    </select>
+
+    <!-- 复核-分析项子列表（班组范围，待复核） -->
+    <select id="appSelectInspectionOrdersByAnalysisItemTeamReview" resultType="com.bmos.lims2.server.inspect.entry.dto.AppTaskEntryItemDTO">
+        SELECT DISTINCT
+            t.id,
+            t.inspection_order_id AS inspectionOrderId,
+            COALESCE(sv.scheme_id, ssv.scheme_id) AS schemeId,
+            t.record_item_id AS recordItemId,
+            io.order_no AS orderNo,
+            m.name AS materialName,
+            m.code AS materialCode,
+            m.specification AS materialSpec,
+            io.batch_no AS batchNo,
+            io.create_time AS requestTime,
+            io.create_by AS requestUserId,
+            t.status,
+            t.judged_abnormal AS abnormal,
+            t.judged_result AS judgedResult,
+            t.judged_time AS judgedTime,
+            t.test_time AS testTime,
+            t.owner_id AS ownerId,
+            t.owner_name AS ownerName,
+            t.reviewed_by AS reviewedBy,
+            t.reviewed_time AS reviewedTime,
+            t.reviewed_abnormal_reason AS reviewRejectReason,
+            le.entry_time AS entryTime,
+            t.scheme_version_id AS schemeVersionId,
+            t.inspect_item_id AS inspectItemId,
+            t.inspect_item_code AS inspectItemCode,
+            t.item_config_id AS itemConfigId,
+            t.parameter_id AS parameterId,
+            t.parameter_code AS parameterCode,
+            ip.name AS parameterName,
+            t.parameter_config_id AS parameterConfigId,
+            COALESCE(isp.standard_rule, sssp.standard_rule) AS standardRule,
+            t.is_executable AS isExecutable,
+            t.is_reportable AS isReportable,
+            t.execute_method AS executeMethod,
+            t.record_id AS recordId,
+            t.record_version_id AS recordVersionId,
+            br.name AS recordName,
+            br.code AS recordCode,
+            brv.version AS recordVersionNo,
+            t.assigner_id AS assignerId,
+            t.assigner_name AS assignerName,
+            t.assign_time AS assignTime,
+            t.claim_time AS claimTime,
+            t.complete_time AS completeTime,
+            t.terminate_time AS terminateTime,
+            t.terminate_reason AS terminateReason,
+            t.return_reason AS returnReason,
+            t.reject_reason AS rejectReason,
+            t.remark AS remark
+        FROM lm_task t
+        INNER JOIN lm_inspection_order io ON t.inspection_order_id = io.id
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        LEFT JOIN lm_inspect_parameter ip ON t.parameter_id = ip.id
+        LEFT JOIN lm_inspect_item ii ON t.inspect_item_id = ii.id
+        LEFT JOIN lm_inspection_scheme_parameter isp ON isp.id = t.parameter_config_id AND isp.is_deleted = 0
+        LEFT JOIN lm_stability_scheme_parameter sssp ON sssp.id = t.parameter_config_id AND sssp.is_deleted = 0
+        LEFT JOIN bm_batch_record br ON br.id = t.record_id AND br.is_deleted = 0
+        LEFT JOIN bm_batch_record_version brv ON brv.id = t.record_version_id AND brv.is_deleted = 0
+        LEFT JOIN (
+            SELECT ier.task_id, MAX(COALESCE(ier.update_time, ier.create_time)) AS entry_time
+            FROM lm_inspection_entry_record ier
+            WHERE ier.is_deleted = 0
+            GROUP BY ier.task_id
+        ) le ON le.task_id = t.id
+        LEFT JOIN lm_inspection_scheme_version sv ON sv.id = io.scheme_version_id AND sv.is_deleted = 0
+        LEFT JOIN lm_stability_scheme_version ssv ON ssv.id = io.scheme_version_id AND ssv.is_deleted = 0
+        WHERE t.is_deleted = 0
+          AND io.is_deleted = 0
+          AND ip.is_deleted = 0
+          AND ii.is_deleted = 0
+          AND t.parameter_id = #{inspectParameterId}
+        <if test="inspectItemId != null">
+            AND t.inspect_item_id = #{inspectItemId}
+        </if>
+          AND t.record_version_id = #{recordVersionId}
+        <if test="query.executeMethod != null">
+            AND t.execute_method = #{query.executeMethod}
+        </if>
+        AND t.status = 'TO_REVIEW'
+        <choose>
+            <when test="query.currentUserTeamIds != null and query.currentUserTeamIds.size() > 0">
+                AND (
+                    EXISTS (
+                        SELECT 1 FROM lm_inspection_scheme_item_teams sit
+                        WHERE sit.inspect_item_id = t.inspect_item_id
+                          AND sit.version_id = io.scheme_version_id
+                          AND sit.is_deleted = 0
+                          AND sit.team_id IN
+                        <foreach collection="query.currentUserTeamIds" item="teamId" open="(" separator="," close=")">
+                            #{teamId}
+                        </foreach>
+                    )
+                    OR EXISTS (
+                        SELECT 1 FROM lm_stability_scheme_item_teams ssit
+                        WHERE ssit.inspect_item_id = t.inspect_item_id
+                          AND ssit.version_id = io.scheme_version_id
+                          AND ssit.is_deleted = 0
+                          AND ssit.team_id IN
+                        <foreach collection="query.currentUserTeamIds" item="teamId" open="(" separator="," close=")">
+                            #{teamId}
+                        </foreach>
+                    )
+                )
+            </when>
+            <otherwise>
+                AND t.owner_id = #{query.currentUserId}
+            </otherwise>
+        </choose>
+        <if test="query.inspectItemName != null and query.inspectItemName != ''">
+            AND ii.name LIKE CONCAT('%', #{query.inspectItemName}, '%')
+        </if>
+        <if test="query.inspectionOrderNo != null and query.inspectionOrderNo != ''">
+            AND io.order_no LIKE CONCAT('%', #{query.inspectionOrderNo}, '%')
+        </if>
+        <if test="query.batchNo != null and query.batchNo != ''">
+            AND io.batch_no LIKE CONCAT('%', #{query.batchNo}, '%')
+        </if>
+        <if test="query.requestStartTime != null">
+            AND io.create_time &gt;= #{query.requestStartTime}
+        </if>
+        <if test="query.requestEndTime != null">
+            AND io.create_time &lt;= #{query.requestEndTime}
+        </if>
+        <if test="query.materialIds != null and query.materialIds.size() > 0">
+            AND io.material_id IN
+            <foreach collection="query.materialIds" item="materialId" open="(" separator="," close=")">#{materialId}</foreach>
+        </if>
+        ORDER BY io.create_time ASC, io.order_no ASC
+    </select>
+
+    <!-- 复核-检验单母列表（班组范围，待复核） -->
+    <select id="appSelectInspectionOrderReviewList" resultType="com.bmos.lims2.server.inspect.entry.dto.AppInspectionOrderEntryDTO">
+        SELECT
+            io.id as inspectionOrderId,
+            io.order_no,
+            io.batch_no,
+            io.create_time as requestTime,
+            io.create_by as requestUserId,
+            m.name as materialName,
+            m.code as materialCode,
+            m.specification as materialSpec
+        FROM lm_inspection_order io
+        INNER JOIN lm_task t ON io.id = t.inspection_order_id
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        WHERE io.is_deleted = 0
+          AND t.is_deleted = 0
+        <if test="query.executeMethod != null">
+            AND t.execute_method = #{query.executeMethod}
+        </if>
+        AND t.status = 'TO_REVIEW'
+        <choose>
+            <when test="query.currentUserTeamIds != null and query.currentUserTeamIds.size() > 0">
+                AND (
+                    EXISTS (
+                        SELECT 1 FROM lm_inspection_scheme_item_teams sit
+                        WHERE sit.inspect_item_id = t.inspect_item_id
+                          AND sit.version_id = io.scheme_version_id
+                          AND sit.is_deleted = 0
+                          AND sit.team_id IN
+                        <foreach collection="query.currentUserTeamIds" item="teamId" open="(" separator="," close=")">
+                            #{teamId}
+                        </foreach>
+                    )
+                    OR EXISTS (
+                        SELECT 1 FROM lm_stability_scheme_item_teams ssit
+                        WHERE ssit.inspect_item_id = t.inspect_item_id
+                          AND ssit.version_id = io.scheme_version_id
+                          AND ssit.is_deleted = 0
+                          AND ssit.team_id IN
+                        <foreach collection="query.currentUserTeamIds" item="teamId" open="(" separator="," close=")">
+                            #{teamId}
+                        </foreach>
+                    )
+                )
+            </when>
+            <otherwise>
+                AND t.owner_id = #{query.currentUserId}
+            </otherwise>
+        </choose>
+        <if test="query.parameterId != null">
+            AND t.parameter_id = #{query.parameterId}
+        </if>
+        <if test="query.parameterName != null and query.parameterName != ''">
+            AND EXISTS (
+                SELECT 1 FROM lm_inspect_parameter ip
+                WHERE ip.id = t.parameter_id
+                  AND ip.name LIKE CONCAT('%', #{query.parameterName}, '%')
+                  AND ip.is_deleted = 0
+            )
+        </if>
+        <if test="query.inspectItemName != null and query.inspectItemName != ''">
+            AND EXISTS (
+                SELECT 1 FROM lm_inspect_item ii
+                WHERE ii.id = t.inspect_item_id
+                  AND ii.name LIKE CONCAT('%', #{query.inspectItemName}, '%')
+                  AND ii.is_deleted = 0
+            )
+        </if>
+        <if test="query.materialIds != null and query.materialIds.size() > 0">
+            AND io.material_id IN
+            <foreach collection="query.materialIds" item="mid" open="(" separator="," close=")">#{mid}</foreach>
+        </if>
+        <if test="query.inspectionOrderNo != null and query.inspectionOrderNo != ''">
+            AND io.order_no LIKE CONCAT('%', #{query.inspectionOrderNo}, '%')
+        </if>
+        <if test="query.batchNo != null and query.batchNo != ''">
+            AND io.batch_no LIKE CONCAT('%', #{query.batchNo}, '%')
+        </if>
+        <if test="query.requestStartTime != null">
+            AND io.create_time &gt;= #{query.requestStartTime}
+        </if>
+        <if test="query.requestEndTime != null">
+            AND io.create_time &lt;= #{query.requestEndTime}
+        </if>
+        GROUP BY io.id
+        ORDER BY io.create_time ASC, io.order_no ASC
+    </select>
+
+    <!-- 复核-检验单子列表（班组范围，待复核） -->
+    <select id="appSelectTasksByInspectionOrderTeamReview" resultType="com.bmos.lims2.server.inspect.entry.dto.AppTaskEntryItemDTO">
+        SELECT
+            t.id,
+            t.inspection_order_id AS inspectionOrderId,
+            COALESCE(sv.scheme_id, ssv.scheme_id) AS schemeId,
+            t.scheme_version_id AS schemeVersionId,
+            t.record_item_id AS recordItemId,
+            t.inspect_item_id AS inspectItemId,
+            ii.name AS inspectItemName,
+            t.inspect_item_code AS inspectItemCode,
+            t.item_config_id AS itemConfigId,
+            t.parameter_id AS parameterId,
+            ip.name AS parameterName,
+            t.parameter_code AS parameterCode,
+            t.parameter_config_id AS parameterConfigId,
+            t.record_id AS recordId,
+            t.record_version_id AS recordVersionId,
+            br.name AS recordName,
+            br.code AS recordCode,
+            brv.version AS recordVersionNo,
+            COALESCE(isp.standard_rule, sssp.standard_rule) AS standardRule,
+            t.is_executable AS isExecutable,
+            t.is_reportable AS isReportable,
+            t.execute_method AS executeMethod,
+            t.status,
+            t.judged_abnormal AS abnormal,
+            t.judged_result AS judgedResult,
+            t.judged_time AS judgedTime,
+            t.test_time AS testTime,
+            t.owner_id AS ownerId,
+            t.owner_name AS ownerName,
+            le.entry_time AS entryTime,
+            t.reviewed_by AS reviewedBy,
+            t.reviewed_time AS reviewedTime,
+            t.reviewed_abnormal_reason AS reviewRejectReason,
+            io.order_no AS orderNo,
+            m.name AS materialName,
+            m.code AS materialCode,
+            m.specification AS materialSpec,
+            io.batch_no AS batchNo,
+            io.create_time AS requestTime,
+            io.create_by AS requestUserId,
+            t.assigner_id AS assignerId,
+            t.assigner_name AS assignerName,
+            t.assign_time AS assignTime,
+            t.claim_time AS claimTime,
+            t.complete_time AS completeTime,
+            t.terminate_time AS terminateTime,
+            t.terminate_reason AS terminateReason,
+            t.return_reason AS returnReason,
+            t.reject_reason AS rejectReason,
+            t.remark AS remark
+        FROM lm_task t
+        LEFT JOIN lm_inspection_order io ON io.id = t.inspection_order_id
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        LEFT JOIN lm_inspection_scheme_version sv ON sv.id = io.scheme_version_id AND sv.is_deleted = 0
+        LEFT JOIN lm_stability_scheme_version ssv ON ssv.id = io.scheme_version_id AND ssv.is_deleted = 0
+        INNER JOIN lm_inspect_item ii ON t.inspect_item_id = ii.id
+        INNER JOIN lm_inspect_parameter ip ON t.parameter_id = ip.id
+        LEFT JOIN lm_inspection_scheme_parameter isp ON isp.id = t.parameter_config_id AND isp.is_deleted = 0
+        LEFT JOIN lm_stability_scheme_parameter sssp ON sssp.id = t.parameter_config_id AND sssp.is_deleted = 0
+        LEFT JOIN bm_batch_record br ON br.id = t.record_id AND br.is_deleted = 0
+        LEFT JOIN bm_batch_record_version brv ON brv.id = t.record_version_id AND brv.is_deleted = 0
+        LEFT JOIN (
+            SELECT ier.task_id, MAX(COALESCE(ier.update_time, ier.create_time)) AS entry_time
+            FROM lm_inspection_entry_record ier
+            WHERE ier.is_deleted = 0
+            GROUP BY ier.task_id
+        ) le ON le.task_id = t.id
+        WHERE t.inspection_order_id = #{inspectionOrderId}
+          AND t.is_deleted = 0
+        <if test="query.executeMethod != null">
+            AND t.execute_method = #{query.executeMethod}
+        </if>
+        AND t.status = 'TO_REVIEW'
+        <choose>
+            <when test="query.currentUserTeamIds != null and query.currentUserTeamIds.size() > 0">
+                AND (
+                    EXISTS (
+                        SELECT 1 FROM lm_inspection_scheme_item_teams sit
+                        WHERE sit.inspect_item_id = t.inspect_item_id
+                          AND sit.version_id = io.scheme_version_id
+                          AND sit.is_deleted = 0
+                          AND sit.team_id IN
+                        <foreach collection="query.currentUserTeamIds" item="teamId" open="(" separator="," close=")">
+                            #{teamId}
+                        </foreach>
+                    )
+                    OR EXISTS (
+                        SELECT 1 FROM lm_stability_scheme_item_teams ssit
+                        WHERE ssit.inspect_item_id = t.inspect_item_id
+                          AND ssit.version_id = io.scheme_version_id
+                          AND ssit.is_deleted = 0
+                          AND ssit.team_id IN
+                        <foreach collection="query.currentUserTeamIds" item="teamId" open="(" separator="," close=")">
+                            #{teamId}
+                        </foreach>
+                    )
+                )
+            </when>
+            <otherwise>
+                AND t.owner_id = #{query.currentUserId}
+            </otherwise>
+        </choose>
+        ORDER BY t.inspect_item_code ASC, t.parameter_code ASC
+    </select>
+
+</mapper>
+
+

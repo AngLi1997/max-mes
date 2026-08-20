@@ -1,0 +1,1 @@
+import{H as e}from"./index-eacb5835.js";const o=o=>e.get("/api/app/mes/flow/todoPage/fresh",o),p=o=>e.post("/api/app/mes/flow/coerce/active",o),a=o=>e.post("/api/app/mes/flow/coerce/procedure/complete",o);export{a,p as c,o as g};

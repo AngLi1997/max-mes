@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.weigh.centre2.ticket.mapper.ITicketMapper">
+    <select id="selectPageByCondition"
+            resultType="com.bmos.mes.service.weigh.centre2.execute.controller.vo.WeighTicketPageVO">
+        SELECT t.id,
+               t.material_merge_code    AS materialMergeCode,
+               t.material_name          AS materialName,
+               c.code                   AS centreCode,
+               c.name                   AS centreName,
+               t.ticket_no              AS ticketNo,
+               t.unit_id                as unitId,
+               t.weigh_centre_id        as weighCentreId,
+               t.plan_date              AS planDate,
+               t.send_time              AS send_time,
+               t.material_specification AS materialSpecification,
+               t.ticket_weigh_status    AS ticketWeighStatus,
+               t.complete_time          AS completeTime
+        FROM bm_weigh_ticket t
+                 LEFT JOIN bm_weigh_centre c ON t.weigh_centre_id = c.id
+        <where>
+            t.is_deleted = 0
+              AND t.weigh_centre_id in
+            <foreach collection="weighCentreIds" item="centreId" open="(" separator="," close=")">
+                #{centreId}
+            </foreach>
+            <choose>
+                <when test="history">
+                    AND t.ticket_weigh_status = 3
+                </when>
+                <otherwise>
+                    AND (t.ticket_weigh_status = 1 OR t.ticket_weigh_status = 2)
+                </otherwise>
+            </choose>
+            <if test="dto.material != null and dto.material != ''">
+                AND (t.material_name LIKE CONCAT('%', #{dto.material}, '%') OR
+                     t.material_merge_code LIKE CONCAT('%', #{dto.material}, '%'))
+            </if>
+            <if test="dto.centre != null and dto.centre != ''">
+                AND (c.code LIKE CONCAT('%', #{dto.centre}, '%') OR c.name LIKE CONCAT('%', #{dto.centre}, '%'))
+            </if>
+            <if test="dto.ticketNo != null and dto.ticketNo != ''">
+                AND t.ticket_no LIKE CONCAT('%', #{dto.ticketNo}, '%')
+            </if>
+        </where>
+    </select>
+
+    <select id="queryPage" resultType="com.bmos.mes.service.weigh.centre2.ticket.vo.TicketPageVO">
+        select bm_weigh_ticket.id,
+               bm_weigh_ticket.ticket_no,
+               bm_weigh_ticket.material_name,
+               bm_weigh_ticket.material_merge_code,
+               bm_storage_material_batch.material_batch_no as storage_material_batch_no,
+               bm_storage_material_batch.id                as storage_material_batch_id,
+               bm_weigh_ticket.material_specification,
+               bm_weigh_centre.id                          as weigh_centre_id,
+               bm_weigh_centre.name                        as weigh_centre_name,
+               bm_weigh_ticket.requirement_quantity,
+               bm_weigh_ticket.unit_id,
+               bm_weigh_ticket.plan_date,
+               bm_weigh_ticket.status
+        from bm_weigh_ticket
+                 left join bm_storage_material_batch
+                           on bm_weigh_ticket.storage_material_batch_id = bm_storage_material_batch.id and
+                              bm_storage_material_batch.is_deleted = 0
+                 left join bm_weigh_centre
+                           on bm_weigh_ticket.weigh_centre_id = bm_weigh_centre.id and bm_weigh_centre.is_deleted = 0
+        where bm_weigh_ticket.is_deleted = 0
+          and bm_weigh_ticket.status != 3
+          and bm_weigh_ticket.weigh_centre_id in
+        <foreach item="centreId" collection="weighCentreIds" open="(" separator="," close=")">
+            #{centreId}
+        </foreach>
+        <if test="page.ticketNo != null and page.ticketNo != ''">
+            and bm_weigh_ticket.ticket_no like concat('%', #{page.ticketNo}, '%')
+        </if>
+        <if test="page.materialName != null and page.materialName != ''">
+            and bm_weigh_ticket.material_name like concat('%', #{page.materialName}, '%')
+        </if>
+        <if test="page.materialMergeCode != null and page.materialMergeCode != ''">
+            and bm_weigh_ticket.material_merge_code like concat('%', #{page.materialMergeCode}, '%')
+        </if>
+        <if test="page.weighCentreName != null and page.weighCentreName != ''">
+            and bm_weigh_centre.name like concat('%', #{page.weighCentreName}, '%')
+        </if>
+        <if test="page.planDateStart != null and page.planDateStart != ''">
+            and DATE_FORMAT(bm_weigh_ticket.plan_date, '%Y-%m-%d') &gt;= #{page.planDateStart}
+        </if>
+        <if test="page.planDateEnd != null and page.planDateEnd != ''">
+            and DATE_FORMAT(bm_weigh_ticket.plan_date, '%Y-%m-%d') &lt;= #{page.planDateEnd}
+        </if>
+
+        order by bm_weigh_ticket.create_time desc
+    </select>
+</mapper>

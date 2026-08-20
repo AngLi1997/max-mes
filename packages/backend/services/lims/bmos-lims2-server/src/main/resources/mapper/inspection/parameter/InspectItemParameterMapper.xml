@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.inspect.item.mapper.InspectItemParameterMapper">
+    <sql id="BASE_COLUM">
+        id,
+        inspect_item_id,
+        inspect_parameter_id,
+        create_by,
+        update_by,
+        create_time,
+        update_time,
+        is_deleted
+    </sql>
+    <select id="selectByInspectId"
+            resultType="com.bmos.lims2.server.inspect.item.entity.InspectItemParameter">
+        SELECT
+            <include refid="BASE_COLUM"/>
+        FROM
+            lm_item_parameter
+        WHERE
+                inspect_item_id = #{inspectId}
+            AND
+                is_deleted = 0
+    </select>
+    
+    <!-- 根据分析项ID查询已绑定的检验项目名称列表 -->
+    <select id="selectInspectItemNamesByParameterId" resultType="java.lang.String">
+        SELECT i.name
+        FROM lm_item_parameter ip
+        INNER JOIN lm_inspect_item i ON ip.inspect_item_id = i.id AND i.is_deleted = 0
+        WHERE ip.is_deleted = 0
+          AND ip.inspect_parameter_id = #{parameterId}
+        ORDER BY i.create_time DESC
+    </select>
+</mapper>

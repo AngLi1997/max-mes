@@ -1,0 +1,1 @@
+mysqldump -uroot -pIsysc0re123 --databases bmos_scheduler --tables xxl_job_user xxl_job_info xxl_job_group > /root/db_back/scheduler.sql

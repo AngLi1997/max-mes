@@ -1,0 +1,1 @@
+import{u as e}from"./systemInfo.b1982836.js";import{r as s}from"./index-eacb5835.js";const a=s("N/A"),o=async()=>{const s=e(),{getParameterByCode:o}=s,r=o("mes.record.empty-data");a.value=r.value||"N/A"};export{o as g,a as n};

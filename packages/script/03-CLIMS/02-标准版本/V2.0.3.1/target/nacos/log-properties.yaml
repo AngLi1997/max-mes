@@ -1,0 +1,22 @@
+log-properties:
+  localeMap:
+    zh-CN: #{id: 主键id, processId: 工艺id}
+      remark: 备注
+      batchNO: 批次号
+      sampleNo: 标本编号
+      sampleBatchNo: 标本批号
+      inspectDate: 检验日期
+      materialNo: 物料编号
+      instrumentNo: 设备编号
+      supplierName: 供应商简称
+      supplierCnShortName: 供应商中文简称
+      inWarehouseNo: 入库单号
+      staticDataType: 静态数据类型
+      projectName: 项目名
+      receiveStoreNo: 领用库编号
+      stationCode: 浆站编码
+      inspectItemNo: 检验项目编号
+      templateNo: 文件模板编号
+
+    en-US:
+      remark: remark

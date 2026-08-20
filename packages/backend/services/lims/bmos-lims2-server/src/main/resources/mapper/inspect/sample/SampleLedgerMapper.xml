@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.inspect.sample.ledger.mapper.SampleLedgerMapper">
+
+    <resultMap id="BaseResultMap" type="com.bmos.lims2.server.inspect.sample.ledger.entity.SampleLedger">
+        <id column="id" property="id" />
+        <result column="inspection_order_id" property="inspectionOrderId" />
+        <result column="material_id" property="materialId" />
+        <result column="sample_id" property="sampleId" />
+        <result column="material_code" property="materialCode" />
+        <result column="sample_no" property="sampleNo" />
+        <result column="quantity" property="quantity" />
+        <result column="recycle_quantity" property="recycleQuantity" />
+        <result column="consumed_quantity" property="consumedQuantity" />
+        <result column="unit_id" property="unitId" />
+        <result column="status" property="status" />
+        <result column="operation_type" property="operationType" />
+        <result column="operation_time" property="operationTime" />
+        <result column="operator_id" property="operatorId" />
+        <result column="operator_name" property="operatorName" />
+        <result column="remark" property="remark" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="create_by" property="createBy" />
+        <result column="update_by" property="updateBy" />
+        <result column="is_deleted" property="deleted" />
+    </resultMap>
+
+    <insert id="batchInsert">
+        INSERT INTO lm_sample_ledger (
+            id, inspection_order_id, material_id, sample_id, material_code, sample_no, quantity, recycle_quantity, consumed_quantity, unit_id, status,
+            operation_type, operation_time, operator_id, operator_name, remark, create_time, update_time, create_by, update_by, is_deleted
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id}, #{item.inspectionOrderId}, #{item.materialId}, #{item.sampleId}, #{item.materialCode}, #{item.sampleNo}, #{item.quantity}, #{item.recycleQuantity}, #{item.consumedQuantity}, #{item.unitId}, #{item.status},
+             #{item.operationType}, #{item.operationTime}, #{item.operatorId}, #{item.operatorName}, #{item.remark}, #{item.createTime}, #{item.updateTime}, #{item.createBy}, #{item.updateBy}, 0)
+        </foreach>
+    </insert>
+
+    <select id="listByOrderId" parameterType="long" resultMap="BaseResultMap">
+        SELECT * FROM lm_sample_ledger
+        WHERE is_deleted = 0 AND inspection_order_id = #{orderId}
+        ORDER BY operation_time DESC, id DESC
+    </select>
+
+    <select id="listBySampleIds" resultMap="BaseResultMap">
+        SELECT * FROM lm_sample_ledger
+        WHERE is_deleted = 0
+          AND sample_id IN
+          <foreach collection="sampleIds" item="id" open="(" separator="," close=")">#{id}</foreach>
+        ORDER BY operation_time DESC, id DESC
+    </select>
+
+    <!-- 查询指定样品最近一条台账记录（按时间/ID倒序） -->
+    <select id="selectLastBySampleId" resultMap="BaseResultMap">
+        SELECT * FROM lm_sample_ledger
+        WHERE is_deleted = 0 AND sample_id = #{sampleId}
+        ORDER BY operation_time DESC, id DESC
+        LIMIT 1
+    </select>
+
+    <!-- 按ID更新消耗量 -->
+    <update id="updateConsumedQuantityById">
+        UPDATE lm_sample_ledger
+        SET consumed_quantity = #{consumedQuantity}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 样品台账分页查询（联表样品、检验单、检品，避免N+1） -->
+    <select id="selectLedgerPage" resultType="com.bmos.lims2.server.inspect.sample.ledger.dto.SampleLedgerListDTO">
+        SELECT
+            sl.id,
+            sl.inspection_order_id AS inspectionOrderId,
+            io.order_no AS inspectionOrderNo,
+            io.batch_no AS batchNo,
+            m.id AS materialId,
+            m.name AS materialName,
+            m.code AS materialCode,
+            m.specification AS materialSpec,
+            sl.sample_id AS sampleId,
+            sl.sample_no AS sampleNo,
+            s.sample_name AS sampleName,
+            sl.quantity AS quantity,
+            sl.recycle_quantity AS recycleQuantity,
+            COALESCE(sl.consumed_quantity, '0') AS consumption,
+            sl.unit_id AS unitId,
+            sl.status AS status,
+            sl.operation_type AS operationType,
+            sl.operation_time AS operationTime,
+            sl.operator_id AS operatorId,
+            sl.operator_name AS operatorName,
+            sl.remark
+        FROM lm_sample_ledger sl
+        INNER JOIN lm_inspection_order io ON sl.inspection_order_id = io.id AND io.is_deleted = 0
+        INNER JOIN lm_sample s ON sl.sample_id = s.id AND s.is_deleted = 0
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        WHERE sl.is_deleted = 0
+        <if test="query != null">
+            <if test="query.materialIds != null and query.materialIds.size() &gt; 0">
+                AND io.material_id IN
+                <foreach collection="query.materialIds" item="mid" open="(" separator="," close=")">#{mid}</foreach>
+            </if>
+            <if test="query.inspectionOrderNo != null and query.inspectionOrderNo != ''">
+                AND io.order_no LIKE CONCAT('%', #{query.inspectionOrderNo}, '%')
+            </if>
+            <if test="query.batchNo != null and query.batchNo != ''">
+                AND io.batch_no LIKE CONCAT('%', #{query.batchNo}, '%')
+            </if>
+            <if test="query.sampleNo != null and query.sampleNo != ''">
+                AND sl.sample_no LIKE CONCAT('%', #{query.sampleNo}, '%')
+            </if>
+            <if test="query.sampleStatuses != null and query.sampleStatuses.size() &gt; 0">
+                <trim prefix="AND (" suffix=")" suffixOverrides="OR">
+                    <if test="query.sampleStatuses.contains('1') or query.sampleStatuses.contains('SAMPLED') or query.sampleStatuses.contains('已取样')">
+                        sl.operation_type = 'SAMPLED' OR
+                    </if>
+                    <if test="query.sampleStatuses.contains('2') or query.sampleStatuses.contains('RECEIVED') or query.sampleStatuses.contains('已接收')">
+                        sl.operation_type = 'RECEIVED' OR
+                    </if>
+                    <if test="query.sampleStatuses.contains('3') or query.sampleStatuses.contains('DIVIDED') or query.sampleStatuses.contains('已分样')">
+                        sl.operation_type = 'DIVIDED' OR
+                    </if>
+                    <if test="query.sampleStatuses.contains('4') or query.sampleStatuses.contains('COLLECTED') or query.sampleStatuses.contains('已领取')">
+                        sl.operation_type = 'COLLECTED' OR
+                    </if>
+                    <if test="query.sampleStatuses.contains('5') or query.sampleStatuses.contains('RECYCLED') or query.sampleStatuses.contains('已回收')">
+                        sl.operation_type = 'RECYCLED' OR
+                    </if>
+                    <if test="query.sampleStatuses.contains('6') or query.sampleStatuses.contains('PROCESSED') or query.sampleStatuses.contains('已处理')">
+                        sl.operation_type = 'PROCESSED' OR
+                    </if>
+                </trim>
+            </if>
+            <if test="query.operationStartTime != null">
+                AND sl.operation_time &gt;= #{query.operationStartTime}
+            </if>
+            <if test="query.operationEndTime != null">
+                AND sl.operation_time &lt;= #{query.operationEndTime}
+            </if>
+        </if>
+        ORDER BY sl.operation_time DESC, sl.id DESC
+    </select>
+
+    <!-- 样品台账不分页查询（按检验单ID过滤，联表样品、检验单、检品） -->
+    <select id="selectLedgerListByOrderId" resultType="com.bmos.lims2.server.inspect.sample.ledger.dto.SampleLedgerListDTO">
+        SELECT
+            sl.id,
+            sl.inspection_order_id AS inspectionOrderId,
+            io.order_no AS inspectionOrderNo,
+            io.batch_no AS batchNo,
+            m.id AS materialId,
+            m.name AS materialName,
+            m.code AS materialCode,
+            m.specification AS materialSpec,
+            sl.sample_id AS sampleId,
+            sl.sample_no AS sampleNo,
+            s.sample_name AS sampleName,
+            sl.quantity AS quantity,
+            sl.recycle_quantity AS recycleQuantity,
+            COALESCE(sl.consumed_quantity, '0') AS consumption,
+            sl.unit_id AS unitId,
+            sl.status AS status,
+            sl.operation_type AS operationType,
+            sl.operation_time AS operationTime,
+            sl.operator_id AS operatorId,
+            sl.operator_name AS operatorName,
+            sl.remark
+        FROM lm_sample_ledger sl
+        INNER JOIN lm_inspection_order io ON sl.inspection_order_id = io.id AND io.is_deleted = 0
+        INNER JOIN lm_sample s ON sl.sample_id = s.id AND s.is_deleted = 0
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        WHERE sl.is_deleted = 0 AND sl.inspection_order_id = #{orderId}
+        ORDER BY sl.operation_time DESC, sl.id DESC
+    </select>
+
+</mapper>
+
+

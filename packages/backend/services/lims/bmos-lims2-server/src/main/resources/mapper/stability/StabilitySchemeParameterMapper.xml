@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.stability.scheme.mapper.StabilitySchemeParameterMapper">
+
+    <select id="selectByItemId" resultType="com.bmos.lims2.server.stability.scheme.entity.StabilitySchemeParameter">
+        SELECT * FROM lm_stability_scheme_parameter
+        WHERE item_config_id = #{itemId} AND is_deleted = 0
+        ORDER BY id ASC
+    </select>
+
+    <select id="selectByVersionId" resultType="com.bmos.lims2.server.stability.scheme.entity.StabilitySchemeParameter">
+        SELECT * FROM lm_stability_scheme_parameter
+        WHERE version_id = #{versionId} AND is_deleted = 0
+        ORDER BY id ASC
+    </select>
+
+    <select id="selectByVersionIdWithNames" resultType="com.bmos.lims2.server.stability.scheme.dto.response.StabilitySchemeParameterDTO">
+        SELECT
+            sp.id,
+            sp.scheme_id AS schemeId,
+            sp.version_id AS versionId,
+            sp.item_config_id AS itemConfigId,
+            sp.inspect_item_id AS inspectItemId,
+            ii.code AS inspectItemCode,
+            sp.parameter_id AS parameterId,
+            sp.standard_rule AS standardRule,
+            sp.is_executable AS isExecutable,
+            sp.is_reportable AS isReportable,
+            sp.execute_method AS executeMethod,
+            sp.final_expression AS finalExpression,
+            sp.record_id AS recordId,
+            sp.record_code AS recordCode,
+            sp.record_version_id AS recordVersionId,
+            sp.record_item_id AS recordItemId,
+            ip.name AS parameterName,
+            ip.code AS parameterCode,
+            br.name AS recordName,
+            rv.version AS recordVersion
+        FROM lm_stability_scheme_parameter sp
+        LEFT JOIN lm_inspect_parameter ip ON sp.parameter_id = ip.id AND ip.is_deleted = 0
+        LEFT JOIN lm_inspect_item ii ON sp.inspect_item_id = ii.id AND ii.is_deleted = 0
+        LEFT JOIN bm_batch_record br ON sp.record_id = br.id AND br.is_deleted = 0
+        LEFT JOIN bm_batch_record_version rv ON sp.record_version_id = rv.id AND rv.is_deleted = 0
+        WHERE sp.version_id = #{versionId} AND sp.is_deleted = 0
+        ORDER BY sp.id ASC
+    </select>
+
+    <select id="selectByItemIdWithNames" resultType="com.bmos.lims2.server.stability.scheme.dto.response.StabilitySchemeParameterDTO">
+        SELECT
+            sp.id,
+            sp.scheme_id AS schemeId,
+            sp.version_id AS versionId,
+            sp.item_config_id AS itemConfigId,
+            sp.inspect_item_id AS inspectItemId,
+            sp.parameter_id AS parameterId,
+            sp.standard_rule AS standardRule,
+            sp.is_executable AS isExecutable,
+            sp.is_reportable AS isReportable,
+            sp.execute_method AS executeMethod,
+            sp.final_expression AS finalExpression,
+            sp.record_id AS recordId,
+            sp.record_code AS recordCode,
+            sp.record_version_id AS recordVersionId,
+            sp.record_item_id AS recordItemId,
+            ip.name AS parameterName,
+            ip.code AS parameterCode,
+            br.name AS recordName,
+            rv.version AS recordVersion
+        FROM lm_stability_scheme_parameter sp
+        LEFT JOIN lm_inspect_parameter ip ON sp.parameter_id = ip.id AND ip.is_deleted = 0
+        LEFT JOIN bm_batch_record br ON sp.record_id = br.id AND br.is_deleted = 0
+        LEFT JOIN bm_batch_record_version rv ON sp.record_version_id = rv.id AND rv.is_deleted = 0
+        WHERE sp.item_config_id = #{itemId} AND sp.is_deleted = 0
+        ORDER BY sp.id ASC
+    </select>
+
+    <delete id="deleteByVersionId">
+        DELETE FROM lm_stability_scheme_parameter WHERE version_id = #{versionId}
+    </delete>
+
+    <delete id="deleteByItemId">
+        DELETE FROM lm_stability_scheme_parameter WHERE item_config_id = #{itemId}
+    </delete>
+
+    <!-- 按分析项ID和方案版本ID查询最终判定表达式 -->
+    <select id="getFinalExpressionByParameterAndVersion" resultType="java.lang.String">
+        SELECT final_expression
+        FROM lm_stability_scheme_parameter
+        WHERE parameter_id = #{parameterId}
+          AND version_id = #{versionId}
+          AND is_deleted = 0
+        LIMIT 1
+    </select>
+
+    <!-- ELN 表头加载：按稳定性方案ID查询分析项-数据点分组，跨版本合并去重 -->
+    <select id="listHeaderGroupsByStabilityScheme" resultType="com.bmos.lims2.server.inspect.entry.dto.HeaderGroupRowDTO">
+        SELECT
+            t.parameter_id   AS parameterId,
+            t.parameter_code AS parameterCode,
+            t.parameter_name AS parameterName,
+            t.point_name     AS pointName,
+            t.point_type     AS pointType
+        FROM (
+            SELECT
+                p.id   AS parameter_id,
+                p.code AS parameter_code,
+                p.name AS parameter_name,
+                dp.name AS point_name,
+                dp.point_type,
+                ROW_NUMBER() OVER (
+                    PARTITION BY v.scheme_id, p.id, dp.name, dp.point_type
+                    ORDER BY v.id DESC
+                ) AS rn
+            FROM lm_stability_scheme_version v
+            INNER JOIN lm_stability_scheme_parameter sp ON sp.version_id = v.id AND sp.is_deleted = 0
+            INNER JOIN lm_inspect_parameter p ON p.id = sp.parameter_id AND p.is_deleted = 0
+            INNER JOIN lm_stability_scheme_data_point dp ON dp.version_id = v.id AND dp.parameter_id = sp.parameter_id AND dp.is_deleted = 0
+            WHERE v.scheme_id = #{schemeId}
+              AND v.is_deleted = 0
+        ) t
+        WHERE t.rn = 1
+        ORDER BY t.parameter_name ASC, t.parameter_id ASC, t.point_name ASC
+    </select>
+
+    <select id="getByParameterConfigId" resultType="com.bmos.lims2.server.stability.scheme.dto.response.StabilitySchemeParameterDTO">
+        SELECT
+            id,
+            scheme_id AS schemeId,
+            version_id AS versionId,
+            item_config_id AS itemConfigId,
+            parameter_id AS parameterId,
+            standard_rule AS standardRule,
+            is_executable AS isExecutable,
+            is_reportable AS isReportable
+        FROM lm_stability_scheme_parameter
+        WHERE id = #{parameterConfigId} AND is_deleted = 0
+    </select>
+
+    <!-- ELN公式计算：查询稳定性方案下的字段配置（镜像常规检验 getFieldsConfig） -->
+    <select id="getFieldsConfig" resultType="com.bmos.lims2.server.eln.entry.vo.FieldConfigVO">
+        select distinct
+            t1.parameter_id as parameterId,
+            t1.record_item_id as recordItemId,
+            t1.id as parameterConfigId,
+            t1.record_version_id,
+            t2.component_type,
+            t2.field_id
+        from lm_stability_scheme_parameter t1
+                 join bm_batch_record_component t2 on t1.record_id = t2.record_id and t1.record_version_id = t2.record_version_id and t2.is_deleted = 0
+        where t1.is_deleted = 0
+          and t1.scheme_id = #{query.schemeId}
+          and t1.version_id = #{query.schemeVersionId}
+          and t2.field_id in
+        <foreach collection="fieldIds" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </select>
+
+</mapper>

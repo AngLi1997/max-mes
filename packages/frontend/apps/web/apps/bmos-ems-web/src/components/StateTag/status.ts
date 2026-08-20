@@ -1,0 +1,1 @@
+export const StateTagStatus = ['warning', 'success', 'primary','danger'];

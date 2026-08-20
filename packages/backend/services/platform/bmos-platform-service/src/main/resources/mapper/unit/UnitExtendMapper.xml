@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.platform.service.unit.mapper.UnitExtendMapper">
+
+    <delete id="deleteUnitExtend">
+        UPDATE
+            bp_unit_extend
+        SET del_flag = id,
+        is_deleted = 1,
+        update_time = now(),
+        update_by = #{userId}
+        WHERE
+            id = #{id}
+    </delete>
+
+    <select id="selectByUnitId" resultType="com.bmos.platform.service.material.vo.MaterialBoundExtendUnitListVO">
+        select ue.id,ue.extend_unit_name,ue.expression_value,ue.extend_precision,u.unit_name,u.id as unitId
+        from bp_unit_extend ue
+        join bp_unit u on ue.unit_id = u.id
+        where ue.is_deleted = false and ue.state = 1
+          and u.id in
+        <foreach collection="unitIdList" open="(" separator="," close=")" item="unitId">
+            #{unitId}
+        </foreach>
+    </select>
+
+    <select id="queryExpressionListByUnitId" resultType="java.lang.String">
+        SELECT
+	        CONCAT_WS(":",extend_unit_name,expression_value)
+        FROM
+            bp_unit_extend
+        WHERE
+            is_deleted = 0
+            and unit_id =#{unitId}
+    </select>
+</mapper>

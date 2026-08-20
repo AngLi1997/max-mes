@@ -1,0 +1,289 @@
+---
+description:
+globs:*.java,*.xml
+alwaysApply:true
+---
+
+# 接口与实现
+- 面向接口编程，接口与实现分离。
+- 每个服务都要有接口和实现。
+
+# 事务管理
+- 多表操作应考虑数据库事务。
+
+# DTO
+- 服务层使用 DTO 对象
+
+
+# 常量与枚举
+- 业务相关常量、枚举单独放在 constant、enums 包下。
+
+# Service层基本规范
+
+## 接口设计规范
+- 必须面向接口编程，每个服务都要有接口和实现类
+- 接口命名为XxxService，实现类命名为XxxServiceImpl
+- 接口方法命名要见名知意，表达业务含义
+- 接口方法必须添加完整的注释，包含功能描述、参数说明、返回值说明
+- 接口参数和返回值使用DTO对象，不要使用实体类
+
+## 实现类规范
+- 实现类必须添加@Service注解
+- 使用@Slf4j注解进行日志记录
+- 必须添加类注释，包含描述、作者、时间
+- 依赖注入推荐使用@Autowired注解
+- 实现类中要有适当的日志记录
+
+## 事务管理
+- 涉及多表操作必须使用@Transactional注解
+- 事务注解统一配置rollbackFor = Exception.class
+- 避免事务嵌套，合理控制事务边界
+- 事务方法内避免远程调用，如必须，要考虑分布式事务
+
+## 业务逻辑规范
+- 业务逻辑在Service层实现，不要在Controller层实现
+- 复杂业务逻辑要拆分成多个小方法
+- 通用业务逻辑要抽取到公共Service中
+- 避免在循环中进行数据库操作
+- 批量操作优先使用批量接口
+
+## 异常处理
+- 业务异常统一抛出BusinessException
+- 参数校验在Service层也要进行
+- 捕获的异常要打印日志并转换为业务异常
+- 敏感信息不要打印到日志中
+
+## 代码示例
+```java
+/**
+ * @Description: 检品信息业务实现类
+ * @Author: yigaohui
+ * @Date: 2024/02/26 20:14
+ */
+@Service
+@Slf4j
+public class MaterialServiceImpl implements MaterialService {
+
+    @Autowired
+    private MaterialMapper materialMapper;
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void saveInspectionProduct(MaterialSaveDTO dto) {
+        log.info("开始保存检品信息：{}", dto);
+        try {
+            // 参数校验
+            validateSaveParam(dto);
+            
+            // 业务处理
+            Material material = convertToEntity(dto);
+            materialMapper.insert(material);
+            
+            log.info("检品信息保存成功，ID：{}", material.getId());
+        } catch (Exception e) {
+            log.error("检品信息保存失败：{}", e.getMessage(), e);
+            throw new BusinessException("检品保存失败");
+        }
+    }
+
+    @Override
+    public CommonPage<MaterialDTO> inspectionProductsPage(MaterialPageQueryDTO queryDTO) {
+        // 分页查询
+        return materialMapper.selectPageWithCategory(queryDTO);
+    }
+}
+```
+
+## 异步处理
+- 使用@Async注解进行异步处理
+- 异步方法要使用自定义线程池
+- 异步方法的返回值使用Future或CompletableFuture
+- 异步方法要考虑异常处理
+
+## 缓存使用
+- 使用Spring Cache注解实现缓存
+- 缓存key要带有业务含义
+- 缓存时间要根据业务设置
+- 及时清理不需要的缓存
+
+## 参数校验
+- 核心参数必须判空
+- 业务规则校验要集中处理
+- 复杂校验逻辑要抽取成独立方法
+- 校验失败抛出具体的异常信息
+
+## 代码组织
+- 相关的业务逻辑放在一起
+- 工具方法放在类的最后
+- 私有方法放在公有方法后面
+- 常量定义放在类的开始
+
+## 性能优化
+- 合理使用缓存
+- 避免循环中查询数据库
+- 大数据量操作要分批处理
+- 及时释放资源
+- 避免大事务
+
+
+
+# 常量与枚举
+- 业务相关常量、枚举单独放在 constant、enums 包下。
+
+# Service层规范
+
+## 参数传递规范
+
+### 强制约束
+1. Service层必须使用DTO类型作为请求参数和响应参数
+2. Service层不允许直接使用VO类型的参数
+3. Service层返回的数据会被Controller层转换为VO后返回给前端
+4. 对象封装形式的传参也必须遵循DTO规范:
+   - 方法参数超过3个时，必须使用对象封装
+   - 封装对象必须使用DTO类型，不允许使用VO或者普通POJO
+   - 示例：
+   ```java
+   // 错误示例
+   @Override
+   public void saveMaterial(String name, String code, Integer type, 
+       String remark, Long categoryId) {
+       // 参数过多，应该封装
+   }
+   
+   // 错误示例
+   @Override
+   public void saveMaterial(MaterialSaveReqVO vo) {
+       // 不允许直接使用VO
+   }
+   
+   // 正确示例
+   @Override
+   @Transactional(rollbackFor = Exception.class)
+   public void saveMaterial(MaterialSaveDTO dto) {
+       // 业务逻辑处理
+   }
+   ```
+
+### DTO类型定义
+1. 基本规范
+   - 命名规范：以DTO结尾
+   - 位置：server模块下的dto包
+   - 用途：服务层间数据传输
+   - 示例：
+   ```java
+   @Getter
+   @Setter
+   public class InspectParameterDTO extends BaseDO {
+       private String code;
+       private String name;
+       private String standard;
+       private AnalyzeResultTypeEnum resultType;
+       private List<InspectParameterOptionDTO> options;
+       private List<InspectParameterTrendDTO> trends;
+   }
+   ```
+
+2. 请求DTO
+   - 用途：接收查询条件、分页参数等
+   - 示例：
+   ```java
+   @Getter
+   @Setter
+   public class AnalyzeProgramPageReqDTO {
+       private Integer pageNum;
+       private Integer pageSize;
+       private String keyword;
+       private String sortField;
+       private String sortOrder;
+   }
+   ```
+
+### 对象封装规范
+1. 新增/修改场景
+   ```java
+   @Data
+   public class MaterialSaveDTO {
+       private String name;
+       private String code;
+       private Integer type;
+       private String remark;
+       private Long categoryId;
+       private Long operatorId;      // 可以包含额外的业务字段
+       private String operatorName;   // 可以包含额外的业务字段
+   }
+   ```
+
+2. 查询场景
+   ```java
+   @Data
+   public class MaterialQueryDTO {
+       private String name;
+       private String code;
+       private Integer type;
+       private Long categoryId;
+       private LocalDateTime createTimeStart;
+       private LocalDateTime createTimeEnd;
+       private List<Long> excludeIds;  // 可以包含额外的查询条件
+       private Boolean includeDeleted; // 可以包含额外的查询条件
+   }
+   ```
+
+3. 批量操作场景
+   ```java
+   @Data
+   public class MaterialBatchDTO {
+       private List<Long> ids;
+       private Integer operationType;
+       private String remark;
+       private Long operatorId;      // 可以包含额外的业务字段
+       private String operatorName;   // 可以包含额外的业务字段
+   }
+   ```
+
+4. 复杂业务场景
+   ```java
+   @Data
+   public class MaterialProcessDTO {
+       // 基本信息
+       private Long id;
+       private String name;
+       private String code;
+       
+       // 业务数据
+       private List<MaterialStepDTO> steps;
+       private MaterialResultDTO result;
+       private Map<String, Object> extraData;
+       
+       // 处理参数
+       private Boolean async;
+       private Integer retryTimes;
+       private String callbackUrl;
+   }
+   ```
+
+### 最佳实践
+1. DTO类应该包含完整的业务数据
+2. 避免在DTO中包含与业务无关的字段
+3. DTO之间应该考虑继承关系，减少代码重复
+4. 对于复杂的数据转换，应该使用专门的Convert类
+5. 分页查询时，应该在Service层处理好分页逻辑
+
+### 数据校验
+1. Service层应该进行业务规则相关的校验
+2. 参数基础校验(非空、长度等)应该在Controller层完成
+3. 示例：
+   ```java
+   @Override
+   @Transactional(rollbackFor = Exception.class)
+   public void saveAnalyzeProgram(InspectParameterDTO dto) {
+       // 业务规则校验
+       if (analyzeMapper.existByCode(dto.getCode())) {
+           throw new BmosException(LimsResponseCode.CODE_EXISTED);
+       }
+       
+       // 业务处理
+       InspectParameter entity = BeanUtil.copyProperties(dto, InspectParameter.class);
+       analyzeMapper.insert(entity);
+   }
+   ```
+

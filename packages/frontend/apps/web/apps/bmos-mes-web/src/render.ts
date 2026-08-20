@@ -1,0 +1,29 @@
+import 'ant-design-vue/dist/reset.css';
+import { createPinia } from 'pinia';
+import { createApp } from 'vue';
+import App from './App.vue';
+import './assets/main.css';
+import btnPermission from './directives/btnPermission';
+import './plugins/svg-icon';
+import router from './router';
+import { getPermissionMenuList } from './services';
+import { usePermissionStore } from './stores/permission';
+import './style/index.less';
+import { flatMenuTreeData } from './utils';
+import { zoomListener } from '@bmos/utils';
+
+const app = createApp(App);
+
+zoomListener();
+
+app.use(createPinia());
+app.use(router);
+btnPermission(app);
+getPermissionMenuList({ rootMenuCode: 120, containsFunc: true })
+  .then(({ data }: any) => {
+    const { setPermissions } = usePermissionStore();
+    setPermissions(flatMenuTreeData(data));
+  })
+  .finally(() => {
+    app.mount('#app');
+  });

@@ -1,0 +1,572 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.inspect.order.mapper.InspectionOrderMapper">
+
+    <!-- 分页查询检验单信息（包含关联信息） -->
+    <select id="selectPageWithRelation" resultType="com.bmos.lims2.server.inspect.order.dto.InspectionOrderDTO">
+        SELECT 
+            io.*,
+            m.name as material_name,
+            m.code as material_code,
+           m.unit_id as unit_id,
+           m.specification as material_spec,
+           io.create_by as request_user_id,
+           COALESCE(io.finished_time, io.terminate_time) AS orderEndTime,
+           io.create_time as request_time,
+            s.name as scheme_name,
+            sv.version_no as scheme_version
+        FROM lm_inspection_order io
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        LEFT JOIN lm_inspection_scheme_version sv ON io.scheme_version_id = sv.id
+        left join lm_inspection_scheme s ON sv.scheme_id = s.id
+        WHERE io.is_deleted = 0
+        <if test="param.orderNo != null and param.orderNo != ''">
+            AND io.order_no LIKE CONCAT('%', #{param.orderNo}, '%')
+        </if>
+        <if test="param.materialIds != null and param.materialIds.size() > 0">
+            AND io.material_id IN
+            <foreach collection="param.materialIds" item="mid" open="(" separator="," close=")">
+                #{mid}
+            </foreach>
+        </if>
+        <if test="param.materialName != null and param.materialName != ''">
+            AND m.name LIKE CONCAT('%', #{param.materialName}, '%')
+        </if>
+        <if test="param.materialCode != null and param.materialCode != ''">
+            AND m.code LIKE CONCAT('%', #{param.materialCode}, '%')
+        </if>
+        <if test="param.batchNo != null and param.batchNo != ''">
+            AND io.batch_no LIKE CONCAT('%', #{param.batchNo}, '%')
+        </if>
+        <if test="param.orderStatus != null and param.orderStatus.size() > 0">
+            AND io.order_status IN
+            <foreach collection="param.orderStatus" item="st" open="(" separator="," close=")">
+                #{st}
+            </foreach>
+        </if>
+        <if test="param.requesterIds != null and param.requesterIds.size()>0">
+            AND io.create_by in
+            <foreach collection="param.requesterIds" item="rid" open="(" separator="," close=")">
+                #{rid}
+            </foreach>
+        </if>
+        <if test="param.inspectionRequestTimeStart != null">
+            AND io.create_time >= #{param.inspectionRequestTimeStart}
+        </if>
+        <if test="param.inspectionRequestTimeEnd != null">
+            AND io.create_time &lt;= #{param.inspectionRequestTimeEnd}
+        </if>
+        <if test="param.schemeSource != null">
+            AND io.scheme_source = #{param.schemeSource}
+        </if>
+        ORDER BY io.create_time DESC
+    </select>
+
+    <!-- 分页查询用于报告审批的候选检验单：
+         1) 单据已确认
+         2) 已经发起过报告审批流程（report_approval_process_instance_id 不为空）
+         3) 未标记报告审批通过（report_approved = 0）
+    -->
+    <select id="selectPendingReportAuditOrders" resultType="com.bmos.lims2.server.inspect.order.dto.OrderPageDTO">
+        SELECT
+            io.id,
+            io.order_no AS orderNo,
+            io.material_id AS materialId,
+            m.name AS materialName,
+            m.code AS materialCode,
+            m.specification AS materialSpec,
+            io.batch_no AS batchNo,
+            io.create_time AS createTime,
+            io.create_by AS createBy,
+            io.create_time AS request_time,
+            io.create_by AS request_user_id,
+            io.remark
+        FROM lm_inspection_order io
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        WHERE io.is_deleted = 0
+          AND io.order_status = 'CONFIRMED'
+          AND (io.report_approved IS NULL OR io.report_approved = 0)
+          AND io.report_approval_process_instance_id IS NOT NULL
+        <if test="query.orderNo != null and query.orderNo != ''">
+            AND io.order_no LIKE CONCAT('%', #{query.orderNo}, '%')
+        </if>
+        <if test="query.materialName != null and query.materialName != ''">
+            AND m.name LIKE CONCAT('%', #{query.materialName}, '%')
+        </if>
+        <if test="query.materialCode != null and query.materialCode != ''">
+            AND m.code LIKE CONCAT('%', #{query.materialCode}, '%')
+        </if>
+        <if test="query.materialIds != null and query.materialIds.size() > 0">
+            AND io.material_id IN
+            <foreach collection="query.materialIds" item="mid" open="(" separator="," close=")">
+                #{mid}
+            </foreach>
+        </if>
+        <if test="query.batchNo != null and query.batchNo != ''">
+            AND io.batch_no LIKE CONCAT('%', #{query.batchNo}, '%')
+        </if>
+        <if test="query.inspectionRequestTimeStart != null">
+            AND io.create_time &gt;= #{query.inspectionRequestTimeStart}
+        </if>
+        <if test="query.inspectionRequestTimeEnd != null">
+            AND io.create_time &lt;= #{query.inspectionRequestTimeEnd}
+        </if>
+        ORDER BY io.create_time ASC
+    </select>
+
+    <!-- 查询已确认且样品审核完成的检验单（报告生成候选） -->
+    <select id="selectSampleAuditedOrders" resultType="com.bmos.lims2.server.inspect.order.dto.InspectionOrderDTO">
+        SELECT DISTINCT
+        io.*,
+        m.name as material_name,
+        m.code as material_code,
+        m.specification as material_spec,
+        io.create_by as request_user_id,
+        io.create_time as request_time,
+        s.name as scheme_name,
+        sv.version_no as scheme_version
+        FROM lm_inspection_order io
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        LEFT JOIN lm_inspection_scheme_version sv ON io.scheme_version_id = sv.id
+        LEFT JOIN lm_inspection_scheme s ON sv.scheme_id = s.id
+        WHERE io.is_deleted = 0
+          AND io.order_status = 'COMPLETED'
+        <if test="param.orderNo != null and param.orderNo != ''">
+            AND io.order_no LIKE CONCAT('%', #{param.orderNo}, '%')
+        </if>
+        <if test="param.batchNo != null and param.batchNo != ''">
+            AND io.batch_no LIKE CONCAT('%', #{param.batchNo}, '%')
+        </if>
+        <if test="param.inspectionRequestTimeStart != null">
+            AND io.create_time &gt;= #{param.inspectionRequestTimeStart}
+        </if>
+        <if test="param.inspectionRequestTimeEnd != null">
+            AND io.create_time &lt;= #{param.inspectionRequestTimeEnd}
+        </if>
+        <if test="param.materialIds != null and param.materialIds.size() > 0">
+            AND io.material_id IN
+            <foreach collection="param.materialIds" item="mid" open="(" separator="," close=")">
+                #{mid}
+            </foreach>
+        </if>
+        ORDER BY io.create_time DESC
+    </select>
+
+    <!-- 在给定的检验单集合中，筛选出满足自动发起样品审核条件的订单：
+         1) 已确认
+         2) 未标记样品审核完成
+         3) 尚未发起样品审核流程（process_instance_id 为空）
+         4) 不存在任一任务录入状态非 REVIEW_PASSED
+         5) 方案期望的每个参数均已生成至少一条任务
+    -->
+    <select id="selectEligibleForSampleAuditStart" resultType="long">
+        SELECT io.id
+        FROM lm_inspection_order io
+        WHERE io.is_deleted = 0
+          <if test="orderIds != null and orderIds.size() > 0">
+            AND io.id IN
+            <foreach collection="orderIds" item="oid" open="(" separator="," close=")">
+                #{oid}
+            </foreach>
+          </if>
+          AND NOT EXISTS (
+              SELECT 1 FROM lm_task t1
+              WHERE t1.inspection_order_id = io.id
+                AND t1.is_deleted = 0
+                AND t1.is_executable = 1
+                AND (t1.status IS NULL OR t1.status != 'REVIEW_PASSED')
+          )
+          AND NOT EXISTS (
+              SELECT 1
+              FROM lm_inspection_scheme_parameter isp
+              WHERE isp.version_id = io.scheme_version_id AND isp.is_deleted = 0
+                AND isp.is_executable = 1
+                AND NOT EXISTS (
+                    SELECT 1 FROM lm_task t2
+                    WHERE t2.inspection_order_id = io.id
+                      AND t2.parameter_id = isp.parameter_id
+                      AND t2.is_deleted = 0
+                      AND t2.is_executable = 1
+                )
+          )
+    </select>
+
+    <!-- 根据ID查询检验单详情（包含关联信息） -->
+    <select id="selectByIdWithRelation" resultType="com.bmos.lims2.server.inspect.order.dto.InspectionOrderDTO">
+        SELECT 
+            io.*,
+            COALESCE(s.name, ss.name) as scheme_name,
+            COALESCE(sv.version_no, ssv.version_no) as scheme_version,
+            m.name as material_name,
+            m.code as material_code,
+            m.category_id,
+            m.unit_id,
+            m.specification as material_spec,
+            dc.name as template_name,
+            io.create_by as request_user_id,
+            COALESCE(io.finished_time, io.terminate_time) AS orderEndTime,
+            io.create_time as request_time
+        FROM lm_inspection_order io
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        LEFT JOIN lm_inspection_scheme_version sv ON io.scheme_version_id = sv.id AND io.scheme_source = 'REGULAR'
+        LEFT JOIN lm_stability_scheme_version ssv ON io.scheme_version_id = ssv.id AND io.scheme_source = 'STABILITY'
+        LEFT JOIN lm_document_config dc ON io.template_id = dc.id
+        LEFT JOIN lm_inspection_scheme s ON sv.scheme_id = s.id
+        LEFT JOIN lm_stability_scheme ss ON ssv.scheme_id = ss.id
+        WHERE io.id = #{id} AND io.is_deleted = 0
+    </select>
+    <!-- 分页查询待接收的检验单列表 -->
+    <select id="selectPendingReceiveOrders" resultType="com.bmos.lims2.server.inspect.order.dto.OrderPageDTO">
+        SELECT DISTINCT
+        io.id,
+        io.order_no AS orderNo,
+        io.material_id AS materialId,
+        m.name AS materialName,
+        m.code AS materialCode,
+        m.specification AS materialSpec,
+        io.batch_no AS batchNo,
+        io.create_time AS createTime,
+        io.create_by AS createBy,
+        io.create_time as request_time,
+        io.create_by AS request_user_id,
+        io.remark
+        FROM lm_inspection_order io
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        WHERE io.is_deleted = 0
+        AND io.order_status = 'CONFIRMED'
+        AND EXISTS (
+        SELECT 1 FROM lm_sample s
+        WHERE s.inspection_order_id = io.id
+        AND s.sampled = 1
+        AND s.is_deleted = 0
+        AND (s.inspect_item_id IS NULL OR s.inspect_item_id != 2000000000000000001)
+        )
+        AND EXISTS (
+        SELECT 1 FROM lm_sample s
+        WHERE s.inspection_order_id = io.id
+        AND s.sampled = 1
+        AND s.received = 0
+        AND s.is_deleted = 0
+        AND (s.inspect_item_id IS NULL OR s.inspect_item_id != 2000000000000000001)
+        )
+        <if test="query.orderNo != null and query.orderNo != ''">
+            AND io.order_no LIKE CONCAT('%', #{query.orderNo}, '%')
+        </if>
+        <if test="query.materialName != null and query.materialName != ''">
+            AND m.name LIKE CONCAT('%', #{query.materialName}, '%')
+        </if>
+        <if test="query.materialCode != null and query.materialCode != ''">
+            AND m.code LIKE CONCAT('%', #{query.materialCode}, '%')
+        </if>
+        <if test="query.materialIds != null and query.materialIds.size() > 0">
+            AND io.material_id IN
+            <foreach collection="query.materialIds" item="mid" open="(" separator="," close=")">
+                #{mid}
+            </foreach>
+        </if>
+        <if test="query.batchNo != null and query.batchNo != ''">
+            AND io.batch_no LIKE CONCAT('%', #{query.batchNo}, '%')
+        </if>
+        <if test="query.inspectionRequestTimeStart != null">
+            AND io.create_time >= #{query.inspectionRequestTimeStart}
+        </if>
+        <if test="query.inspectionRequestTimeEnd != null">
+            AND io.create_time &lt;= #{query.inspectionRequestTimeEnd}
+        </if>
+        ORDER BY io.create_time DESC
+    </select>
+
+    <!-- 分页查询待分样的检验单列表 -->
+    <select id="selectPageWithSamplesForDivision" resultType="com.bmos.lims2.server.inspect.order.dto.OrderPageDTO">
+        SELECT DISTINCT
+        io.id,
+        io.order_no AS orderNo,
+        io.material_id AS materialId,
+        m.name AS materialName,
+        m.code AS materialCode,
+        m.specification AS materialSpec,
+        io.batch_no AS batchNo,
+        io.create_time AS createTime,
+        io.create_by AS createBy,
+        io.create_time as request_time,
+        io.create_by AS request_user_id,
+        io.remark
+        FROM lm_inspection_order io
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        WHERE io.is_deleted = 0
+        AND io.order_status != 'PENDING_CONFIRM'
+        AND io.order_status != 'TERMINATED'
+        AND io.order_status != 'COMPLETED'
+        AND EXISTS (
+            SELECT 1 FROM lm_sample s
+            WHERE s.inspection_order_id = io.id
+            AND s.received = 1
+            AND s.discarded = 0
+            AND s.is_deleted = 0
+        )
+        <if test="query.orderNo != null and query.orderNo != ''">
+            AND io.order_no LIKE CONCAT('%', #{query.orderNo}, '%')
+        </if>
+        <if test="query.materialName != null and query.materialName != ''">
+            AND m.name LIKE CONCAT('%', #{query.materialName}, '%')
+        </if>
+        <if test="query.materialCode != null and query.materialCode != ''">
+            AND m.code LIKE CONCAT('%', #{query.materialCode}, '%')
+        </if>
+        <if test="query.materialIds != null and query.materialIds.size() > 0">
+            AND io.material_id IN
+            <foreach collection="query.materialIds" item="mid" open="(" separator="," close=")">
+                #{mid}
+            </foreach>
+        </if>
+        <if test="query.batchNo != null and query.batchNo != ''">
+            AND io.batch_no LIKE CONCAT('%', #{query.batchNo}, '%')
+        </if>
+        <if test="query.inspectionRequestTimeStart != null">
+            AND io.create_time >= #{query.inspectionRequestTimeStart}
+        </if>
+        <if test="query.inspectionRequestTimeEnd != null">
+            AND io.create_time &lt;= #{query.inspectionRequestTimeEnd}
+        </if>
+        <if test="query.sampleNo != null and query.sampleNo != ''">
+            AND EXISTS (
+                SELECT 1 FROM lm_sample s2
+                WHERE s2.inspection_order_id = io.id
+                AND s2.sample_no LIKE CONCAT('%', #{query.sampleNo}, '%')
+                AND s2.is_deleted = 0
+            )
+        </if>
+        <if test="query.sampleName != null and query.sampleName != ''">
+            AND EXISTS (
+                SELECT 1 FROM lm_sample s3
+                WHERE s3.inspection_order_id = io.id
+                AND s3.sample_name LIKE CONCAT('%', #{query.sampleName}, '%')
+                AND s3.is_deleted = 0
+            )
+        </if>
+        ORDER BY io.create_time DESC
+    </select>
+    <select id="selectConfirmedOrders" resultType="com.bmos.lims2.server.inspect.order.dto.InspectionOrderDTO">
+        SELECT DISTINCT
+        io.*,
+        m.name as material_name,
+        m.code as material_code,
+        m.specification as material_spec,
+        io.create_by as request_user_id,
+        io.create_time as request_time,
+        s.name as scheme_name,
+        sv.version_no as scheme_version
+        FROM lm_inspection_order io
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        LEFT JOIN lm_inspection_scheme_version sv ON io.scheme_version_id = sv.id
+        left join lm_inspection_scheme s ON sv.scheme_id = s.id
+        WHERE io.is_deleted = 0
+          AND io.order_status = 'CONFIRMED'
+          AND (io.scheme_source IS NULL OR io.scheme_source != 'STABILITY')
+          AND EXISTS (
+            SELECT 1 FROM lm_sample s0
+            WHERE s0.inspection_order_id = io.id
+              AND s0.sampled = 0
+              AND s0.discarded = 0
+              AND s0.is_deleted = 0
+          )
+        <if test="param.materialIds != null and param.materialIds.size() > 0">
+            AND io.material_id IN
+            <foreach collection="param.materialIds" item="mid" open="(" separator="," close=")">
+                #{mid}
+            </foreach>
+        </if>
+          <if test="param.orderNo != null and param.orderNo != ''">
+              AND io.order_no LIKE CONCAT('%', #{param.orderNo}, '%')
+          </if>
+          <if test="param.materialName != null and param.materialName != ''">
+              AND m.name LIKE CONCAT('%', #{param.materialName}, '%')
+          </if>
+
+          <if test="param.batchNo != null and param.batchNo != ''">
+              AND io.batch_no LIKE CONCAT('%', #{param.batchNo}, '%')
+          </if>
+        <if test="param.inspectionRequestTimeStart != null">
+            AND io.create_time >= #{param.inspectionRequestTimeStart}
+        </if>
+        <if test="param.inspectionRequestTimeEnd != null">
+            AND io.create_time &lt;= #{param.inspectionRequestTimeEnd}
+        </if>
+        ORDER BY io.create_time DESC
+    </select>
+
+    <select id="countConfirmedOrdersForSampling" resultType="java.lang.Long">
+        SELECT COUNT(DISTINCT io.id)
+        FROM lm_inspection_order io
+        WHERE io.is_deleted = 0
+          AND io.order_status = 'CONFIRMED'
+          AND (io.scheme_source IS NULL OR io.scheme_source != 'STABILITY')
+          AND EXISTS (
+              SELECT 1 FROM lm_sample s0
+              WHERE s0.inspection_order_id = io.id
+                AND s0.sampled = 0
+                AND s0.discarded = 0
+                AND s0.is_deleted = 0
+          )
+    </select>
+
+    <!-- 查询用于工作流待办过滤的样品审核候选检验单列表：
+         由工作流分页驱动，这里仅按业务筛选：
+         1) 单据已确认
+         2) 已经发起过样品审核流程（sample_audit_process_instance_id 不为空）
+         3) 未标记样品审核完成（sample_audited = 0）
+    -->
+    <select id="selectPendingSampleAuditOrders" resultType="com.bmos.lims2.server.inspect.order.dto.OrderPageDTO">
+        SELECT
+            io.id,
+            io.order_no AS orderNo,
+            io.material_id AS materialId,
+            m.name AS materialName,
+            m.code AS materialCode,
+            m.specification AS materialSpec,
+            io.batch_no AS batchNo,
+            io.create_time AS createTime,
+            io.create_by AS createBy,
+            io.create_time AS request_time,
+            io.create_by AS request_user_id,
+            io.remark
+        FROM lm_inspection_order io
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        WHERE io.is_deleted = 0
+          AND io.order_status = 'SAMPLE_AUDIT_PENDING'
+          AND io.sample_audit_process_instance_id IS NOT NULL
+          AND NOT EXISTS (
+              SELECT 1 FROM lm_stability_plan_timepoint_task tpt
+              WHERE tpt.inspection_order_id = io.id AND tpt.is_deleted = 0
+          )
+        <if test="query.orderNo != null and query.orderNo != ''">
+            AND io.order_no LIKE CONCAT('%', #{query.orderNo}, '%')
+        </if>
+        <if test="query.materialName != null and query.materialName != ''">
+            AND m.name LIKE CONCAT('%', #{query.materialName}, '%')
+        </if>
+        <if test="query.materialCode != null and query.materialCode != ''">
+            AND m.code LIKE CONCAT('%', #{query.materialCode}, '%')
+        </if>
+        <if test="query.materialIds != null and query.materialIds.size() > 0">
+            AND io.material_id IN
+            <foreach collection="query.materialIds" item="mid" open="(" separator="," close=")">
+                #{mid}
+            </foreach>
+        </if>
+        <if test="query.batchNo != null and query.batchNo != ''">
+            AND io.batch_no LIKE CONCAT('%', #{query.batchNo}, '%')
+        </if>
+        <if test="query.inspectionRequestTimeStart != null">
+            AND io.create_time &gt;= #{query.inspectionRequestTimeStart}
+        </if>
+        <if test="query.inspectionRequestTimeEnd != null">
+            AND io.create_time &lt;= #{query.inspectionRequestTimeEnd}
+        </if>
+        ORDER BY io.create_time ASC
+    </select>
+
+    <!-- 依赖下拉：按检品/方案版本/请验时间筛选检验单，按请验时间倒序，用于联动选择 -->
+    <select id="listOptions" resultType="com.bmos.lims2.server.inspect.order.dto.InspectionOrderOptionDTO">
+        SELECT
+            io.id,
+            io.order_no AS orderNo,
+            io.create_time AS requestTime,
+            m.name AS materialName,
+            sv.version_no AS schemeVersionNo
+        FROM lm_inspection_order io
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        LEFT JOIN lm_inspection_scheme_version sv ON io.scheme_version_id = sv.id
+        <where>
+            io.is_deleted = 0
+            <if test="query.materialId != null">
+                AND io.material_id = #{query.materialId}
+            </if>
+            <if test="query.schemeVersionId != null">
+                AND io.scheme_version_id = #{query.schemeVersionId}
+            </if>
+            <if test="query.requestStartTime != null">
+                AND io.create_time &gt;= #{query.requestStartTime}
+            </if>
+            <if test="query.requestEndTime != null">
+                AND io.create_time &lt;= #{query.requestEndTime}
+            </if>
+        </where>
+        ORDER BY io.create_time DESC, io.id DESC
+    </select>
+
+    <!-- 下拉：根据方案ID和可选状态筛选检验单，按请验时间倒序 -->
+    <select id="listOptionsByScheme" resultType="com.bmos.lims2.server.inspect.order.dto.InspectionOrderOptionDTO">
+        SELECT
+            io.id,
+            io.order_no AS orderNo,
+            io.create_time AS requestTime,
+            m.name AS materialName,
+            sv.version_no AS schemeVersionNo
+        FROM lm_inspection_order io
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        LEFT JOIN lm_inspection_scheme_version sv ON io.scheme_version_id = sv.id
+        <where>
+            io.is_deleted = 0
+            <if test="query.schemeId != null">
+                AND sv.scheme_id = #{query.schemeId}
+            </if>
+            <if test="query.orderStatus != null and query.orderStatus != ''">
+                AND io.order_status = #{query.orderStatus}
+            </if>
+        </where>
+        ORDER BY io.create_time DESC, io.id DESC
+    </select>
+
+    <!-- 根据请验单ID集合查询方案版本ID（去重） -->
+    <select id="selectSchemeVersionIdsByOrderIds" resultType="java.lang.Long">
+        SELECT DISTINCT io.scheme_version_id
+        FROM lm_inspection_order io
+        WHERE io.is_deleted = 0
+        <if test="orderIds != null and orderIds.size() > 0">
+            AND io.id IN
+            <foreach collection="orderIds" item="oid" open="(" separator="," close=")">
+                #{oid}
+            </foreach>
+        </if>
+    </select>
+
+  <!-- 是否存在使用指定请验单模板的检验单 -->
+  <select id="existsByTemplateId" resultType="boolean">
+    SELECT CASE WHEN COUNT(1) > 0 THEN TRUE ELSE FALSE END
+    FROM lm_inspection_order io
+    WHERE io.is_deleted = 0
+      AND io.template_id = #{templateId}
+  </select>
+
+  <!-- 查询0月候选检验单（带关联信息：方案名、版本号、请验人、请验时间） -->
+  <select id="selectCandidatesByBatchNoAndMaterialId"
+          resultType="com.bmos.lims2.server.inspect.order.dto.InspectionOrderDTO">
+    SELECT
+        io.id,
+        io.order_no,
+        io.batch_no,
+        io.order_status,
+        io.finished,
+        io.finished_time,
+        io.create_by   AS request_user_id,
+        io.create_time AS request_time,
+        s.name         AS scheme_name,
+        sv.version_no  AS scheme_version,
+        EXISTS (
+            SELECT 1 FROM lm_sample ls
+            WHERE ls.inspection_order_id = io.id
+              AND ls.sampled = 1
+              AND ls.is_deleted = 0
+        ) AS has_sampled
+    FROM lm_inspection_order io
+    LEFT JOIN lm_inspection_scheme_version sv ON io.scheme_version_id = sv.id AND sv.is_deleted = 0
+    LEFT JOIN lm_inspection_scheme s ON sv.scheme_id = s.id AND s.is_deleted = 0
+    WHERE io.is_deleted = 0
+      AND io.batch_no = #{batchNo}
+      AND io.material_id = #{materialId}
+      AND io.scheme_source = 'REGULAR'
+      AND io.order_status != 'TERMINATED'
+    ORDER BY io.create_time DESC
+  </select>
+</mapper>

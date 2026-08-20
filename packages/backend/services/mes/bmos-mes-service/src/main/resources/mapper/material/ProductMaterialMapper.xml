@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.product.mapper.ProductMaterialMapper">
+
+    <select id="selectPageList" resultType="com.bmos.mes.service.product.vo.ProductMaterialPageVO">
+        select
+        m.id,
+        m.name,
+        m.code,
+        m.specification,
+        m.material_category_id,
+        m.unit_id,
+        m.unit_extend_id,
+        m.is_sub_material as subMaterial,
+        m.status,
+        m.merge_code
+        from bm_material m
+        left join bm_material_category c on m.material_category_id = c.id
+        where m.is_deleted = 0
+        <if test="name != null and name != ''">
+            and m.name like concat('%',#{name},'%')
+        </if>
+        <if test="code != null and code != ''">
+            and m.code like concat('%',#{code},'%')
+        </if>
+        <if test="mergeCode != null and mergeCode != ''">
+            and m.merge_code like concat('%',#{mergeCode},'%')
+        </if>
+        <if test="materialCategoryIds != null and materialCategoryIds.size() > 0">
+            and m.material_category_id in
+            <foreach collection="materialCategoryIds" open="(" separator="," close=")" item="mId">
+                #{mId}
+            </foreach>
+        </if>
+        <if test="materialCategoryId == null and categoryType != null">
+            and c.category_type = #{categoryType}
+        </if>
+        <if test="status != null">
+            and m.status = #{status}
+        </if>
+        order by m.merge_code asc
+    </select>
+    <select id="selectByPlatformMaterialIdsAndType" resultType="com.bmos.mes.service.product.model.ProductMaterial">
+        SELECT
+        m.id,
+        m.NAME,
+        m.CODE,
+        m.material_category_id,
+        m.platform_material_id,
+        c.category_type
+        FROM
+        bm_material m
+        LEFT JOIN bm_material_category c ON m.material_category_id = c.id
+        WHERE
+        m.is_deleted = 0
+        <if test="type != null">
+            and c.category_type = #{type}
+        </if>
+        <if test="list != null and list.size() > 0">
+            and m.platform_material_id in
+            <foreach collection="list" open="(" separator="," close=")" item="pmid">
+                #{pmid}
+            </foreach>
+        </if>
+    </select>
+    <select id="selectPrincipalList" resultType="com.bmos.mes.service.product.model.ProductMaterial">
+        select
+        id,
+        code,
+        name,
+        merge_code
+        from bm_material
+        where is_deleted = 0
+        and is_sub_material = false
+        <if test="filter != null and filter">
+          and status = 1
+        </if>
+        <if test="materialCategoryId != null">
+            and material_category_id = #{materialCategoryId}
+        </if>
+        order by merge_code asc
+    </select>
+    <select id="selectByPlatformMaterialIdsAndTypes" resultType="com.bmos.mes.service.product.model.ProductMaterial">
+        select m.id,m.code,m.name,m.platform_material_id,c.category_type
+        from bm_material m
+        left join bm_material_category c on m.material_category_id = c.id
+        where m.is_deleted = 0
+        <if test="types != null and types.size >0">
+            and c.category_type in
+            <foreach collection="types" open="(" separator="," close=")" item="type">
+                #{type}
+            </foreach>
+        </if>
+        <if test="ids != null and ids.size > 0">
+            and m.platform_material_id in
+            <foreach collection="ids" open="(" separator="," close=")" item="mid">
+                #{mid}
+            </foreach>
+        </if>
+    </select>
+    <select id="selectEnabledByType" resultType="com.bmos.mes.service.product.vo.ProductListVO">
+        SELECT
+            m.id,
+            m.NAME,
+            m.merge_code,
+            m.specification,
+            m.inner_packing_specification,
+            m.packing_specification,
+            m.product_mark
+        FROM
+            bm_material m
+                LEFT JOIN bm_material_category c ON m.material_category_id = c.id
+        WHERE
+            m.is_deleted = 0
+          AND m.STATUS = TRUE
+        <if test="categoryType != null">
+            AND c.category_type = #{categoryType}
+        </if>
+        order by m.merge_code asc
+    </select>
+    <select id="selectEnabledTreeNodeByType" resultType="com.bmos.mes.service.product.vo.ProductCategoryTreeNodeVO">
+        SELECT
+        m.id,
+        m.NAME,
+        m.merge_code,
+        m.material_category_id as parentId,
+        m.create_time,
+        m.product_mark,
+        m.specification
+        FROM
+        bm_material m
+        LEFT JOIN bm_material_category c ON m.material_category_id = c.id
+        WHERE
+        m.is_deleted = 0
+        AND m.STATUS = TRUE
+        <if test="categoryType != null">
+            AND c.category_type = #{categoryType}
+        </if>
+        order by m.code desc
+    </select>
+    <select id="selectByIdsAndType" resultType="com.bmos.mes.service.product.model.ProductMaterial">
+        select
+            m.id,
+            m.name,
+            m.code,
+            m.specification,
+            m.material_category_id,
+            m.unit_id,
+            m.unit_extend_id,
+            m.is_sub_material as subMaterial,
+            m.status,
+            m.merge_code,
+            m.create_time
+        from bm_material m
+                 inner join bm_material_category c on m.material_category_id = c.id
+        where m.is_deleted = 0 and c.is_deleted = 0
+        and m.id in
+        <foreach collection="ids" open="(" close=")" item="item" separator=",">
+            #{item}
+        </foreach>
+        and c.category_type = #{type}
+    </select>
+    <select id="getFinishProductListVO" resultType="com.bmos.mes.service.product.vo.ProductListVO">
+        SELECT
+        m.id,
+        m.NAME,
+        m.merge_code,
+        m.specification,
+        m.inner_packing_specification,
+        m.packing_specification
+        FROM
+        bm_material m
+        left join bm_material_category c on m.material_category_id = c.id
+        WHERE m.is_deleted = 0
+        AND m.STATUS = TRUE
+        AND m.is_finish_product = TRUE
+        <if test="categoryType != null">
+          and  c.category_type = #{categoryType}
+        </if>
+        order by m.merge_code asc
+    </select>
+    <select id="selectEnabledTreeNodeByTypes"
+            resultType="com.bmos.mes.service.product.vo.ProductCategoryTreeNodeVO">
+        SELECT
+        m.id,
+        m.NAME,
+        m.merge_code,
+        m.material_category_id as parentId,
+        m.create_time
+        FROM
+        bm_material m
+        LEFT JOIN bm_material_category c ON m.material_category_id = c.id
+        WHERE
+        m.is_deleted = 0
+        AND m.STATUS = TRUE
+        <if test="list != null and list.size() > 0">
+            AND c.category_type in
+            <foreach collection="list" open="(" separator="," close=")" item="type">
+                #{type}
+            </foreach>
+        </if>
+    </select>
+    <select id="selectEnabledIdListByCategoryIds" resultType="java.lang.Long">
+        select id
+        from bm_material
+        where is_deleted = 0
+        and STATUS = TRUE
+        <if test="list != null and list.size() > 0">
+            and material_category_id in
+            <foreach collection="list" open="(" separator="," close=")" item="categoryId">
+                #{categoryId}
+            </foreach>
+        </if>
+        <if test="finished != null">
+            and is_finish_product = #{finished}
+        </if>
+    </select>
+    <select id="selectEnabledFinishProductTreeNodeByType"
+            resultType="com.bmos.mes.service.product.vo.ProductCategoryTreeNodeVO">
+        SELECT
+        m.id,
+        m.NAME,
+        m.merge_code,
+        m.material_category_id as parentId,
+        m.create_time
+        FROM
+        bm_material m
+        LEFT JOIN bm_material_category c ON m.material_category_id = c.id
+        WHERE
+        m.is_deleted = 0
+        AND m.STATUS = TRUE
+        <if test="categoryType != null">
+            AND c.category_type = #{categoryType}
+        </if>
+        <if test="isFinishedProduct != null">
+            and m.is_finish_product = #{isFinishedProduct}
+        </if>
+        order by m.code desc
+    </select>
+    <select id="selectListByBatchIds" resultMap="materialMap">
+        select m.*,c.category_type
+        from bm_material m
+        left join bm_material_category c on m.material_category_id = c.id
+        where m.is_deleted = 0
+        <if test="ids != null and ids.size() > 0">
+            and m.id in
+            <foreach collection="ids" open="(" close=")" separator="," item="id">
+                #{id}
+            </foreach>
+        </if>
+    </select>
+    <select id="selectAllInfoById" resultMap="materialMap">
+        select m.*,c.category_type
+        from bm_material m
+        left join bm_material_category c on m.material_category_id = c.id
+        where m.is_deleted = 0 AND m.id = #{id}
+    </select>
+    <select id="selectByIds" resultType="com.bmos.mes.service.product.model.ProductMaterial">
+        select m.*,c.category_type
+        from bm_material m
+         left join bm_material_category c on m.material_category_id = c.id
+        where m.is_deleted = 0
+        <if test=""></if>
+    </select>
+    <select id="selectByProcessIdList" resultType="com.bmos.mes.service.product.vo.ProcessProductVO">
+        select distinct t1.*,t2.id as process_id
+        from bm_material t1
+        left join bm_process t2 on t2.product_id = t1.id
+        where t1.is_deleted = 0
+        and t2.id in
+        <foreach collection="processIds" open="(" separator="," close=")" item="id">
+            #{id}
+        </foreach>
+    </select>
+
+
+    <resultMap id="materialMap" type="com.bmos.mes.service.product.model.ProductMaterial" >
+        <result column="id" property="id" />
+        <result column="material_category_id" property="materialCategoryId" />
+        <result column="principal_material_id" property="principalMaterialId" />
+        <result column="name" property="name" />
+        <result column="code" property="code" />
+        <result column="specification" property="specification" />
+        <result column="unit_id" property="unitId" />
+        <result column="is_sub_material" property="subMaterial" />
+        <result column="remark" property="remark" />
+        <result column="status" property="status" />
+        <result column="create_by" property="createBy" />
+        <result column="update_by" property="updateBy" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="merge_code" property="mergeCode" />
+        <result column="unit_extend_id" property="unitExtendId" />
+        <result column="is_finish_product" property="finishProduct" />
+        <result column="platform_material_id" property="platformMaterialId" />
+        <result column="production_cycle" property="productionCycle" />
+        <result column="inner_packing_specification" property="innerPackingSpecification" />
+        <result column="packing_specification" property="packingSpecification" />
+        <result column="expand_info" property="expandInfo" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
+        <result column="category_type" property="categoryType"/>
+    </resultMap>
+</mapper>

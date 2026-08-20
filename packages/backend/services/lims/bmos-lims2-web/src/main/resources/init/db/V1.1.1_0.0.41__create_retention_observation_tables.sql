@@ -1,0 +1,53 @@
+-- 创建留样观察任务表
+CREATE TABLE IF NOT EXISTS lm_retention_observation_task (
+    id BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+    sample_id BIGINT NOT NULL COMMENT '样品ID',
+    sample_no VARCHAR(100) NOT NULL COMMENT '样品编号',
+    observation_year INT NOT NULL COMMENT '观察年度（第几年）',
+    due_date DATE NOT NULL COMMENT '任务到期日期（样品接收日期+观察年度）',
+    completed TINYINT(1) DEFAULT 0 COMMENT '是否已完成（0-未完成，1-已完成）',
+    observation_result VARCHAR(50) COMMENT '观察结果（符合/不符合）',
+    observation_remark TEXT COMMENT '观察备注',
+    observer_id VARCHAR(50) COMMENT '观察人ID',
+    observer_name VARCHAR(100) COMMENT '观察人名称',
+    observation_time DATETIME COMMENT '观察时间',
+    create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    create_by VARCHAR(50) COMMENT '创建人',
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    update_by VARCHAR(50) COMMENT '更新人',
+    is_deleted TINYINT(1) DEFAULT 0 COMMENT '是否删除（0-未删除，1-已删除）',
+    PRIMARY KEY (id),
+    KEY idx_sample_id (sample_id),
+    KEY idx_sample_no (sample_no),
+    KEY idx_due_date (due_date),
+    KEY idx_completed (completed)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='留样观察任务表';
+
+-- 创建留样观察台账表
+CREATE TABLE IF NOT EXISTS lm_retention_observation_ledger (
+    id BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+    task_id BIGINT NOT NULL COMMENT '任务ID',
+    sample_no VARCHAR(100) NOT NULL COMMENT '样品编号',
+    batch_no VARCHAR(100) COMMENT '批号',
+    material_id BIGINT COMMENT '物料ID',
+    material_name VARCHAR(200) COMMENT '物料名称',
+    material_code VARCHAR(100) COMMENT '物料编码',
+    material_spec VARCHAR(200) COMMENT '物料规格',
+    quantity VARCHAR(50) COMMENT '样品数量',
+    unit_id BIGINT COMMENT '单位ID',
+    observation_result VARCHAR(50) NOT NULL COMMENT '观察结果',
+    observation_remark TEXT COMMENT '备注',
+    observer_id VARCHAR(50) NOT NULL COMMENT '观察人ID',
+    observer_name VARCHAR(100) NOT NULL COMMENT '观察人名称',
+    observation_time DATETIME NOT NULL COMMENT '观察时间',
+    create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    create_by VARCHAR(50) COMMENT '创建人',
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    update_by VARCHAR(50) COMMENT '更新人',
+    is_deleted TINYINT(1) DEFAULT 0 COMMENT '是否删除（0-未删除，1-已删除）',
+    PRIMARY KEY (id),
+    KEY idx_task_id (task_id),
+    KEY idx_sample_no (sample_no),
+    KEY idx_batch_no (batch_no),
+    KEY idx_observation_time (observation_time)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='留样观察台账表';

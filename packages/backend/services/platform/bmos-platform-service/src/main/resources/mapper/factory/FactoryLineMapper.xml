@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.platform.service.factory.mapper.FactoryLineMapper">
+    <sql id="BASE_COLUM">
+        id,
+        code,
+        name,
+        enable,
+        description,
+        module_id,
+        use_count,
+        operate_id,
+        operator,
+        operate_time,
+        create_by,
+        update_by,
+        create_time,
+        update_time,
+        is_deleted
+    </sql>
+
+    <select id="queryLineListByLineIds" resultType="com.bmos.platform.facade.factory.vo.FactoryLineFeignVO">
+        select
+            id,
+            `code`,
+            `name`,
+            module_id,
+            `enable`,
+            is_deleted
+        from
+            bp_factory_line
+        where
+            id in
+        <foreach collection="lineIdList" item="lineId" open="(" close=")" separator=",">
+            #{lineId}
+        </foreach>
+    </select>
+
+    <select id="selectByParam" resultType="com.bmos.platform.service.factory.model.FactoryLine">
+        SELECT
+            <include refid="BASE_COLUM"/>
+        FROM bp_factory_line
+        <if test="param.deptIds != null and param.deptIds.size > 0">
+            LEFT JOIN bm_resource_permission ON bm_resource_permission.resource_id = bp_factory_line.id
+        </if>
+        <where>
+            <if test="param.name != null and param.name != ''">
+                AND name LIKE CONCAT('%',#{param.name},'%')
+            </if>
+            <if test="param.moduleId != null">
+                AND module_id = #{param.moduleId}
+            </if>
+            <if test="param.code != null and param.code != ''">
+                AND code LIKE CONCAT('%', #{param.code}, '%')
+            </if>
+            <if test="param.enable != null">
+                AND enable = #{param.enable}
+            </if>
+            <if test="param.moduleIdList != null and param.moduleIdList.size > 0">
+                AND module_id IN
+                <foreach collection="param.moduleIdList" item="moduleId" separator="," open="(" close=")">
+                    #{moduleId}
+                </foreach>
+            </if>
+            <if test="param.deptIds != null and param.deptIds.size > 0">
+                AND bm_resource_permission.dept_id IN
+                <foreach collection="param.deptIds" item="deptId" separator="," open="(" close=")">
+                    #{deptId}
+                </foreach>
+            </if>
+            AND bp_factory_line.is_deleted = 0
+        </where>
+        group by bp_factory_line.id, bp_factory_line.`name`, bp_factory_line.code
+        <choose>
+            <when test="param.mobile != null and param.mobile">
+                order by bp_factory_line.`name` DESC
+            </when>
+            <otherwise>
+                order by bp_factory_line.code asc
+            </otherwise>
+        </choose>
+    </select>
+</mapper>

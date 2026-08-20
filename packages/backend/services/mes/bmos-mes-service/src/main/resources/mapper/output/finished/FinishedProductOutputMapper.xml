@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.output.finished.mapper.FinishedProductOutputMapper">
+
+    <select id="getProductBatchNo" resultType="java.lang.String">
+        select distinct product_batch_no
+        from bm_output_finished_product
+        where is_deleted = 0 and product_plan_id = #{productPlanId}
+    </select>
+</mapper>

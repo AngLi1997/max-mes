@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.wms.service.position.mapper.ICargoPositionMapper">
+    <select id="queryList" resultType="com.bmos.wms.service.position.model.CargoPosition">
+        select distinct bw_cargo_position.id,
+                        bw_cargo_position.storage_id,
+                        bw_cargo_position.position,
+                        bw_cargo_position.id_path,
+                        bw_cargo_position.code,
+                        bw_cargo_position.remark,
+                        bw_cargo_position.enable,
+                        bw_cargo_position.create_time,
+                        bw_cargo_position.update_time,
+                        bw_cargo_position.create_by,
+                        bw_cargo_position.update_by,
+                        bw_cargo_position.is_deleted as deleted
+        from bw_cargo_position
+                 inner join bw_resource_permission on bw_cargo_position.id = bw_resource_permission.resource_id
+        <where>
+            bw_cargo_position.is_deleted = 0
+            <if test="deptIds == null or deptIds.size() == 0">
+                and 1 = 2
+            </if>
+            <if test="deptIds != null and deptIds.size() > 0">
+                and bw_resource_permission.dept_id in
+                <foreach collection="deptIds" open="(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="positionIds != null and positionIds.size() > 0">
+                and bw_cargo_position.storage_id in
+                <foreach collection="positionIds" open="(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="pageQuery.position != null and pageQuery.position != ''">
+                and bw_cargo_position.position like concat('%', #{pageQuery.position}, '%')
+            </if>
+            <if test="pageQuery.code != null and pageQuery.code != ''">
+                and bw_cargo_position.code like concat('%', #{pageQuery.code}, '%')
+            </if>
+        </where>
+        order by bw_cargo_position.code
+    </select>
+
+    <select id="queryEnabledListByStorageIdsWithPermission" resultType="com.bmos.wms.service.position.model.CargoPosition">
+        select distinct bw_cargo_position.*
+        from bw_cargo_position
+                 inner join bw_resource_permission on bw_cargo_position.id = bw_resource_permission.resource_id
+            <where>
+                bw_cargo_position.is_deleted = 0
+                and bw_cargo_position.enable = true
+                <if test="storagesIds == null or storagesIds.size() == 0">
+                    and 1 = 2
+                </if>
+                <if test="storagesIds != null and storagesIds.size() > 0">
+                    and bw_cargo_position.storage_id in
+                    <foreach collection="storagesIds" open="(" close=")" separator="," item="item">
+                        #{item}
+                    </foreach>
+                </if>
+                <if test="deptIds == null or deptIds.size() == 0">
+                    and 1 = 2
+                </if>
+                <if test="deptIds != null and deptIds.size() > 0">
+                    and bw_resource_permission.dept_id in
+                    <foreach collection="deptIds" open="(" close=")" separator="," item="item">
+                        #{item}
+                    </foreach>
+                </if>
+            </where>
+    </select>
+
+    <select id="getCargoPositionPath" resultType="java.lang.String">
+        SELECT GROUP_CONCAT(bw_storage.name SEPARATOR '/') AS names
+        FROM bw_cargo_position,
+             bw_storage
+        WHERE FIND_IN_SET(bw_storage.id, bw_cargo_position.id_path) and bw_cargo_position.id = #{id}
+    </select>
+</mapper>

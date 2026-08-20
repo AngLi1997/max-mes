@@ -1,0 +1,58 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+## 注意事项
+
+### 1. Ant Design Vue 组件使用不加前缀 如 <Button type="primary" @click="">{{ t('新增') }}</Button>
+
+### 2. BMTable column 的配置搜索 hideInSearch 为true 则不在搜索表单中，不传默认在搜索表单中表现为 Input, 可传formItemProps来改变form的属性 
+```typescript
+  formItemProps: {
+    component: 'Select',
+    componentProps: {
+      options: [],
+    },
+  },
+```
+
+### 3. i18n国际化的`t`使用`import { t } from '@bmos/i18n';`，不应该直接使用`import { useI18n } from 'vue-i18n'; const { t } = useI18n();`;
+
+### 4. 项目使用vue3，页面使用BMPageComponent时不应该再包裹一层div;
+
+### 5. 列表列配置中应该将筛选项的配置拆出来放到表单配置中
+```typescript
+schemas: [
+  {
+    field: '字段名',
+    component: 'Input',
+    label: t('label'),
+    componentProps: {
+      // 组件参数
+      ...
+    },
+    componentSlots: {
+      // 组件插槽
+      ...
+    }
+  },
+  ...
+],
+```
+
+### 6. BMTableTitle组件的title也需要使用国际化，并且所有组件如果有传入参数为中文的都需要国际化
+
+### 7. 表单配置中一般不需要传递placeholder参数
+
+### 8. 页面中创建的子组件也需要注意文件拆分，规则和页面一致
+```
+组件名称/  # 使用大驼峰命名方式
+├── hooks/         # 使用hooks管理table和表单的配置项(可能还有其他，比如使用工作流的配置等)，如果组件不涉及table和form也就不需要创建useTable和useForm
+│   ├── useTable.ts(.tsx)  # table的配置(不一定有表格)
+│   ├── useForm.ts(.tsx)   # 表单的配置(也不一定有表单)
+│   ├── useXxx.ts(.tsx)    # xxx的hook
+├── index.ts   # 将所有hook全部在这里导出方便使用
+├── types.ts       # 这个页面需要使用的ts类型
+└── index.vue      # 这里写页面的内容并使用hooks和components子组件
+```

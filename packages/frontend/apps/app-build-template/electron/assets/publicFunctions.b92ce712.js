@@ -1,0 +1,1 @@
+const r=(r,e,a=0)=>{for(let t of e)a?r[t.key]=t.value:t.value=r[t.key]},e=(r,e)=>{if(!Array.isArray(r))throw new Error("First argument must be an array");if(0===r.length)return[[],[],[]];const a=[[],[],[]];return r.forEach(((r,e)=>{e%3==0?a[0].push(r):e%3==1?a[1].push(r):e%3==2&&a[2].push(r)})),a};export{e as c,r as m};

@@ -1,0 +1,30 @@
+{
+  "name": "@bmos/open",
+  "version": "0.0.0",
+  "description": "demo",
+  "keywords": [
+    "utils"
+  ],
+  "license": "MIT",
+  "author": "Ansel",
+  "exports": {
+    ".": {
+      "require": "./src/index.ts",
+      "module": "./src/index.ts"
+    }
+  },
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "start": "node ./src/index.js"
+  },
+  "dependencies": {
+    "@bmos/axios": "workspace:^",
+    "ts-morph": "^20.0.0"
+  }
+}

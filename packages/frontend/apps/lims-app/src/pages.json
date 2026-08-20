@@ -1,0 +1,1035 @@
+{
+  "easycom": {
+    "autoscan": true,
+    "custom": {
+      "^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue",
+      "^uv-(.*)": "@climblee/uv-ui/components/uv-$1/uv-$1.vue",
+      "^wd-(.*)": "wot-design-uni/components/wd-$1/wd-$1.vue"
+    }
+  },
+  "pages": [
+    {
+      "path": "pages/login/index",
+      "style": {
+        "navigationBarTitleText": "登录页",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/home/index",
+      "style": {
+        "navigationBarTitleText": "首页",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/home/personal/HandleSign",
+      "style": {
+        "navigationBarTitleText": "手写签名",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/demo/index",
+      "style": {
+        "navigationBarTitleText": "DEMO",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/demo/test",
+      "style": {
+        "navigationBarTitleText": "DEMO",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/lockPage/index",
+      "style": {
+        "navigationBarTitleText": "锁屏页",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/upload/index",
+      "style": {
+        "navigationBarTitleText": "App升级页面",
+        "enablePullDownRefresh": false,
+        "navigationStyle": "custom",
+        "backgroundColor": "transparent",
+        "app-plus": {
+          "animationType": "fade-in",
+          "background": "transparent",
+          "popGesture": "none"
+        }
+      }
+    },
+    {
+      "path": "pages/pleaseVerify/index",
+      "style": {
+        "navigationBarTitleText": "请验",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/pleaseVerify/initiateVerification/index",
+      "style": {
+        "navigationBarTitleText": "请验-发起请验",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/pleaseVerify/detailPage/index",
+      "style": {
+        "navigationBarTitleText": "请验-请验详情",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/pleaseVerify/inspectResult/index",
+      "style": {
+        "navigationBarTitleText": "请验-检验结果",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/webview/index",
+      "style": {
+        "navigationBarTitleText": "webview页面",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/webview/quickEntry",
+      "style": {
+        "navigationBarTitleText": "webview快捷录入页面",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/webviewComponent/TrendAnalysis/index",
+      "style": {
+        "navigationBarTitleText": "webview趋势分析页面",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/webviewComponent/timeDateComponent/index",
+      "style": {
+        "navigationBarTitleText": "时间日期组件",
+        "enablePullDownRefresh": false,
+        "navigationStyle": "custom",
+        "backgroundColor": "transparent",
+        "app-plus": {
+          "animationType": "fade-in",
+          "background": "transparent",
+          "popGesture": "none"
+        }
+      }
+    },
+    {
+      "path": "pages/inventoryManagement/inventoryInfo/index",
+      "style": {
+        "navigationBarTitleText": "库存管理-库存信息",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/inventoryManagement/materialDetails/index",
+      "style": {
+        "navigationBarTitleText": "库存管理-查询物料",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/inventoryManagement/materialOperation/unpacking/index",
+      "style": {
+        "navigationBarTitleText": "库存管理-拆包出库",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/inventoryManagement/materialOperation/use/index",
+      "style": {
+        "navigationBarTitleText": "库存管理-物料使用",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/inventoryManagement/materialOperation/return/index",
+      "style": {
+        "navigationBarTitleText": "库存管理-物料退库",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/inventoryManagement/materialOperation/destruction/index",
+      "style": {
+        "navigationBarTitleText": "库存管理-物料销毁",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/inventoryManagement/materialOperation/inventory/index",
+      "style": {
+        "navigationBarTitleText": "库存管理-物料盘点",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/inventoryManagement/materialOperation/reserve/index",
+      "style": {
+        "navigationBarTitleText": "库存管理-物料预定",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/inventoryManagement/materialOperation/materialOutbound/index",
+      "style": {
+        "navigationBarTitleText": "库存管理-物料出库",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/inventoryManagement/materialOperation/transfer/index",
+      "style": {
+        "navigationBarTitleText": "库存管理-物料移库",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/inventoryManagement/materialOperation/toWarehouse/index",
+      "style": {
+        "navigationBarTitleText": "库存管理-物料入库",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/inventoryManagement/materialOperation/cancelReserve/index",
+      "style": {
+        "navigationBarTitleText": "库存管理-取消预定",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/materialPlan/index",
+      "style": {
+        "navigationBarTitleText": "领料计划-批次领料",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/materialPicking/index",
+      "style": {
+        "navigationBarTitleText": "领料计划-物料领料",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/lockMaterial/index",
+      "style": {
+        "navigationBarTitleText": "预定暂存物料",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/addMaterials/index",
+      "style": {
+        "navigationBarTitleText": "添加物料-批次领料",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/addMatte/index",
+      "style": {
+        "navigationBarTitleText": "添加物料-物料领料",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/ingredientPlan/index",
+      "style": {
+        "navigationBarTitleText": "配料计划",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/addBatch/index",
+      "style": {
+        "navigationBarTitleText": "添加物料批次",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/materialReceiving/index",
+      "style": {
+        "navigationBarTitleText": "领料接收",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/materialWeighing/confirmOutputBatch/index",
+      "style": {
+        "navigationBarTitleText": "物料称量",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/materialWeighing/modeDevice/index",
+      "style": {
+        "navigationBarTitleText": "物料称量-模式设备",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/materialWeighing/removePeel/index",
+      "style": {
+        "navigationBarTitleText": "物料称量-清零&去皮-称量",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/materialWeighingHistory/index",
+      "style": {
+        "navigationBarTitleText": "物料称量历史",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/materialDetails/index",
+      "style": {
+        "navigationBarTitleText": "物料详情",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/feedRecycling/index",
+      "style": {
+        "navigationBarTitleText": "生产投料",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/materialRecycling/index",
+      "style": {
+        "navigationBarTitleText": "物料回收",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/materialReservation/index",
+      "style": {
+        "navigationBarTitleText": "物料预定",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/reservationLock/index",
+      "style": {
+        "navigationBarTitleText": "物料预定",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/clearingRooms/index",
+      "style": {
+        "navigationBarTitleText": "选择房间",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/clearingRoomsDetails/index",
+      "style": {
+        "navigationBarTitleText": "房间详情",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/cleaningExecution/index",
+      "style": {
+        "navigationBarTitleText": "房间清场执行",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/deviceStatus/deviceDetails/index",
+      "style": {
+        "navigationBarTitleText": "设备详情",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/roomManagement/managementPage/index",
+      "style": {
+        "navigationBarTitleText": "房间管理",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/roomManagement/roomDetailsPage/index",
+      "style": {
+        "navigationBarTitleText": "房间详情",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/roomManagement/roomCleaningExecution/index",
+      "style": {
+        "navigationBarTitleText": "房间清场执行",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/webviewComponent/menuComponent/index",
+      "style": {
+        "navigationBarTitleText": "菜单组件弹框",
+        "enablePullDownRefresh": false,
+        "navigationStyle": "custom",
+        "backgroundColor": "transparent",
+        "app-plus": {
+          "animationType": "fade-in",
+          "background": "transparent",
+          "popGesture": "none"
+        }
+      }
+    },
+    {
+      "path": "pages/webviewComponent/selectComponent/index",
+      "style": {
+        "navigationBarTitleText": "选择组件弹框",
+        "enablePullDownRefresh": false,
+        "navigationStyle": "custom",
+        "backgroundColor": "transparent",
+        "app-plus": {
+          "animationType": "fade-in",
+          "background": "transparent",
+          "popGesture": "none"
+        }
+      }
+    },
+    {
+      "path": "pages/webviewComponent/radioComponent/index",
+      "style": {
+        "navigationBarTitleText": "单选组件弹框",
+        "enablePullDownRefresh": false,
+        "navigationStyle": "custom",
+        "backgroundColor": "transparent",
+        "app-plus": {
+          "animationType": "fade-in",
+          "background": "transparent",
+          "popGesture": "none"
+        }
+      }
+    },
+    {
+      "path": "pages/webviewComponent/checkboxComponent/index",
+      "style": {
+        "navigationBarTitleText": "多选组件弹框",
+        "enablePullDownRefresh": false,
+        "navigationStyle": "custom",
+        "backgroundColor": "transparent",
+        "app-plus": {
+          "animationType": "fade-in",
+          "background": "transparent",
+          "popGesture": "none"
+        }
+      }
+    },
+    {
+      "path": "pages/webviewComponent/finishComponent/index",
+      "style": {
+        "navigationBarTitleText": "完成弹框",
+        "enablePullDownRefresh": false,
+        "navigationStyle": "custom",
+        "backgroundColor": "transparent",
+        "app-plus": {
+          "animationType": "fade-in",
+          "background": "transparent",
+          "popGesture": "none"
+        }
+      }
+    },
+    {
+      "path": "pages/webviewComponent/saveTipsComponent/index",
+      "style": {
+        "navigationBarTitleText": "保存提示弹窗",
+        "enablePullDownRefresh": false,
+        "navigationStyle": "custom",
+        "backgroundColor": "transparent",
+        "app-plus": {
+          "animationType": "fade-in",
+          "background": "transparent",
+          "popGesture": "none"
+        }
+      }
+    },
+    {
+      "path": "pages/webviewComponent/signModalComponent/index",
+      "style": {
+        "navigationBarTitleText": "保存/签名组件弹框",
+        "enablePullDownRefresh": false,
+        "navigationStyle": "custom",
+        "backgroundColor": "transparent",
+        "app-plus": {
+          "animationType": "fade-in",
+          "background": "transparent",
+          "popGesture": "none"
+        }
+      }
+    },
+    {
+      "path": "pages/webviewPopups/HandleWriteSignPopup/index",
+      "style": {
+        "navigationBarTitleText": "手写签名组件弹框",
+        "enablePullDownRefresh": false,
+        "navigationStyle": "custom",
+        "backgroundColor": "transparent",
+        "app-plus": {
+          "animationType": "fade-in",
+          "background": "transparent",
+          "popGesture": "none"
+        }
+      }
+    },
+    {
+      "path": "pages/webviewPopups/HandleWriteSignPopup/HandleSign",
+      "style": {
+        "navigationBarTitleText": "手写签名组件设置",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/webviewComponent/warningDataComponent/index",
+      "style": {
+        "navigationBarTitleText": "异常告警",
+        "enablePullDownRefresh": false,
+        "navigationStyle": "custom",
+        "backgroundColor": "transparent",
+        "app-plus": {
+          "animationType": "fade-in",
+          "background": "transparent",
+          "popGesture": "none"
+        }
+      }
+    },
+    {
+      "path": "pages/webviewComponent/historyDataComponent/index",
+      "style": {
+        "navigationBarTitleText": "新历史数据弹框",
+        "enablePullDownRefresh": false,
+        "navigationStyle": "custom",
+        "backgroundColor": "transparent",
+        "app-plus": {
+          "animationType": "fade-in",
+          "background": "transparent",
+          "popGesture": "none"
+        }
+      }
+    },
+    {
+      "path": "pages/webviewPopups/TakePhotosToCollectEvidencePage/index",
+      "style": {
+        "navigationBarTitleText": "拍照取证页面",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/production/productionManagement/index",
+      "style": {
+        "navigationBarTitleText": "生产管理",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/production/associatedBatches/index",
+      "style": {
+        "navigationBarTitleText": "关联批次",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/production/beforeProductionConfirm/index",
+      "style": {
+        "navigationBarTitleText": "生产前确认列表",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/production/beforeProductionConfirm/ProcessConfirmationPage/index",
+      "style": {
+        "navigationBarTitleText": "生产前确认",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/production/beforeProductionConfirm/CreateInstructionSheet/index",
+      "style": {
+        "navigationBarTitleText": "创建指令单",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/production/productionManagement/craftsmanshipFlow/index",
+      "style": {
+        "navigationBarTitleText": "工艺流程",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/production/productionManagement/processFlow/index",
+      "style": {
+        "navigationBarTitleText": "工序流程",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/weighingIngredients/index",
+      "style": {
+        "navigationBarTitleText": "配料称量-首页",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/weighingIngredients/modeDevice/index",
+      "style": {
+        "navigationBarTitleText": "配料称量-模式&设备",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/weighingIngredients/removePeel/index",
+      "style": {
+        "navigationBarTitleText": "配料称量-清零&去皮-称量",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/weighingIngredients/ingredientsDetails/index",
+      "style": {
+        "navigationBarTitleText": "配料单详情",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/weighingIngredients/weighingResults/index",
+      "style": {
+        "navigationBarTitleText": "称量结果",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/productOutput/index",
+      "style": {
+        "navigationBarTitleText": "成品产出",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/productOutput/result",
+      "style": {
+        "navigationBarTitleText": "产出结果",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/outputWeighing/confirmOutputBatch/index",
+      "style": {
+        "navigationBarTitleText": "中间品产出",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/outputWeighing/result/index",
+      "style": {
+        "navigationBarTitleText": "中间品产出-称量结果",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/outputWeighing/modeDevice/index",
+      "style": {
+        "navigationBarTitleText": "中间品产出-设备&模式",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/outputWeighing/removePeel/index",
+      "style": {
+        "navigationBarTitleText": "产出称量-清零&去皮-称量",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/weighingData/modeDevice/index",
+      "style": {
+        "navigationBarTitleText": "称量数据-设备&模式",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/weighingData/result/index",
+      "style": {
+        "navigationBarTitleText": "称量数据-称量结果",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/weighingData/weighing/index",
+      "style": {
+        "navigationBarTitleText": "称量数据-称量",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/equipmentDataAcquisition/index",
+      "style": {
+        "navigationBarTitleText": "设备数据采集(未识别到设备)",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/equipmentDataAcquisition/equipmentSelection/index",
+      "style": {
+        "navigationBarTitleText": "设备选择",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/equipmentDataAcquisition/dataAcquisition/index",
+      "style": {
+        "navigationBarTitleText": "数据采集",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/equipmentDataDraw/index",
+      "style": {
+        "navigationBarTitleText": "设备数采绘图",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/equipmentDataDrawDetail/index",
+      "style": {
+        "navigationBarTitleText": "设备数采绘图",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/equipmentInfo/index",
+      "style": {
+        "navigationBarTitleText": "设备信息详情",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/ingredientsInput/index",
+      "style": {
+        "navigationBarTitleText": "配料投入",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/materialInput/index",
+      "style": {
+        "navigationBarTitleText": "物料投入",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/webviewPopups/OperatingProcedures/index",
+      "style": {
+        "navigationBarTitleText": "操作规程",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/webviewPopups/OperatingProceduresList/index",
+      "style": {
+        "navigationBarTitleText": "操作规程列表",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/weighingCenter/list/index",
+      "style": {
+        "navigationBarTitleText": "称量中心-列表页",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/weighingCenter/execution/index",
+      "style": {
+        "navigationBarTitleText": "称量中心-执行",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/weighingCenter/taskDetail/index",
+      "style": {
+        "navigationBarTitleText": "称量中心-任务详情",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/weighingCenter/modeDevice/index",
+      "style": {
+        "navigationBarTitleText": "称量中心-模式设备",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/weighingCenter/result/index",
+      "style": {
+        "navigationBarTitleText": "称量中心-称量结果",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/weighingCenter/materialWeighing/index",
+      "style": {
+        "navigationBarTitleText": "称量中心-物料称量",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/weighingWorkOrder/list/index",
+      "style": {
+        "navigationBarTitleText": "称量工单-列表页",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/weighingWorkOrder/execution/index",
+      "style": {
+        "navigationBarTitleText": "称量工单-执行",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/weighingWorkOrder/taskDetail/index",
+      "style": {
+        "navigationBarTitleText": "称量工单-任务详情",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/weighingWorkOrder/modeDevice/index",
+      "style": {
+        "navigationBarTitleText": "称量工单-模式设备",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/weighingWorkOrder/result/index",
+      "style": {
+        "navigationBarTitleText": "称量工单-称量结果",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/weighingWorkOrder/materialWeighing/index",
+      "style": {
+        "navigationBarTitleText": "称量工单-物料称量",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/weighingWorkOrderHistory/list/index",
+      "style": {
+        "navigationBarTitleText": "称量工单历史-列表页",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/weighingWorkOrderHistory/detail/index",
+      "style": {
+        "navigationBarTitleText": "称量工单历史-详情页",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/weighingHistory/list/index",
+      "style": {
+        "navigationBarTitleText": "称量历史-列表页",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/weighingHistory/detail/index",
+      "style": {
+        "navigationBarTitleText": "称量历史-详情页",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/liquidPlan/index",
+      "style": {
+        "navigationBarTitleText": "配液计划",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/liquidPlan/addMaterial/index",
+      "style": {
+        "navigationBarTitleText": "添加物料批次-配液计划",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/liquidMeasure/index",
+      "style": {
+        "navigationBarTitleText": "配液量取",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/liquidMeasure/result/index",
+      "style": {
+        "navigationBarTitleText": "配液量取-量取结果",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/liquidMeasure/liquidSheetDetail/index",
+      "style": {
+        "navigationBarTitleText": "配液量取-配液单详情",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/liquidMeasure/modeDevice/index",
+      "style": {
+        "navigationBarTitleText": "配液量取-模式&设备",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/liquidMeasure/measure/index",
+      "style": {
+        "navigationBarTitleText": "配液量取-量取",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/liquidInvest/index",
+      "style": {
+        "navigationBarTitleText": "配液投入",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/liquidOutput/index",
+      "style": {
+        "navigationBarTitleText": "配液产出",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/liquidOutput/modeDevice/index",
+      "style": {
+        "navigationBarTitleText": "配液产出-模式&设备",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/liquidOutput/output/index",
+      "style": {
+        "navigationBarTitleText": "配液产出-产出",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/liquidOutput/result/index",
+      "style": {
+        "navigationBarTitleText": "配液产出-产出结果",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/takePhotos/index",
+      "style": {
+        "navigationBarTitleText": "拍照",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/inspectionResults/index",
+      "style": {
+        "navigationBarTitleText": "检验组件",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/webviewComponent/takePhotoComponent/index",
+      "style": {
+        "navigationBarTitleText": "拍照历史数据弹窗",
+        "enablePullDownRefresh": false,
+        "navigationStyle": "custom",
+        "backgroundColor": "transparent",
+        "app-plus": {
+          "animationType": "fade-in",
+          "background": "transparent",
+          "popGesture": "none"
+        }
+      }
+    },
+    {
+      "path": "pages/webviewComponent/takePhotoComponent/component/photosDetails",
+      "style": {
+        "navigationBarTitleText": "拍照详情",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/businessComponents/materialInfo/index",
+      "style": {
+        "navigationBarTitleText": "物料件信息",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/materialReceiving/index",
+      "style": {
+        "navigationBarTitleText": "物料接收",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/exception/management/index",
+      "style": {
+        "navigationBarTitleText": "异常管理",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/equipment/useInfo/index",
+      "style": {
+        "navigationBarTitleText": "设备使用日志填报",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/processChange/index",
+      "style": {
+        "navigationBarTitleText": "工艺换班",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/webviewPopups/addException/index",
+      "style": {
+        "navigationBarTitleText": "异常填报",
+        "enablePullDownRefresh": false
+      }
+    }
+  ],
+  "globalStyle": {
+    "rpxCalcMaxDeviceWidth": 3840,
+
+    "app-plus": {
+      "titleNView": false
+    },
+    "pageOrientation": "landscape"
+  }
+}

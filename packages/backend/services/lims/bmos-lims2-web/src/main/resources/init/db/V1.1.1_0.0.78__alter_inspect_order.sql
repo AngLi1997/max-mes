@@ -1,0 +1,1 @@
+update lm_inspection_order set scheme_source='REGULAR' where scheme_source is null

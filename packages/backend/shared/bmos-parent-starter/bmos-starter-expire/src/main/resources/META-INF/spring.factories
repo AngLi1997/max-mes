@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.bmos.expire.config.ExpireMessageConfiguration,\
+com.bmos.expire.producer.ExpireMessageProducer

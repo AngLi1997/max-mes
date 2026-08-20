@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.process.mapper.ProcessVersionMapper">
+
+    <sql id="BASE_COLUM">
+        id,
+        process_id,
+        process_instance_id,
+        version,
+        product_formula_version_id,
+        description,
+        action_state,
+        production_line_id,
+        state,
+        production_stage_code,
+        process_model_id,
+        relations,
+        history_state,
+        effect_date,
+        create_time,
+        update_time,
+        create_by,
+        update_by,
+        is_deleted
+    </sql>
+
+    <select id="selectPageList" resultType="com.bmos.mes.service.process.vo.ProcessVersionPageVO">
+        select
+        bp.id,
+        bp.process_id,
+        bp.description,
+        bp.action_state,
+        bp.state,
+        bp.process_model_id,
+        bp.version,
+        bp.create_time,
+        bp.effect_date,
+        f.name as productFormulaName,
+        fv.version_no as productFormulaVersionNo,
+        fv.id as productFormulaVersionId,
+        bp.process_instance_id as processInstanceId,
+        bm.`name` as name
+        from bm_process_version bp
+        left join bm_product_formula_version fv on bp.product_formula_version_id = fv.id
+        left join bm_product_formula f on f.id = fv.product_formula_id
+        left join bm_process bm on bp.process_id = bm.id
+        <if test="deptIds != null and deptIds.size > 0">
+            join bm_resource_permission br on bp.id = br.resource_id
+            and br.dept_id in
+            <foreach collection="deptIds" open="(" close=")" separator="," item="item">
+                #{item}
+            </foreach>
+        </if>
+        where bp.is_deleted = 0
+        and bp.process_id = #{processId}
+        order by bp.create_time desc
+    </select>
+    <select id="selectProcessNameByProcessId" resultType="java.lang.String">
+        select
+            name
+        from bm_process
+        where is_deleted = 0
+        and id = #{processId}
+    </select>
+    <select id="selectProcessList" resultType="com.bmos.mes.service.process.vo.ProcessVO">
+        select
+            bp.id,
+            bp.process_id,
+            bp.state,
+            bp.process_model_id,
+            bp.version,
+            br.product_id,
+            br.product_category_id
+        from bm_process_version bp
+        join bm_process br on bp.process_id = br.id and br.is_deleted = 0
+        <where>
+            <if test="productId != null">
+                and br.product_id = #{productId}
+            </if>
+            <if test="state != null">
+                and bp.state = #{state}
+            </if>
+            <if test="processId != null">
+                and br.id = #{processId}
+            </if>
+            <if test="actionState != null and actionState != ''">
+                and bp.action_state = #{actionState}
+            </if>
+        </where>
+        order by bp.create_time desc
+    </select>
+    <select id="selectAuditTodoProcessVersionIds"
+            resultType="com.bmos.mes.service.process.vo.ProcessTodoPageVO">
+        select
+        bpv.id,
+        bpv.process_instance_id,
+        bpv.version,
+        bpv.process_id,
+        bpv.description,
+        bp.product_id,
+        bp.name processName,
+        bm.name as productName,
+        bm.code as productCode
+        from bm_process bp
+        join bm_process_version bpv on bp.id = bpv.process_id and bpv.is_deleted = 0
+        join bm_material bm on bp.product_id = bm.id and bm.is_deleted = 0
+        where bp.is_deleted = 0
+        and bpv.action_state = #{actionState}
+        <if test="dto.productName != null and dto.productName != ''">
+            and bm.name like concat('%',#{dto.productName},'%')
+        </if>
+        <if test="dto.processName != null and dto.processName != ''">
+            and bp.name like concat('%',#{dto.processName},'%')
+        </if>
+        <if test="dto.processVersionIds != null and dto.processVersionIds.size()>0">
+            and bpv.id in
+            <foreach collection="dto.processVersionIds" open="(" close=")" separator="," item="processVersionId">
+                #{processVersionId}
+            </foreach>
+        </if>
+    </select>
+    <select id="selectByProcessInstanceIds" resultType="com.bmos.mes.service.process.vo.ProcessTodoPageVO">
+        select
+        bpv.id,
+        bpv.process_instance_id,
+        bpv.version,
+        bpv.process_id,
+        bpv.description,
+        bp.product_id,
+        bpv.effect_date,
+        bp.name processName,
+        bm.name as productName,
+        bm.merge_code as productCode
+        from bm_process bp
+        join bm_process_version bpv on bp.id = bpv.process_id and bpv.is_deleted = 0
+        join bm_material bm on bp.product_id = bm.id and bm.is_deleted = 0
+        where bp.is_deleted = 0
+        and bpv.action_state = #{actionState}
+        and bpv.process_instance_id in
+        <foreach collection="processInstanceIds" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </select>
+    <select id="selectProcessDetailInfo"
+            resultType="com.bmos.mes.service.record.business.model.ProcessDetailInfo">
+        select p.id processId,p.name processName,v.id processVersionId, v.version processVersion,v.product_formula_version_id formulaVersionId
+        from bm_process_version v
+        left join bm_process p on v.process_id = p.id
+        where v.process_id = #{processId} and v.version = #{processVersion}
+    </select>
+
+    <select id="selectByQueryDTOLIst" resultType="com.bmos.mes.service.process.model.ProcessVersion">
+        SELECT
+            id,
+            process_id,
+            process_instance_id,
+            version,
+            product_formula_version_id,
+            description,
+            action_state,
+            state,
+            production_stage_code,
+            process_model_id,
+            relations,
+            create_time,
+            update_time,
+            create_by,
+            update_by,
+            is_deleted,
+            effect_date,
+            history_state
+        FROM
+            bm_process_version
+        WHERE
+            is_deleted = 0
+        AND
+        <foreach collection="queryDTOList" open="(" separator=" OR " close=")" item="item">
+            (process_id = #{item.processId} AND version = #{item.version})
+        </foreach>
+
+    </select>
+
+</mapper>

@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.process.mapper.ProcedureStepModelMapper">
+
+    <delete id="deleteByIdNotIn">
+        update bm_procedure_step_model
+        set is_deleted = 1,
+        del_id_flag = id
+        where procedure_model_id = #{procedureModelId}
+        <if test="ids != null and ids.size() > 0">
+            and id not in
+            <foreach collection="ids" open="(" close=")" separator="," item="item">
+                #{item}
+            </foreach>
+        </if>
+    </delete>
+    <update id="deleteByProcedureModelId">
+        update bm_procedure_step_model
+        set is_deleted = 1,
+            del_id_flag = id
+        where procedure_model_id = #{procedureModelId}
+    </update>
+
+    <select id="selectRecords" resultType="com.bmos.mes.service.process.vo.ProcessRecordVO">
+        select
+            t1.id,
+            t1.record_item_id,
+            t1.record_version_id,
+            t1.create_time,
+            t1.reusable,
+            t1.name as procedureStepName,
+            t1.procedure_step_id,
+            t2.name as procedureName,
+            t3.name as recordItemName,
+            t1.procedure_step_id
+        from bm_procedure_step_model t1
+        join bm_procedure_model t2 on t1.procedure_model_id = t2.id and t2.is_deleted = false
+        join bm_batch_record_item t3 on t1.record_item_id = t3.item_id and t1.record_version_id = t3.record_version_id and t3.is_deleted = false
+        where t1.is_deleted = false
+        and t1.process_id = #{processId}
+        and t1.process_version = #{processVersion}
+          <if test="nodeFunction != null and nodeFunction != ''">
+              and t1.node_function != #{nodeFunction}
+          </if>
+    </select>
+    <select id="selectListByProcess" resultType="com.bmos.mes.service.process.vo.ProcessStepVO">
+        select
+            t1.id,
+            t1.name,
+            t1.procedure_step_id,
+            t1.procedure_id,
+            t1.procedure_model_id,
+            t1.reusable,
+            t1.record_item_id,
+            t1.record_version_id,
+            t2.name as procedureName
+        from bm_procedure_step_model t1
+                 join bm_procedure_model t2 on t1.procedure_model_id = t2.id and t2.is_deleted = false
+        where t1.is_deleted = false
+          and t1.process_id = #{processId}
+          and t1.process_version = #{processVersion}
+    </select>
+
+    <select id="selectFieldsConfig" resultType="com.bmos.mes.service.process.vo.FieldConfigVO">
+        select distinct
+        t1.procedure_step_id,
+        t1.reusable as reuse,
+        t1.record_item_id,
+        t1.record_version_id,
+        t2.component_type,
+        t2.field_id
+        from bm_procedure_step_model t1
+        join bm_batch_record_component t2 on t1.record_item_id = t2.record_item_id and t1.record_version_id = t2.record_version_id and t2.is_deleted = 0
+        where t1.is_deleted = 0
+        and t1.process_id = #{query.processId}
+        and t1.process_version = #{query.processVersion}
+        and t2.field_id in
+        <foreach collection="fieldIds" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </select>
+    <select id="selectRecordContents" resultType="com.bmos.mes.service.execute.vo.IntactFormDataVO">
+        select
+            t1.name as recordName,
+            t1.id as id,
+            t1.item_id as record_item_id,
+            t1.item_type,
+            t1.page_config,
+            t1.record_version_id,
+            t2.procedure_step_id,
+            t2.id as copyVersionId,
+            t2.version as copy_version,
+            t2.is_reuse as reuse,
+            t2.is_discard as discard,
+            t2.process_change_number,
+            t2.procedure_change_number,
+            t3.procedure_model_id,
+            t3.procedure_id,
+            t3.id as procedureStepModelId
+        from bm_execute_record_copy t2
+                 left join bm_procedure_step_model t3 on t3.process_id = #{processId} and t3.process_version = #{processVersion} and t3.is_deleted = 0
+            AND ((t2.is_reuse = false AND t3.procedure_step_id = t2.procedure_step_id) OR (t2.is_reuse = true AND t3.reusable = t2.is_reuse))
+            and t3.record_item_id = t2.record_item_id and t3.record_version_id = t2.record_version_id
+        join bm_batch_record_item t1 on t2.record_item_id = t1.item_id and t2.record_version_id = t1.record_version_id
+        where t1.is_deleted = 0
+        and t2.process_id = #{processId}
+        and t2.process_version = #{processVersion}
+        and t2.product_plan_id = #{productPlanId}
+        and t3.node_function != #{nodeFunction}
+        GROUP BY t2.id
+        ORDER BY procedureStepModelId asc
+    </select>
+
+    <select id="queryRecordVersionIdByProcessId" resultType="com.bmos.mes.service.process.vo.ProcessRecordItemVO">
+        SELECT
+            t1.record_version_id as recordVersionId,
+            t1.record_item_id as recordItemId,
+            t1.procedure_model_id AS procedureModelId,
+            t1.node_function as nodeFunction,
+            t1.name as name,
+            t2.`name` as procedureName
+        FROM
+            bm_procedure_step_model as t1
+        join bm_procedure_model as t2 on t1.procedure_model_id = t2.id
+        WHERE
+                t1.is_deleted = 0
+            AND t1.del_id_flag = 0
+            and t2.is_deleted = 0
+            and t2.del_id_flag = 0
+            and t1.process_id =#{processId}
+            and t1.process_version =#{processVersion}
+            and t1.procedure_model_id in
+            <foreach collection="modelList" open="(" close=")" separator="," item="item">
+                #{item}
+            </foreach>
+        order by t2.sort asc
+    </select>
+    <select id="selectDurationByNodeIds" resultType="com.bmos.mes.service.workflow.vo.ProcedureStepDurationVO">
+        SELECT
+            t1.process_id,
+            t1.process_version,
+            t1.id AS procedureStepModelId,
+            t1.node_id AS procedureStepNodeId,
+            t1.duration AS procedureStepDuration,
+            t1.time_unit AS procedureStepTimeUnit,
+            t2.id AS procedureModelId,
+            t2.node_id AS procedureNodeId,
+            t2.duration AS procedureDuration,
+            t2.time_unit AS procedureTimeUnit,
+            t1.procedure_step_id as procedureStepId,
+            t2.`name` as procedureModelName,
+            t1.node_function as nodeFunction,
+            IFNULL(t1.sort,0) as sort,
+            t2.procedure_id as procedureId
+        FROM
+            bm_procedure_step_model t1
+            LEFT JOIN bm_procedure_model t2 ON t1.procedure_model_id = t2.id
+        <where>
+        t1.is_deleted = '0'
+        and t2.is_deleted = '0'
+            <if test="procedureStepNodeIdList != null and procedureStepNodeIdList.size() > 0">
+                and t1.node_id in
+                <foreach collection="procedureStepNodeIdList" open="(" separator="," close=")" item="nodeId">
+                    #{nodeId}
+                </foreach>
+            </if>
+        </where>
+    </select>
+    <select id="selectDurationByStepModeIds"
+            resultType="com.bmos.mes.service.workflow.vo.ProcedureStepDurationVO">
+        SELECT
+        t1.process_id,
+        t1.process_version,
+        t1.id AS procedureStepModelId,
+        t1.node_id AS procedureStepNodeId,
+        t1.duration AS procedureStepDuration,
+        t1.time_unit AS procedureStepTimeUnit,
+        t2.id AS procedureModelId,
+        t2.node_id AS procedureNodeId,
+        t2.duration AS procedureDuration,
+        t2.time_unit AS procedureTimeUnit,
+        t1.procedure_step_id as procedureStepId,
+        t2.`name` as procedureModelName,
+        t1.node_function as nodeFunction,
+        IFNULL(t1.sort,0) as sort,
+        t2.procedure_id as procedureId
+        FROM
+        bm_procedure_step_model t1
+        LEFT JOIN bm_procedure_model t2 ON t1.procedure_model_id = t2.id
+        <where>
+            t1.is_deleted = '0'
+            and t2.is_deleted = '0'
+            <if test="procedureStepModelIdList != null and procedureStepModelIdList.size() > 0">
+                and t1.id in
+                <foreach collection="procedureStepModelIdList" open="(" separator="," close=")" item="stepModeId">
+                    #{stepModeId}
+                </foreach>
+            </if>
+        </where>
+    </select>
+    <select id="queryStepModelList" resultType="com.bmos.mes.service.process.vo.ProcedureStepModelDetailVO">
+        select t1.*,
+               t2.name as procedureName,
+               t2.id as procedureModelId
+        from bm_procedure_step_model t1
+        left join bm_procedure_model t2 on t1.procedure_model_id = t2.id
+        <where>
+            t1.is_deleted = 0
+            and t2.is_deleted = 0
+            and t1.process_id = #{processId}
+            and t1.process_version = #{processVersion}
+            <if test="procedureName != null and procedureName != ''">
+                and t2.name like concat('%', #{procedureName}, '%')
+            </if>
+            <if test="procedureStepName != null and procedureStepName != ''">
+                and t1.name like concat('%', #{procedureStepName}, '%')
+            </if>
+        </where>
+    </select>
+    <select id="selectRecordContentsByNodeFunction"
+            resultType="com.bmos.mes.service.execute.vo.IntactFormDataVO">
+        select
+            t1.name as recordName,
+            t1.item_id as record_item_id,
+            t1.file_content,
+            t1.item_type,
+            t1.page_config,
+            t1.record_version_id,
+            t2.procedure_step_id,
+            t2.version as copy_version,
+            t2.is_reuse as reuse,
+            t2.is_discard as discard,
+            t3.id as procedureStepModelId
+        from bm_execute_record_copy t2
+                 left join bm_procedure_step_model t3 on t3.process_id = #{processId} and t3.process_version = #{processVersion} and t3.is_deleted = 0
+            AND ((t2.is_reuse = false AND t3.procedure_step_id = t2.procedure_step_id) OR (t2.is_reuse = true AND t3.reusable = t2.is_reuse))
+            and t3.record_item_id = t2.record_item_id and t3.record_version_id = t2.record_version_id
+                 join bm_batch_record_item t1 on t2.record_item_id = t1.item_id and t2.record_version_id = t1.record_version_id
+        where t1.is_deleted = 0
+          and t2.process_id = #{processId}
+          and t2.process_version = #{processVersion}
+          and t2.product_plan_id = #{productPlanId}
+          and t3.node_function == #{nodeFunction}
+        GROUP BY t2.id
+        ORDER BY procedureStepModelId asc
+    </select>
+
+    <select id="queryByIds" resultType="com.bmos.mes.service.process.vo.Task.NodeVO">
+        select
+            id as id,
+            name as name,
+            is_deleted as isDeleted
+        from
+            bm_procedure_step_model
+        where id in
+        <foreach collection="ids" open="(" separator="," close=")" item="id">
+            #{id}
+        </foreach>
+    </select>
+    <select id="selectByProcessAndRecord" resultType="com.bmos.mes.service.process.model.ProcedureStepModel">
+        select
+            t1.id as id,
+            t1.node_id as nodeId,
+            t1.process_id as processId,
+            t1.node_function as nodeFunction,
+            t1.reusable as reusable,
+            t1.procedure_id as procedureId,
+            t1.procedure_model_id as procedureModelId,
+            t1.procedure_step_id as procedureStepId,
+            t1.process_version as processVersion,
+            t1.record_version_id,
+            t1.name as name
+        from
+            bm_procedure_step_model t1
+        <where>
+            t1.is_deleted = 0 AND
+            <foreach collection="queryDTOList" open="(" separator="or" close=")" item="qeuryDTO">
+                t1.process_id = #{qeuryDTO.processId}
+                and t1.process_version = #{qeuryDTO.processVersion}
+                and t1.record_item_id = #{qeuryDTO.recordId}
+                and t1.reusable = #{qeuryDTO.reuse}
+            </foreach>
+        </where>
+    </select>
+</mapper>

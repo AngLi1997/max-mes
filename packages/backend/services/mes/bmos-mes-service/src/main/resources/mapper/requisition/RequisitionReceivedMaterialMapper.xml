@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.requisition.mapper.RequisitionReceivedMaterialMapper">
+
+
+    <select id="selectRepositoryBatchMaterialList"
+            resultType="com.bmos.mes.service.requisition.vo.RepositoryBatchMaterialListVO">
+        select bm_requisition_received_material.*,bm_requisition_received_material.inventory_no as materialNo,bm_material.id as materialId,bm_material.merge_code as materialMergeCode
+        from bm_requisition_received_material
+        left join bm_material
+        on bm_material.platform_material_id = bm_requisition_received_material.platform_material_id
+        and bm_material.is_deleted = 0
+        where bm_requisition_received_material.requisition_plan_id = #{requisitionId}
+          and bm_requisition_received_material.received_batch_id = #{receivedBatchId}
+          and bm_material.id = #{materialId}
+    </select>
+</mapper>

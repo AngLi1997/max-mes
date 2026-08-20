@@ -1,0 +1,1832 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.inspect.entry.mapper.InspectionEntryRecordMapper">
+
+    <!-- 基础结果映射 -->
+    <resultMap id="BaseResultMap" type="com.bmos.lims2.server.inspect.entry.entity.InspectionEntryRecord">
+        <id column="id" property="id"/>
+        <result column="inspection_order_id" property="inspectionOrderId"/>
+        <result column="inspection_order_no" property="inspectionOrderNo"/>
+        <result column="task_id" property="taskId"/>
+        <result column="scheme_id" property="schemeId"/>
+        <result column="scheme_version_id" property="schemeVersionId"/>
+        <result column="package_id" property="packageId"/>
+        <result column="item_config_id" property="itemConfigId"/>
+        <result column="parameter_config_id" property="parameterConfigId"/>
+        <result column="scheme_data_point_id" property="dataPointConfigId"/>
+        <result column="original_data_point_id" property="dataPointId"/>
+        <result column="inspect_item_id" property="inspectItemId"/>
+        <result column="inspect_item_code" property="inspectItemCode"/>
+        <result column="parameter_id" property="parameterId"/>
+        <result column="parameter_code" property="parameterCode"/>
+        <result column="data_point_id" property="dataPointId"/>
+        <result column="data_point_name" property="dataPointName"/>
+        <result column="point_type" property="pointType"/>
+        <result column="value_text" property="valueText"/>
+        <result column="value_number" property="valueNumber"/>
+        <result column="test_time" property="testTime"/>
+        <result column="operator_id" property="operatorId"/>
+        <result column="operator_name" property="operatorName"/>
+        <result column="is_abnormal" property="abnormal"/>
+        <result column="remark" property="remark"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="is_deleted" property="deleted"/>
+    </resultMap>
+
+    <!-- 分析项录入列表查询（母列表）- 参照任务分配实现 -->
+    <select id="selectAnalysisItemEntryList" resultType="com.bmos.lims2.server.inspect.entry.dto.AnalysisItemEntryDTO">
+        SELECT
+        ip.id as inspectParameterId,
+        ip.name as inspectParameterName,
+        ip.code as inspectParameterCode,
+        MAX(COALESCE(CONVERT(isp.standard_rule USING utf8mb4), CONVERT(sssp.standard_rule USING utf8mb4))) as standardRule,
+        ii.id as inspectItemId,
+        ii.name as inspectItemName,
+        ii.code as inspectItemCode
+        FROM lm_inspect_parameter ip
+        INNER JOIN lm_task t ON ip.id = t.parameter_id
+        INNER JOIN lm_inspect_item ii ON t.inspect_item_id = ii.id
+        INNER JOIN lm_inspection_order io ON t.inspection_order_id = io.id
+        LEFT JOIN lm_inspection_scheme_parameter isp ON isp.id = t.parameter_config_id AND isp.is_deleted = 0
+        LEFT JOIN lm_stability_scheme_parameter sssp ON sssp.id = t.parameter_config_id AND sssp.is_deleted = 0
+        WHERE t.is_deleted = 0
+        AND ip.is_deleted = 0
+        AND ii.is_deleted = 0
+        AND io.is_deleted = 0
+        <!-- 录入界面不能查询分配状态下的任务 -->
+        and t.status not in('PENDING_ASSIGNMENT','RETURN_PENDING_APPROVAL')
+        <!-- 数据权限控制：只有当前人员在相关检验项目的班组中，才能看到相关的任务 -->
+        <if test="query.currentUserTeamIds != null and query.currentUserTeamIds.size() > 0">
+            AND (
+            EXISTS (
+            SELECT 1 FROM lm_inspection_scheme_item_teams sit
+            WHERE sit.inspect_item_id = t.inspect_item_id
+            AND sit.version_id = io.scheme_version_id
+            AND sit.is_deleted = 0
+            AND sit.team_id IN
+            <foreach collection="query.currentUserTeamIds" item="teamId" open="(" separator="," close=")">
+                #{teamId}
+            </foreach>
+            )
+            OR EXISTS (
+            SELECT 1 FROM lm_stability_scheme_item_teams ssit
+            WHERE ssit.inspect_item_id = t.inspect_item_id
+            AND ssit.version_id = io.scheme_version_id
+            AND ssit.is_deleted = 0
+            AND ssit.team_id IN
+            <foreach collection="query.currentUserTeamIds" item="teamId" open="(" separator="," close=")">
+                #{teamId}
+            </foreach>
+            )
+            )
+        </if>
+        <!-- 只能查询当前人员的录入任务-->
+        <if test="query.ownerOnly!=null and query.ownerOnly and  query.currentUserId != null and query.currentUserId != ''">
+            AND t.owner_id = #{query.currentUserId}
+        </if>
+        <if test="query.inspectItemName != null and query.inspectItemName != ''">
+            AND ii.name LIKE CONCAT('%', #{query.inspectItemName}, '%')
+        </if>
+        <if test="query.parameterName != null and query.parameterName != ''">
+            AND ip.name LIKE CONCAT('%', #{query.parameterName}, '%')
+        </if>
+        <if test="query.inspectionOrderNo != null and query.inspectionOrderNo != ''">
+            AND io.order_no LIKE CONCAT('%', #{query.inspectionOrderNo}, '%')
+        </if>
+        <if test="query.batchNo != null and query.batchNo != ''">
+            AND io.batch_no LIKE CONCAT('%', #{query.batchNo}, '%')
+        </if>
+        <if test="query.requestStartTime != null">
+            AND io.create_time >= #{query.requestStartTime}
+        </if>
+        <if test="query.requestEndTime != null">
+            AND io.create_time &lt;= #{query.requestEndTime}
+        </if>
+        <if test="query.materialIds != null and query.materialIds.size() > 0">
+            AND io.material_id IN
+            <foreach collection="query.materialIds" item="materialId" open="(" separator="," close=")">
+                #{materialId}
+            </foreach>
+        </if>
+        <if test="query.taskStatuses != null and query.taskStatuses.size() > 0">
+            AND t.status IN
+            <foreach collection="query.taskStatuses" item="st" open="(" separator="," close=")">
+                #{st}
+            </foreach>
+        </if>
+        <if test="query.unreviewedOnly != null and query.unreviewedOnly">
+            AND t.status = 'TO_REVIEW'
+        </if>
+        <if test="query.abnormal != null">
+            <if test="query.abnormal == true">
+                AND ((t.judged_abnormal = 1 AND t.status != 'TERMINATED') OR t.status IN ('REVIEW_REJECTED','SAMPLE_AUDIT_REJECTED'))
+            </if>
+            <if test="query.abnormal == false">
+                AND t.judged_abnormal = 0
+            </if>
+        </if>
+        GROUP BY ip.id, ip.name, ip.code, ii.id, ii.name, ii.code
+        ORDER BY ii.code ASC, ip.code ASC
+    </select>
+
+    <!-- 检项查询-按方案返回表头分组（参数-数据点），在参数内按名称+类型去重，跨版本合并 -->
+    <select id="listHeaderGroupsByScheme" resultType="com.bmos.lims2.server.inspect.entry.dto.HeaderGroupRowDTO">
+        SELECT
+            t.parameter_id   AS parameterId,
+            t.parameter_code AS parameterCode,
+            t.parameter_name AS parameterName,
+            t.point_name     AS pointName,
+            t.point_type     AS pointType
+        FROM (
+                 SELECT
+                     p.id   AS parameter_id,
+                     p.code AS parameter_code,
+                     p.name AS parameter_name,
+                     dp.name AS point_name,
+                     dp.point_type,
+                     ROW_NUMBER() OVER (
+                    PARTITION BY v.scheme_id, p.id, dp.name, dp.point_type
+                    ORDER BY v.id DESC
+                ) AS rn
+                 FROM lm_inspection_scheme_version v
+                          INNER JOIN lm_inspection_scheme_parameter sp ON sp.version_id = v.id AND sp.is_deleted = 0
+                          INNER JOIN lm_inspect_parameter p ON p.id = sp.parameter_id AND p.is_deleted = 0
+                          INNER JOIN lm_inspection_scheme_data_point dp ON dp.version_id = v.id AND dp.parameter_id = sp.parameter_id AND dp.is_deleted = 0
+                 WHERE v.scheme_id = #{schemeId}
+                   AND v.is_deleted = 0
+             ) t
+        WHERE t.rn = 1
+        ORDER BY t.parameter_name ASC, t.parameter_id ASC, t.point_name ASC
+    </select>
+
+    <!-- 检项查询-按版本返回表头分组（参数-数据点），在参数内按名称+类型去重 -->
+    <select id="listHeaderGroupsByVersion" resultType="com.bmos.lims2.server.inspect.entry.dto.HeaderGroupRowDTO">
+        SELECT
+            p.id   AS parameterId,
+            p.code AS parameterCode,
+            p.name AS parameterName,
+            dp.name AS pointName,
+            dp.point_type AS pointType
+        FROM lm_inspection_scheme_parameter sp
+                 INNER JOIN lm_inspect_parameter p ON p.id = sp.parameter_id AND p.is_deleted = 0
+                 INNER JOIN (
+            SELECT sdp.parameter_id, sdp.name, sdp.point_type, MIN(sdp.id) AS min_id
+            FROM lm_inspection_scheme_data_point sdp
+            WHERE sdp.is_deleted = 0 AND sdp.version_id = #{versionId}
+            GROUP BY sdp.parameter_id, sdp.name, sdp.point_type
+        ) dp ON dp.parameter_id = sp.parameter_id
+        WHERE sp.version_id = #{versionId}
+          AND sp.is_deleted = 0
+        ORDER BY p.name ASC, p.id ASC, dp.min_id ASC
+    </select>
+    <!-- 查询特定分析项的检验单任务分组（子列表）- 参照任务分配实现 -->
+    <select id="selectInspectionOrdersByAnalysisItem" resultType="com.bmos.lims2.server.inspect.entry.dto.AnalysisItemEntryDTO$InspectionOrderEntryItemDTO">
+        SELECT DISTINCT
+        t.id,
+        t.inspection_order_id AS inspectionOrderId,
+        io.order_no AS orderNo,
+        m.name AS materialName,
+        m.code AS materialCode,
+        m.specification AS materialSpec,
+        io.batch_no AS batchNo,
+        io.create_time AS requestTime,
+        io.create_by AS requestUserId,
+        t.status,
+        t.judged_abnormal AS abnormal,
+        t.judged_result AS judgedResult,
+        t.judged_time AS judgedTime,
+        t.test_time AS testTime,
+        t.owner_id AS ownerId,
+        t.owner_name AS ownerName,
+        t.reviewed_by AS reviewedBy,
+        t.reviewed_time AS reviewedTime,
+        t.reviewed_abnormal_reason AS reviewRejectReason,
+        le.entry_time AS entryTime,
+        t.scheme_version_id AS schemeVersionId,
+        t.inspect_item_id AS inspectItemId,
+        t.inspect_item_code AS inspectItemCode,
+        t.item_config_id AS itemConfigId,
+        t.parameter_id AS parameterId,
+        t.parameter_code AS parameterCode,
+        ip.name AS parameterName,
+        t.parameter_config_id AS parameterConfigId,
+        COALESCE(isp.standard_rule, sssp.standard_rule) AS standardRule,
+        t.is_executable AS isExecutable,
+        t.is_reportable AS isReportable,
+        t.assigner_id AS assignerId,
+        t.assigner_name AS assignerName,
+        t.assign_time AS assignTime,
+        t.claim_time AS claimTime,
+        t.complete_time AS completeTime,
+        t.terminate_time AS terminateTime,
+        t.terminate_reason AS terminateReason,
+        t.return_reason AS returnReason,
+        t.reject_reason AS rejectReason,
+        t.remark AS remark,
+        t.execute_method AS executeMethod
+        FROM lm_task t
+        INNER JOIN lm_inspection_order io ON t.inspection_order_id = io.id
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        LEFT JOIN lm_inspect_parameter ip ON t.parameter_id = ip.id
+        LEFT JOIN lm_inspect_item ii ON t.inspect_item_id = ii.id
+        LEFT JOIN lm_inspection_scheme_parameter isp ON isp.id = t.parameter_config_id AND isp.is_deleted = 0
+        LEFT JOIN lm_stability_scheme_parameter sssp ON sssp.id = t.parameter_config_id AND sssp.is_deleted = 0
+        LEFT JOIN (
+        SELECT ier.task_id, MAX(COALESCE(ier.update_time, ier.create_time)) AS entry_time
+        FROM lm_inspection_entry_record ier
+        WHERE ier.is_deleted = 0
+        GROUP BY ier.task_id
+        ) le ON le.task_id = t.id
+        WHERE t.is_deleted = 0
+        AND io.is_deleted = 0
+        AND ip.is_deleted = 0
+        AND ii.is_deleted = 0
+        AND t.parameter_id = #{inspectParameterId}
+        AND t.inspect_item_id = #{inspectItemId}
+        <!-- 录入界面不能查询分配状态下的任务 -->
+        and t.status not in('PENDING_ASSIGNMENT','RETURN_PENDING_APPROVAL')
+        <!-- 数据权限控制 -->
+        <if test="query.currentUserTeamIds != null and query.currentUserTeamIds.size() > 0">
+            AND (
+            EXISTS (
+            SELECT 1 FROM lm_inspection_scheme_item_teams sit
+            WHERE sit.inspect_item_id = t.inspect_item_id
+            AND sit.version_id = io.scheme_version_id
+            AND sit.is_deleted = 0
+            AND sit.team_id IN
+            <foreach collection="query.currentUserTeamIds" item="teamId" open="(" separator="," close=")">
+                #{teamId}
+            </foreach>
+            )
+            OR EXISTS (
+            SELECT 1 FROM lm_stability_scheme_item_teams ssit
+            WHERE ssit.inspect_item_id = t.inspect_item_id
+            AND ssit.version_id = io.scheme_version_id
+            AND ssit.is_deleted = 0
+            AND ssit.team_id IN
+            <foreach collection="query.currentUserTeamIds" item="teamId" open="(" separator="," close=")">
+                #{teamId}
+            </foreach>
+            )
+            )
+        </if>
+        <!-- 只能查询当前人员的录入任务-->
+        <if test="query.ownerOnly!=null and query.ownerOnly and  query.currentUserId != null and query.currentUserId != ''">
+            AND t.owner_id = #{query.currentUserId}
+        </if>
+        <if test="query.inspectItemName != null and query.inspectItemName != ''">
+            AND ii.name LIKE CONCAT('%', #{query.inspectItemName}, '%')
+        </if>
+        <if test="query.inspectionOrderNo != null and query.inspectionOrderNo != ''">
+            AND io.order_no LIKE CONCAT('%', #{query.inspectionOrderNo}, '%')
+        </if>
+        <if test="query.batchNo != null and query.batchNo != ''">
+            AND io.batch_no LIKE CONCAT('%', #{query.batchNo}, '%')
+        </if>
+        <if test="query.requestStartTime != null">
+            AND io.create_time >= #{query.requestStartTime}
+        </if>
+        <if test="query.requestEndTime != null">
+            AND io.create_time &lt;= #{query.requestEndTime}
+        </if>
+        <if test="query.materialIds != null and query.materialIds.size() > 0">
+            AND io.material_id IN
+            <foreach collection="query.materialIds" item="materialId" open="(" separator="," close=")">
+                #{materialId}
+            </foreach>
+        </if>
+        <if test="query.taskStatuses != null and query.taskStatuses.size() > 0">
+            AND t.status IN
+            <foreach collection="query.taskStatuses" item="st" open="(" separator="," close=")">
+                #{st}
+            </foreach>
+        </if>
+        <if test="query.unreviewedOnly != null and query.unreviewedOnly">
+            AND t.status = 'TO_REVIEW'
+        </if>
+        <if test="query.abnormal != null">
+            <if test="query.abnormal == true">
+                AND ((t.judged_abnormal = 1 AND t.status != 'TERMINATED') OR t.status IN ('REVIEW_REJECTED','SAMPLE_AUDIT_REJECTED'))
+            </if>
+            <if test="query.abnormal == false">
+                AND t.judged_abnormal = 0
+            </if>
+        </if>
+        ORDER BY io.create_time DESC, io.order_no DESC
+    </select>
+
+    <!-- 检项查询-按方案版本获取分析项（一级表头） -->
+    <select id="listHeadersParametersByVersion" resultType="com.bmos.lims2.server.inspect.entry.dto.DataPointQueryRespDTO$HeaderLevel1">
+        SELECT
+            p.id AS parameterId,
+            p.code AS parameterCode,
+            p.name AS parameterName
+        FROM lm_inspection_scheme_parameter sp
+                 INNER JOIN lm_inspect_parameter p ON p.id = sp.parameter_id AND p.is_deleted = 0
+        WHERE sp.version_id = #{versionId}
+          AND sp.is_deleted = 0
+        ORDER BY p.name ASC, p.id ASC
+    </select>
+
+    <!-- 检项查询-按方案版本获取数据点名称（去重） -->
+    <select id="listHeaderPointNamesByVersion" resultType="string">
+        SELECT DISTINCT sdp.name
+        FROM lm_inspection_scheme_data_point sdp
+        WHERE sdp.version_id = #{versionId}
+          AND sdp.is_deleted = 0
+        ORDER BY sdp.id ASC
+    </select>
+
+    <!-- 检项查询-按方案获取分析项（一级表头） -->
+    <select id="listHeadersParametersByScheme" resultType="com.bmos.lims2.server.inspect.entry.dto.DataPointQueryRespDTO$HeaderLevel1">
+        SELECT DISTINCT
+            p.id AS parameterId,
+            p.code AS parameterCode,
+            p.name AS parameterName
+        FROM lm_inspection_scheme_version v
+                 INNER JOIN lm_inspection_scheme_parameter sp ON sp.version_id = v.id AND sp.is_deleted = 0
+                 INNER JOIN lm_inspect_parameter p ON p.id = sp.parameter_id AND p.is_deleted = 0
+        WHERE v.scheme_id = #{schemeId}
+          AND v.is_deleted = 0
+        ORDER BY p.name ASC, p.id ASC
+    </select>
+
+    <!-- 检项查询-按方案获取数据点名称（去重，同名+类型合并） -->
+    <select id="listHeaderPointNamesByScheme" resultType="string">
+        SELECT dp.name
+        FROM lm_inspection_scheme_version v
+                 INNER JOIN lm_inspection_scheme_data_point dp ON dp.version_id = v.id AND dp.is_deleted = 0
+        WHERE v.scheme_id = #{schemeId}
+          AND v.is_deleted = 0
+        GROUP BY dp.name, dp.point_type
+        ORDER BY MIN(dp.id) ASC
+    </select>
+
+    <!-- 检项查询-按条件分页检验单基础（用于行分页） -->
+    <select id="pageOrderBaseForDataPoint" resultType="com.bmos.lims2.server.inspect.order.dto.InspectionOrderOptionDTO">
+        SELECT
+        io.id,
+        io.order_no AS orderNo,
+        io.create_time AS requestTime,
+        m.name AS materialName,
+        sv.version_no AS schemeVersionNo
+        FROM lm_inspection_order io
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        LEFT JOIN lm_inspection_scheme_version sv ON io.scheme_version_id = sv.id
+        <where>
+            io.is_deleted = 0
+            <if test="materialId != null">
+                AND io.material_id = #{materialId}
+            </if>
+            <if test="schemeVersionId != null">
+                AND io.scheme_version_id = #{schemeVersionId}
+            </if>
+            <if test="requestStartTime != null">
+                AND io.create_time &gt;= #{requestStartTime}
+            </if>
+            <if test="requestEndTime != null">
+                AND io.create_time &lt;= #{requestEndTime}
+            </if>
+            <if test="orderIds != null and orderIds.size() > 0">
+                AND io.id IN
+                <foreach collection="orderIds" item="oid" open="(" separator="," close=")">#{oid}</foreach>
+            </if>
+        </where>
+        ORDER BY io.create_time DESC, io.id DESC
+    </select>
+
+    <!-- 检项查询-按方案分页检验单基础（用于行分页） -->
+    <select id="pageOrderBaseForDataPointByScheme" resultType="com.bmos.lims2.server.inspect.order.dto.InspectionOrderOptionDTO">
+        SELECT
+        io.id,
+        io.order_no AS orderNo,
+        io.create_time AS requestTime,
+        m.name AS materialName,
+        sv.version_no AS schemeVersionNo
+        FROM lm_inspection_order io
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        LEFT JOIN lm_inspection_scheme_version sv ON io.scheme_version_id = sv.id
+        <where>
+            io.is_deleted = 0
+            <if test="materialId != null">
+                AND io.material_id = #{materialId}
+            </if>
+            <if test="schemeId != null">
+                AND sv.scheme_id = #{schemeId}
+            </if>
+            <if test="requestStartTime != null">
+                AND io.create_time &gt;= #{requestStartTime}
+            </if>
+            <if test="requestEndTime != null">
+                AND io.create_time &lt;= #{requestEndTime}
+            </if>
+            <if test="orderIds != null and orderIds.size() > 0">
+                AND io.id IN
+                <foreach collection="orderIds" item="oid" open="(" separator="," close=")">#{oid}</foreach>
+            </if>
+        </where>
+        ORDER BY io.create_time DESC, io.id DESC
+    </select>
+
+    <!-- 检项查询-按稳定性方案分页检验单基础（用于行分页） -->
+    <select id="pageOrderBaseForDataPointByStabilityScheme" resultType="com.bmos.lims2.server.inspect.order.dto.InspectionOrderOptionDTO">
+        SELECT
+        io.id,
+        io.order_no AS orderNo,
+        io.create_time AS requestTime,
+        m.name AS materialName,
+        ssv.version_no AS schemeVersionNo
+        FROM lm_inspection_order io
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        LEFT JOIN lm_stability_scheme_version ssv ON io.scheme_version_id = ssv.id
+        <where>
+            io.is_deleted = 0
+            <if test="materialId != null">
+                AND io.material_id = #{materialId}
+            </if>
+            <if test="schemeId != null">
+                AND ssv.scheme_id = #{schemeId}
+            </if>
+            <if test="requestStartTime != null">
+                AND io.create_time &gt;= #{requestStartTime}
+            </if>
+            <if test="requestEndTime != null">
+                AND io.create_time &lt;= #{requestEndTime}
+            </if>
+            <if test="orderIds != null and orderIds.size() > 0">
+                AND io.id IN
+                <foreach collection="orderIds" item="oid" open="(" separator="," close=")">#{oid}</foreach>
+            </if>
+        </where>
+        ORDER BY io.create_time DESC, io.id DESC
+    </select>
+    <select id="listEntryValuesByOrderIds" resultType="com.bmos.lims2.server.inspect.entry.dto.InspectionEntryRecordDTO">
+        SELECT
+        ier.id,
+        ier.inspection_order_id AS inspectionOrderId,
+        ier.inspection_order_no AS inspectionOrderNo,
+        ier.task_id AS taskId,
+        ier.scheme_id AS schemeId,
+        ier.scheme_version_id AS schemeVersionId,
+        ier.package_id AS packageId,
+        ier.item_config_id AS itemConfigId,
+        ier.parameter_config_id AS parameterConfigId,
+        ier.scheme_data_point_id AS dataPointConfigId,
+        ier.original_data_point_id AS dataPointId,
+        ier.inspect_item_id AS inspectItemId,
+        ier.inspect_item_code AS inspectItemCode,
+        ii.name AS inspectItemName,
+        ier.parameter_id AS parameterId,
+        ier.parameter_code AS parameterCode,
+        ip.name AS parameterName,
+        ier.data_point_id AS dataPointId,
+        ier.data_point_name AS dataPointName,
+        ier.point_type AS pointType,
+        ier.value_text AS valueText,
+        ier.value_number AS valueNumber,
+        t.test_time AS testTime,
+        ier.operator_id AS operatorId,
+        ier.operator_name AS operatorName,
+        t.owner_id AS ownerId,
+        t.owner_name AS ownerName,
+        ier.is_abnormal AS abnormal,
+        ier.remark,
+        ier.create_time AS createTime,
+        ier.update_time AS updateTime
+        FROM lm_inspection_entry_record ier
+        LEFT JOIN lm_inspect_item ii ON ier.inspect_item_id = ii.id
+        LEFT JOIN lm_inspect_parameter ip ON ier.parameter_id = ip.id
+        WHERE ier.is_deleted = 0
+        AND ier.scheme_version_id = #{schemeVersionId}
+        <if test="orderIds != null and orderIds.size() > 0">
+            AND ier.inspection_order_id IN
+            <foreach collection="orderIds" item="oid" open="(" separator="," close=")">#{oid}</foreach>
+        </if>
+        ORDER BY ier.update_time DESC, ier.create_time DESC, ier.id DESC
+    </select>
+
+    <!-- 检项查询-查询选中检验单的数据点值（最新一条），按方案过滤 -->
+    <select id="listEntryValuesByOrderIdsByScheme" resultType="com.bmos.lims2.server.inspect.entry.dto.InspectionEntryRecordDTO">
+        SELECT
+        ier.id,
+        ier.inspection_order_id AS inspectionOrderId,
+        ier.inspection_order_no AS inspectionOrderNo,
+        ier.task_id AS taskId,
+        ier.scheme_id AS schemeId,
+        ier.scheme_version_id AS schemeVersionId,
+        ier.package_id AS packageId,
+        ier.item_config_id AS itemConfigId,
+        ier.parameter_config_id AS parameterConfigId,
+        ier.data_point_config_id AS dataPointConfigId,
+        ier.data_point_id AS dataPointId,
+        ier.inspect_item_id AS inspectItemId,
+        ier.inspect_item_code AS inspectItemCode,
+        ii.name AS inspectItemName,
+        ier.parameter_id AS parameterId,
+        ier.parameter_code AS parameterCode,
+        ip.name AS parameterName,
+        ier.data_point_id AS dataPointId,
+        ier.data_point_name AS dataPointName,
+        ier.point_type AS pointType,
+        ier.value_text AS valueText,
+        ier.value_number AS valueNumber,
+        ier.test_time AS testTime,
+        ier.operator_id AS operatorId,
+        ier.operator_name AS operatorName,
+        ier.is_abnormal AS abnormal,
+        ier.remark,
+        ier.create_time AS createTime,
+        ier.update_time AS updateTime
+        FROM lm_inspection_entry_record ier
+        LEFT JOIN lm_inspect_item ii ON ier.inspect_item_id = ii.id
+        LEFT JOIN lm_inspect_parameter ip ON ier.parameter_id = ip.id
+        LEFT JOIN lm_inspection_scheme_version sv ON ier.scheme_version_id = sv.id AND sv.is_deleted = 0
+        WHERE ier.is_deleted = 0
+        AND sv.scheme_id = #{schemeId}
+        <if test="orderIds != null and orderIds.size() > 0">
+            AND ier.inspection_order_id IN
+            <foreach collection="orderIds" item="oid" open="(" separator="," close=")">#{oid}</foreach>
+        </if>
+        ORDER BY ier.update_time DESC, ier.create_time DESC, ier.id DESC
+    </select>
+
+    <!-- 检项查询-查询选中检验单的数据点值（最新一条），按稳定性方案过滤 -->
+    <select id="listEntryValuesByOrderIdsByStabilityScheme" resultType="com.bmos.lims2.server.inspect.entry.dto.InspectionEntryRecordDTO">
+        SELECT
+        ier.id,
+        ier.inspection_order_id AS inspectionOrderId,
+        ier.inspection_order_no AS inspectionOrderNo,
+        ier.task_id AS taskId,
+        ier.scheme_id AS schemeId,
+        ier.scheme_version_id AS schemeVersionId,
+        ier.package_id AS packageId,
+        ier.item_config_id AS itemConfigId,
+        ier.parameter_config_id AS parameterConfigId,
+        ier.data_point_config_id AS dataPointConfigId,
+        ier.data_point_id AS dataPointId,
+        ier.inspect_item_id AS inspectItemId,
+        ier.inspect_item_code AS inspectItemCode,
+        ii.name AS inspectItemName,
+        ier.parameter_id AS parameterId,
+        ier.parameter_code AS parameterCode,
+        ip.name AS parameterName,
+        ier.data_point_id AS dataPointId,
+        ier.data_point_name AS dataPointName,
+        ier.point_type AS pointType,
+        ier.value_text AS valueText,
+        ier.value_number AS valueNumber,
+        ier.test_time AS testTime,
+        ier.operator_id AS operatorId,
+        ier.operator_name AS operatorName,
+        ier.is_abnormal AS abnormal,
+        ier.remark,
+        ier.create_time AS createTime,
+        ier.update_time AS updateTime
+        FROM lm_inspection_entry_record ier
+        LEFT JOIN lm_inspect_item ii ON ier.inspect_item_id = ii.id
+        LEFT JOIN lm_inspect_parameter ip ON ier.parameter_id = ip.id
+        LEFT JOIN lm_stability_scheme_version ssv ON ier.scheme_version_id = ssv.id AND ssv.is_deleted = 0
+        WHERE ier.is_deleted = 0
+        AND ssv.scheme_id = #{schemeId}
+        <if test="orderIds != null and orderIds.size() > 0">
+            AND ier.inspection_order_id IN
+            <foreach collection="orderIds" item="oid" open="(" separator="," close=")">#{oid}</foreach>
+        </if>
+        ORDER BY ier.update_time DESC, ier.create_time DESC, ier.id DESC
+    </select>
+
+    <!-- 根据检验单ID查询所有数据点录入记录 -->
+    <select id="selectByInspectionOrderId" resultType="com.bmos.lims2.server.inspect.entry.dto.InspectionEntryRecordDTO">
+        SELECT
+            ier.id,
+            ier.inspection_order_id AS inspectionOrderId,
+            ier.inspection_order_no AS inspectionOrderNo,
+            ier.task_id AS taskId,
+            ier.scheme_id AS schemeId,
+            ier.scheme_version_id AS schemeVersionId,
+            ier.package_id AS packageId,
+            ier.item_config_id AS itemConfigId,
+            ier.parameter_config_id AS parameterConfigId,
+            ier.data_point_config_id AS dataPointConfigId,
+            ier.data_point_id AS dataPointId,
+            ier.inspect_item_id AS inspectItemId,
+            ier.inspect_item_code AS inspectItemCode,
+            ii.name AS inspectItemName,
+            ier.parameter_id AS parameterId,
+            ier.parameter_code AS parameterCode,
+            ip.name AS parameterName,
+            ier.data_point_id AS dataPointId,
+            ier.data_point_name AS dataPointName,
+            ier.point_type AS pointType,
+            ier.value_text AS valueText,
+            ier.value_number AS valueNumber,
+            ier.test_time AS testTime,
+            ier.operator_id AS operatorId,
+            ier.operator_name AS operatorName,
+            ier.is_abnormal AS abnormal,
+            ier.remark,
+            ier.create_time AS createTime,
+            ier.update_time AS updateTime
+        FROM lm_inspection_entry_record ier
+                 LEFT JOIN lm_inspect_item ii ON ier.inspect_item_id = ii.id
+                 LEFT JOIN lm_inspect_parameter ip ON ier.parameter_id = ip.id
+        WHERE ier.inspection_order_id = #{inspectionOrderId}
+          AND ier.is_deleted = 0
+        ORDER BY ier.task_id, ier.data_point_id
+    </select>
+
+    <!-- 根据检验单ID与检验项目ID查询数据点录入记录（用于检验项目分页签明细） -->
+    <select id="selectByInspectionOrderIdAndItemId" resultType="com.bmos.lims2.server.inspect.entry.dto.InspectionEntryRecordDTO">
+        SELECT
+            ier.id,
+            ier.inspection_order_id AS inspectionOrderId,
+            ier.inspection_order_no AS inspectionOrderNo,
+            ier.task_id AS taskId,
+            ier.scheme_id AS schemeId,
+            ier.scheme_version_id AS schemeVersionId,
+            ier.package_id AS packageId,
+            ier.item_config_id AS itemConfigId,
+            ier.parameter_config_id AS parameterConfigId,
+            ier.data_point_config_id AS dataPointConfigId,
+            ier.data_point_id AS dataPointId,
+            ier.inspect_item_id AS inspectItemId,
+            ier.inspect_item_code AS inspectItemCode,
+            ii.name AS inspectItemName,
+            ier.parameter_id AS parameterId,
+            ier.parameter_code AS parameterCode,
+            ip.name AS parameterName,
+            ier.data_point_id AS dataPointId,
+            ier.data_point_name AS dataPointName,
+            ier.point_type AS pointType,
+            ier.value_text AS valueText,
+            ier.value_number AS valueNumber,
+            t.test_time AS testTime,
+            ier.operator_id AS operatorId,
+            ier.operator_name AS operatorName,
+            t.owner_id AS ownerId,
+            t.owner_name AS ownerName,
+            ier.is_abnormal AS abnormal,
+            COALESCE(isp.standard_rule, sssp.standard_rule) AS standardRule,
+            t.is_reportable AS isReportable,
+            t.is_executable AS isExecutable,
+            t.judged_result AS judgedResult,
+            t.judged_time AS judgedTime,
+            t.status AS status,
+            t.judged_abnormal AS abnormal,
+            t.reviewed_by AS reviewedBy,
+            t.reviewed_time AS reviewedTime,
+            le.entry_time AS entryTime,
+            ier.remark,
+            ier.create_time AS createTime,
+            ier.update_time AS updateTime,
+            t.execute_method AS executeMethod
+        FROM lm_inspection_entry_record ier
+                 LEFT JOIN lm_inspect_item ii ON ier.inspect_item_id = ii.id
+                 LEFT JOIN lm_inspect_parameter ip ON ier.parameter_id = ip.id
+                 LEFT JOIN lm_inspection_scheme_parameter isp ON ier.parameter_config_id = isp.id AND isp.is_deleted = 0
+                 LEFT JOIN lm_stability_scheme_parameter sssp ON ier.parameter_config_id = sssp.id AND sssp.is_deleted = 0
+                 LEFT JOIN lm_task t ON t.id = ier.task_id AND t.is_deleted = 0
+                 LEFT JOIN (
+            SELECT ier2.task_id, MAX(COALESCE(ier2.update_time, ier2.create_time)) AS entry_time
+            FROM lm_inspection_entry_record ier2
+            WHERE ier2.is_deleted = 0
+            GROUP BY ier2.task_id
+        ) le ON le.task_id = ier.task_id
+        WHERE ier.inspection_order_id = #{inspectionOrderId}
+          AND ier.inspect_item_id = #{inspectItemId}
+          AND ier.is_deleted = 0
+        ORDER BY ier.task_id, ier.data_point_id
+    </select>
+
+    <!-- 查询某检验单已录入数据的检验项目（去重）用于页签展示 -->
+    <select id="listEnteredInspectItemsByOrderId" resultType="com.bmos.lims2.server.inspect.entry.dto.InspectItemTabDTO">
+        SELECT DISTINCT
+            ier.inspect_item_id AS inspectItemId,
+            ier.inspect_item_code AS inspectItemCode,
+            ii.name AS inspectItemName
+        FROM lm_inspection_entry_record ier
+                 LEFT JOIN lm_inspect_item ii ON ier.inspect_item_id = ii.id
+        WHERE ier.inspection_order_id = #{orderId}
+          AND ier.is_deleted = 0
+        ORDER BY ier.inspect_item_id
+    </select>
+
+    <!-- 可按方案版本过滤的检验单数据点录入记录 -->
+    <select id="selectByInspectionOrderIdAndSchemeVersionId" resultType="com.bmos.lims2.server.inspect.entry.dto.InspectionEntryRecordDTO">
+        SELECT
+            ier.id,
+            ier.inspection_order_id AS inspectionOrderId,
+            ier.inspection_order_no AS inspectionOrderNo,
+            ier.task_id AS taskId,
+            ier.scheme_id AS schemeId,
+            ier.scheme_version_id AS schemeVersionId,
+            ier.package_id AS packageId,
+            ier.item_config_id AS itemConfigId,
+            ier.parameter_config_id AS parameterConfigId,
+            ier.scheme_data_point_id AS dataPointConfigId,
+            ier.original_data_point_id AS dataPointId,
+            ier.inspect_item_id AS inspectItemId,
+            ier.inspect_item_code AS inspectItemCode,
+            ii.name AS inspectItemName,
+            ier.parameter_id AS parameterId,
+            ier.parameter_code AS parameterCode,
+            ip.name AS parameterName,
+            ier.data_point_id AS dataPointId,
+            ier.data_point_name AS dataPointName,
+            ier.point_type AS pointType,
+            ier.value_text AS valueText,
+            ier.value_number AS valueNumber,
+            ier.test_time AS testTime,
+            ier.operator_id AS operatorId,
+            ier.operator_name AS operatorName,
+            ier.is_abnormal AS abnormal,
+            ier.remark,
+            ier.create_time AS createTime,
+            ier.update_time AS updateTime
+        FROM lm_inspection_entry_record ier
+                 LEFT JOIN lm_inspect_item ii ON ier.inspect_item_id = ii.id
+                 LEFT JOIN lm_inspect_parameter ip ON ier.parameter_id = ip.id
+        WHERE ier.inspection_order_id = #{inspectionOrderId}
+          AND (#{schemeVersionId} IS NULL OR ier.scheme_version_id = #{schemeVersionId})
+          AND ier.is_deleted = 0
+        ORDER BY ier.task_id, ier.data_point_id
+    </select>
+
+    <!-- 合并统计 - 分析项录入（全部/未完成/异常） -->
+    <select id="analysisItemEntryStats" resultType="com.bmos.lims2.server.inspect.entry.dto.EntryStatsDTO">
+        SELECT
+        COUNT(DISTINCT t.id) AS allCount,
+        COUNT(DISTINCT CASE WHEN t.status IN ('PENDING_COMPLETION','IN_PROGRESS') THEN t.id END) AS incompleteCount,
+        COUNT(DISTINCT CASE WHEN ((t.judged_abnormal = 1 AND t.status != 'TERMINATED') OR t.status IN ('REVIEW_REJECTED','SAMPLE_AUDIT_REJECTED')) THEN t.id END) AS abnormalCount
+        FROM lm_task t
+        LEFT JOIN lm_inspect_item ii ON t.inspect_item_id = ii.id
+        LEFT JOIN lm_inspect_parameter ip ON t.parameter_id = ip.id
+        LEFT JOIN lm_inspection_order io ON t.inspection_order_id = io.id
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        WHERE t.is_deleted = 0
+        <!-- 录入界面不能查询分配状态下的任务 -->
+        and t.status not in('PENDING_ASSIGNMENT','RETURN_PENDING_APPROVAL')
+        <if test="query.inspectItemName != null and query.inspectItemName != ''">
+            AND ii.name LIKE CONCAT('%', #{query.inspectItemName}, '%')
+        </if>
+        <if test="query.parameterName != null and query.parameterName != ''">
+            AND ip.name LIKE CONCAT('%', #{query.parameterName}, '%')
+        </if>
+        <if test="query.materialIds != null and query.materialIds.size() > 0">
+            AND io.material_id IN
+            <foreach collection="query.materialIds" item="materialId" open="(" close=")" separator=",">
+                #{materialId}
+            </foreach>
+        </if>
+        <if test="query.inspectionOrderNo != null and query.inspectionOrderNo != ''">
+            AND io.order_no LIKE CONCAT('%', #{query.inspectionOrderNo}, '%')
+        </if>
+        <if test="query.batchNo != null and query.batchNo != ''">
+            AND io.batch_no LIKE CONCAT('%', #{query.batchNo}, '%')
+        </if>
+        <if test="query.requestStartTime != null">
+            AND io.create_time &gt;= #{query.requestStartTime}
+        </if>
+        <if test="query.requestEndTime != null">
+            AND io.create_time &lt;= #{query.requestEndTime}
+        </if>
+        <if test="query.currentUserTeamIds != null and query.currentUserTeamIds.size() > 0">
+            AND (
+            EXISTS (
+            SELECT 1 FROM lm_inspection_scheme_item_teams sit
+            INNER JOIN lm_inspection_order io2 ON t.inspection_order_id = io2.id
+            WHERE sit.inspect_item_id = t.inspect_item_id
+            AND sit.version_id = io2.scheme_version_id
+            AND sit.is_deleted = 0
+            AND sit.team_id IN
+            <foreach collection="query.currentUserTeamIds" item="teamId" open="(" separator="," close=")">
+                #{teamId}
+            </foreach>
+            )
+            OR EXISTS (
+            SELECT 1 FROM lm_stability_scheme_item_teams ssit
+            INNER JOIN lm_inspection_order io2 ON t.inspection_order_id = io2.id
+            WHERE ssit.inspect_item_id = t.inspect_item_id
+            AND ssit.version_id = io2.scheme_version_id
+            AND ssit.is_deleted = 0
+            AND ssit.team_id IN
+            <foreach collection="query.currentUserTeamIds" item="teamId" open="(" separator="," close=")">
+                #{teamId}
+            </foreach>
+            )
+            )
+        </if>
+        <!-- 只能查询当前人员的录入任务-->
+        <if test="query.ownerOnly!=null and query.ownerOnly and  query.currentUserId != null and query.currentUserId != ''">
+            AND t.owner_id = #{query.currentUserId}
+        </if>
+    </select>
+
+    <!-- 合并统计 - 检验单录入（全部/未完成/异常） -->
+    <select id="inspectionOrderEntryStats" resultType="com.bmos.lims2.server.inspect.entry.dto.EntryStatsDTO">
+        SELECT
+        COUNT(DISTINCT io.id) AS allCount,
+        COUNT(DISTINCT CASE WHEN t.status IN ('PENDING_COMPLETION','IN_PROGRESS') THEN io.id END) AS incompleteCount,
+        COUNT(DISTINCT CASE WHEN ((t.judged_abnormal = 1 AND t.status != 'TERMINATED') OR t.status IN ('REVIEW_REJECTED','SAMPLE_AUDIT_REJECTED')) THEN io.id END) AS abnormalCount
+        FROM lm_inspection_order io
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        LEFT JOIN lm_task t ON io.id = t.inspection_order_id
+        LEFT JOIN lm_inspect_item ii ON t.inspect_item_id = ii.id
+        LEFT JOIN lm_inspect_parameter ip ON t.parameter_id = ip.id
+        WHERE io.is_deleted = 0
+        AND t.is_deleted = 0
+        <!-- 录入界面不能查询分配状态下的任务 -->
+        and t.status not in('PENDING_ASSIGNMENT','RETURN_PENDING_APPROVAL')
+        <if test="query.inspectItemName != null and query.inspectItemName != ''">
+            AND ii.name LIKE CONCAT('%', #{query.inspectItemName}, '%')
+        </if>
+        <if test="query.parameterName != null and query.parameterName != ''">
+            AND ip.name LIKE CONCAT('%', #{query.parameterName}, '%')
+        </if>
+        <if test="query.materialIds != null and query.materialIds.size() > 0">
+            AND io.material_id IN
+            <foreach collection="query.materialIds" item="materialId" open="(" close=")" separator=",">
+                #{materialId}
+            </foreach>
+        </if>
+        <if test="query.inspectionOrderNo != null and query.inspectionOrderNo != ''">
+            AND io.order_no LIKE CONCAT('%', #{query.inspectionOrderNo}, '%')
+        </if>
+        <if test="query.batchNo != null and query.batchNo != ''">
+            AND io.batch_no LIKE CONCAT('%', #{query.batchNo}, '%')
+        </if>
+        <if test="query.requestStartTime != null">
+            AND io.create_time &gt;= #{query.requestStartTime}
+        </if>
+        <if test="query.requestEndTime != null">
+            AND io.create_time &lt;= #{query.requestEndTime}
+        </if>
+        <if test="query.currentUserTeamIds != null and query.currentUserTeamIds.size() > 0">
+            AND (
+            EXISTS (
+            SELECT 1 FROM lm_inspection_scheme_item_teams sit
+            INNER JOIN lm_inspection_order io2 ON t.inspection_order_id = io2.id
+            WHERE sit.inspect_item_id = t.inspect_item_id
+            AND sit.version_id = io2.scheme_version_id
+            AND sit.is_deleted = 0
+            AND sit.team_id IN
+            <foreach collection="query.currentUserTeamIds" item="teamId" open="(" separator="," close=")">
+                #{teamId}
+            </foreach>
+            )
+            OR EXISTS (
+            SELECT 1 FROM lm_stability_scheme_item_teams ssit
+            INNER JOIN lm_inspection_order io2 ON t.inspection_order_id = io2.id
+            WHERE ssit.inspect_item_id = t.inspect_item_id
+            AND ssit.version_id = io2.scheme_version_id
+            AND ssit.is_deleted = 0
+            AND ssit.team_id IN
+            <foreach collection="query.currentUserTeamIds" item="teamId" open="(" separator="," close=")">
+                #{teamId}
+            </foreach>
+            )
+            )
+        </if>
+        <!-- 只能查询当前人员的录入任务-->
+        <if test="query.ownerOnly!=null and query.ownerOnly and  query.currentUserId != null and query.currentUserId != ''">
+            AND t.owner_id = #{query.currentUserId}
+        </if>
+    </select>
+
+    <!-- 检验单录入列表查询（母列表）- 参照任务分配实现 -->
+    <select id="selectInspectionOrderEntryList" resultType="com.bmos.lims2.server.inspect.entry.dto.InspectionOrderEntryDTO">
+        SELECT
+        io.id as inspectionOrderId,
+        io.order_no,
+        io.batch_no,
+        io.create_time as requestTime,
+        io.create_by as requestUserId,
+        m.name as materialName,
+        m.code as materialCode,
+        m.specification as materialSpec
+        FROM lm_inspection_order io
+        INNER JOIN lm_task t ON io.id = t.inspection_order_id
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        WHERE io.is_deleted = 0
+        AND t.is_deleted = 0
+        <!-- 录入界面不能查询分配状态下的任务 -->
+        and t.status not in('PENDING_ASSIGNMENT','RETURN_PENDING_APPROVAL')
+        <!-- 数据权限控制：只有当前人员在相关检验项目的班组中，才能看到相关的任务 -->
+        <if test="query.currentUserTeamIds != null and query.currentUserTeamIds.size() > 0">
+            AND (
+            EXISTS (
+            SELECT 1 FROM lm_inspection_scheme_item_teams sit
+            WHERE sit.inspect_item_id = t.inspect_item_id
+            AND sit.version_id = io.scheme_version_id
+            AND sit.is_deleted = 0
+            AND sit.team_id IN
+            <foreach collection="query.currentUserTeamIds" item="teamId" open="(" separator="," close=")">
+                #{teamId}
+            </foreach>
+            )
+            OR EXISTS (
+            SELECT 1 FROM lm_stability_scheme_item_teams ssit
+            WHERE ssit.inspect_item_id = t.inspect_item_id
+            AND ssit.version_id = io.scheme_version_id
+            AND ssit.is_deleted = 0
+            AND ssit.team_id IN
+            <foreach collection="query.currentUserTeamIds" item="teamId" open="(" separator="," close=")">
+                #{teamId}
+            </foreach>
+            )
+            )
+        </if>
+        <!-- 只能查询当前人员的录入任务-->
+        <if test="query.ownerOnly!=null and query.ownerOnly and  query.currentUserId != null and query.currentUserId != ''">
+            AND t.owner_id = #{query.currentUserId}
+        </if>
+        <if test="query.parameterName != null and query.parameterName != ''">
+            AND EXISTS (
+            SELECT 1 FROM lm_inspect_parameter ip
+            WHERE ip.id = t.parameter_id
+            AND ip.name LIKE CONCAT('%', #{query.parameterName}, '%')
+            AND ip.is_deleted = 0
+            )
+        </if>
+        <if test="query.inspectItemName != null and query.inspectItemName != ''">
+            AND EXISTS (
+            SELECT 1 FROM lm_inspect_item ii
+            WHERE ii.id = t.inspect_item_id
+            AND ii.name LIKE CONCAT('%', #{query.inspectItemName}, '%')
+            AND ii.is_deleted = 0
+            )
+        </if>
+        <if test="query.materialIds != null and query.materialIds.size() > 0">
+            AND io.material_id IN
+            <foreach collection="query.materialIds" item="mid" open="(" separator="," close=")">
+                #{mid}
+            </foreach>
+        </if>
+        <if test="query.inspectionOrderId != null">
+            AND io.id = #{query.inspectionOrderId}
+        </if>
+        <if test="query.inspectionOrderNo != null and query.inspectionOrderNo != ''">
+            AND io.order_no LIKE CONCAT('%', #{query.inspectionOrderNo}, '%')
+        </if>
+        <if test="query.batchNo != null and query.batchNo != ''">
+            AND io.batch_no LIKE CONCAT('%', #{query.batchNo}, '%')
+        </if>
+        <if test="query.requestStartTime != null">
+            AND io.create_time >= #{query.requestStartTime}
+        </if>
+        <if test="query.requestEndTime != null">
+            AND io.create_time &lt;= #{query.requestEndTime}
+        </if>
+        <if test="query.taskStatuses != null and query.taskStatuses.size() > 0">
+            AND t.status IN
+            <foreach collection="query.taskStatuses" item="st" open="(" separator="," close=")">
+                #{st}
+            </foreach>
+        </if>
+        <if test="query.unreviewedOnly != null and query.unreviewedOnly">
+            AND t.status = 'TO_REVIEW'
+        </if>
+        <if test="query.abnormal != null">
+            <if test="query.abnormal == true">
+                AND ((t.judged_abnormal = 1 AND t.status != 'TERMINATED') OR t.status IN ('REVIEW_REJECTED','SAMPLE_AUDIT_REJECTED'))
+            </if>
+            <if test="query.abnormal == false">
+                AND t.judged_abnormal = 0
+            </if>
+        </if>
+        GROUP BY io.id
+        ORDER BY io.create_time DESC, io.order_no ASC
+    </select>
+
+    <!-- 查询检验单下的任务列表（子列表）- 参照任务分配实现 -->
+    <select id="selectTasksByInspectionOrderPage" resultType="com.bmos.lims2.server.inspect.entry.dto.InspectionOrderEntryDTO$AnalysisItemEntryItemDTO">
+        SELECT
+        t.id,
+        t.scheme_version_id AS schemeVersionId,
+        t.inspect_item_id AS inspectItemId,
+        ii.name AS inspectItemName,
+        t.inspect_item_code AS inspectItemCode,
+        t.item_config_id AS itemConfigId,
+        t.parameter_id AS parameterId,
+        ip.name AS parameterName,
+        t.parameter_code AS parameterCode,
+        t.parameter_config_id AS parameterConfigId,
+        t.record_id AS recordId,
+        t.record_version_id AS recordVersionId,
+        t.record_item_id AS recordItemId,
+        br.name AS recordName,
+        br.code AS recordCode,
+        brv.version AS recordVersionNo,
+        COALESCE(isp.standard_rule, sssp.standard_rule) AS standardRule,
+        t.is_executable AS isExecutable,
+        t.is_reportable AS isReportable,
+        t.status,
+        t.judged_abnormal AS abnormal,
+        t.judged_result AS judgedResult,
+        t.judged_time AS judgedTime,
+        t.test_time AS testTime,
+        t.owner_id AS ownerId,
+        t.owner_name AS ownerName,
+        le.entry_time AS entryTime,
+        t.reviewed_by AS reviewedBy,
+        t.reviewed_time AS reviewedTime,
+        t.reviewed_abnormal_reason AS reviewRejectReason,
+        t.assigner_id AS assignerId,
+        t.assigner_name AS assignerName,
+        t.assign_time AS assignTime,
+        t.claim_time AS claimTime,
+        t.complete_time AS completeTime,
+        t.terminate_time AS terminateTime,
+        t.terminate_reason AS terminateReason,
+        t.return_reason AS returnReason,
+        t.reject_reason AS rejectReason,
+        t.remark AS remark,
+        t.execute_method AS executeMethod
+        FROM lm_task t
+        INNER JOIN lm_inspect_item ii ON t.inspect_item_id = ii.id
+        INNER JOIN lm_inspect_parameter ip ON t.parameter_id = ip.id
+        LEFT JOIN lm_inspection_scheme_parameter isp ON isp.id = t.parameter_config_id AND isp.is_deleted = 0
+        LEFT JOIN lm_stability_scheme_parameter sssp ON sssp.id = t.parameter_config_id AND sssp.is_deleted = 0
+        LEFT JOIN bm_batch_record br ON br.id = t.record_id AND br.is_deleted = 0
+        LEFT JOIN bm_batch_record_version brv ON brv.id = t.record_version_id AND brv.is_deleted = 0
+        LEFT JOIN (
+        SELECT ier.task_id, MAX(COALESCE(ier.update_time, ier.create_time)) AS entry_time
+        FROM lm_inspection_entry_record ier
+        WHERE ier.is_deleted = 0
+        GROUP BY ier.task_id
+        ) le ON le.task_id = t.id
+        WHERE t.inspection_order_id = #{inspectionOrderId}
+        AND t.is_deleted = 0
+        <!-- 录入界面不能查询分配状态下的任务 -->
+        and t.status not in('PENDING_ASSIGNMENT','RETURN_PENDING_APPROVAL')
+        <!-- 数据权限控制 -->
+        <if test="query.currentUserTeamIds != null and query.currentUserTeamIds.size() > 0">
+            AND (
+            EXISTS (
+            SELECT 1 FROM lm_inspection_scheme_item_teams sit
+            INNER JOIN lm_inspection_order io ON t.inspection_order_id = io.id
+            WHERE sit.inspect_item_id = t.inspect_item_id
+            AND sit.version_id = io.scheme_version_id
+            AND sit.is_deleted = 0
+            AND sit.team_id IN
+            <foreach collection="query.currentUserTeamIds" item="teamId" open="(" separator="," close=")">
+                #{teamId}
+            </foreach>
+            )
+            OR EXISTS (
+            SELECT 1 FROM lm_stability_scheme_item_teams ssit
+            INNER JOIN lm_inspection_order io ON t.inspection_order_id = io.id
+            WHERE ssit.inspect_item_id = t.inspect_item_id
+            AND ssit.version_id = io.scheme_version_id
+            AND ssit.is_deleted = 0
+            AND ssit.team_id IN
+            <foreach collection="query.currentUserTeamIds" item="teamId" open="(" separator="," close=")">
+                #{teamId}
+            </foreach>
+            )
+            )
+        </if>
+        <!-- 只能查询当前人员的录入任务-->
+        <if test="query.ownerOnly!=null and query.ownerOnly and  query.currentUserId != null and query.currentUserId != ''">
+            AND t.owner_id = #{query.currentUserId}
+        </if>
+        <!-- 名称类筛选：检验项目/分析项 -->
+        <if test="query.inspectItemName != null and query.inspectItemName != ''">
+            AND ii.name LIKE CONCAT('%', #{query.inspectItemName}, '%')
+        </if>
+        <if test="query.parameterName != null and query.parameterName != ''">
+            AND ip.name LIKE CONCAT('%', #{query.parameterName}, '%')
+        </if>
+        <!-- 检品筛选（通过检验单关联） -->
+        <if test="query.materialIds != null and query.materialIds.size() > 0">
+            AND EXISTS (
+            SELECT 1 FROM lm_inspection_order io
+            WHERE io.id = t.inspection_order_id
+            AND io.is_deleted = 0
+            AND io.material_id IN
+            <foreach collection="query.materialIds" item="mid" open="(" separator="," close=")">#{mid}</foreach>
+            )
+        </if>
+        <!-- 请验时间范围（与母列表对齐） -->
+        <if test="query.requestStartTime != null">
+            AND EXISTS (
+            SELECT 1 FROM lm_inspection_order io2
+            WHERE io2.id = t.inspection_order_id
+            AND io2.is_deleted = 0
+            AND io2.create_time &gt;= #{query.requestStartTime}
+            )
+        </if>
+        <if test="query.requestEndTime != null">
+            AND EXISTS (
+            SELECT 1 FROM lm_inspection_order io3
+            WHERE io3.id = t.inspection_order_id
+            AND io3.is_deleted = 0
+            AND io3.create_time &lt;= #{query.requestEndTime}
+            )
+        </if>
+        <if test="query.taskStatuses != null and query.taskStatuses.size() > 0">
+            AND t.status IN
+            <foreach collection="query.taskStatuses" item="st" open="(" separator="," close=")">
+                #{st}
+            </foreach>
+        </if>
+        <if test="query.unreviewedOnly != null and query.unreviewedOnly">
+            AND t.status = 'TO_REVIEW'
+        </if>
+        <if test="query.abnormal != null">
+            <if test="query.abnormal == true">
+                AND ((t.judged_abnormal = 1 AND t.status != 'TERMINATED') OR t.status IN ('REVIEW_REJECTED','SAMPLE_AUDIT_REJECTED'))
+            </if>
+            <if test="query.abnormal == false">
+                AND t.judged_abnormal = 0
+            </if>
+        </if>
+        ORDER BY t.inspect_item_code ASC, t.parameter_code ASC
+    </select>
+
+
+
+    <!-- 查询检验单下的任务列表（子列表）- standardRule 由 service 层按来源（常规/稳定性）分别填充 -->
+    <select id="selectSampleAuditTasksByInspectionOrder" resultType="com.bmos.lims2.server.inspect.entry.dto.InspectionOrderEntryDTO$AnalysisItemEntryItemDTO">
+        SELECT
+            t.id,
+            t.scheme_version_id AS schemeVersionId,
+            t.inspect_item_id AS inspectItemId,
+            ii.name AS inspectItemName,
+            t.inspect_item_code AS inspectItemCode,
+            t.item_config_id AS itemConfigId,
+            t.parameter_id AS parameterId,
+            ip.name AS parameterName,
+            t.parameter_code AS parameterCode,
+            t.parameter_config_id AS parameterConfigId,
+            t.is_executable AS isExecutable,
+            t.execute_method AS executeMethod,
+            t.is_reportable AS isReportable,
+            t.status,
+            t.judged_abnormal AS abnormal,
+            t.judged_result AS judgedResult,
+            t.judged_time AS judgedTime,
+            t.test_time AS testTime,
+            t.owner_id AS ownerId,
+            t.owner_name AS ownerName,
+            le.entry_time AS entryTime,
+            t.reviewed_by AS reviewedBy,
+            t.reviewed_time AS reviewedTime,
+            t.reviewed_abnormal_reason AS reviewRejectReason,
+            t.assigner_id AS assignerId,
+            t.assigner_name AS assignerName,
+            t.assign_time AS assignTime,
+            t.claim_time AS claimTime,
+            t.complete_time AS completeTime,
+            t.terminate_time AS terminateTime,
+            t.terminate_reason AS terminateReason,
+            t.return_reason AS returnReason,
+            t.reject_reason AS rejectReason,
+            t.remark AS remark
+        FROM lm_task t
+                 INNER JOIN lm_inspect_item ii ON t.inspect_item_id = ii.id
+                 INNER JOIN lm_inspect_parameter ip ON t.parameter_id = ip.id
+                 LEFT JOIN (
+            SELECT ier.task_id, MAX(COALESCE(ier.update_time, ier.create_time)) AS entry_time
+            FROM lm_inspection_entry_record ier
+            WHERE ier.is_deleted = 0
+            GROUP BY ier.task_id
+        ) le ON le.task_id = t.id
+        WHERE t.inspection_order_id = #{inspectionOrderId}
+          AND t.is_deleted = 0
+          AND t.status ='SAMPLE_AUDIT_PENDING'
+        ORDER BY t.inspect_item_code ASC, t.parameter_code ASC
+    </select>
+
+    <!-- 查询检验单下已完成的任务列表（样品审核通过后回传 MES 用） -->
+    <select id="selectCompletedTasksByInspectionOrder" resultType="com.bmos.lims2.server.inspect.entry.dto.InspectionOrderEntryDTO$AnalysisItemEntryItemDTO">
+        SELECT
+            t.id,
+            t.scheme_version_id AS schemeVersionId,
+            t.inspect_item_id AS inspectItemId,
+            ii.name AS inspectItemName,
+            t.inspect_item_code AS inspectItemCode,
+            t.item_config_id AS itemConfigId,
+            t.parameter_id AS parameterId,
+            ip.name AS parameterName,
+            t.parameter_code AS parameterCode,
+            t.parameter_config_id AS parameterConfigId,
+            t.is_executable AS isExecutable,
+            t.execute_method AS executeMethod,
+            t.is_reportable AS isReportable,
+            t.status,
+            t.judged_abnormal AS abnormal,
+            t.judged_result AS judgedResult,
+            t.judged_time AS judgedTime,
+            t.test_time AS testTime,
+            t.owner_id AS ownerId,
+            t.owner_name AS ownerName,
+            le.entry_time AS entryTime,
+            t.reviewed_by AS reviewedBy,
+            t.reviewed_time AS reviewedTime,
+            t.reviewed_abnormal_reason AS reviewRejectReason,
+            t.assigner_id AS assignerId,
+            t.assigner_name AS assignerName,
+            t.assign_time AS assignTime,
+            t.claim_time AS claimTime,
+            t.complete_time AS completeTime,
+            t.terminate_reason AS terminateReason,
+            t.return_reason AS returnReason,
+            t.reject_reason AS rejectReason,
+            t.remark AS remark
+        FROM lm_task t
+                 INNER JOIN lm_inspect_item ii ON t.inspect_item_id = ii.id
+                 INNER JOIN lm_inspect_parameter ip ON t.parameter_id = ip.id
+                 LEFT JOIN (
+            SELECT ier.task_id, MAX(COALESCE(ier.update_time, ier.create_time)) AS entry_time
+            FROM lm_inspection_entry_record ier
+            WHERE ier.is_deleted = 0
+            GROUP BY ier.task_id
+        ) le ON le.task_id = t.id
+        WHERE t.inspection_order_id = #{inspectionOrderId}
+          AND t.is_deleted = 0
+          AND t.status = 'COMPLETED'
+        ORDER BY t.inspect_item_code ASC, t.parameter_code ASC
+    </select>
+
+    <!-- 批量查询任务的录入人（操作人）ID列表 -->
+    <select id="selectTaskOperatorsByTaskIds" resultType="com.bmos.lims2.server.inspect.entry.dto.TaskOperatorDTO">
+        SELECT DISTINCT
+        ier.task_id AS taskId,
+        ier.operator_id AS operatorId
+        FROM lm_inspection_entry_record ier
+        WHERE ier.is_deleted = 0
+        AND ier.operator_id IS NOT NULL
+        AND ier.task_id IN
+        <foreach collection="taskIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <!-- 根据任务ID查询应录入的数据点（来源于方案配置），并联结已录入值 -->
+    <!-- 常规检验任务：按任务ID查询数据点录入记录 -->
+    <select id="selectByTaskId" resultType="com.bmos.lims2.server.inspect.entry.dto.InspectionEntryRecordDTO">
+        SELECT
+            ier.id,
+            t.inspection_order_id AS inspectionOrderId,
+            io.order_no AS inspectionOrderNo,
+            t.id AS taskId,
+            sv.scheme_id AS schemeId,
+            io.scheme_version_id AS schemeVersionId,
+            sdp.package_id AS packageId,
+            isi.id AS itemConfigId,
+            isp.id AS parameterConfigId,
+            sdp.id AS dataPointConfigId,
+            sdp.data_point_id AS dataPointId,
+            sdp.name AS dataPointName,
+            sdp.point_type AS pointType,
+            sdp.time_format AS timeFormat,
+            sdp.date_style AS dateStyle,
+            sdp.options AS optionsJson,
+            sdp.inspect_item_id AS inspectItemId,
+            ii.code AS inspectItemCode,
+            ii.name AS inspectItemName,
+            sdp.parameter_id AS parameterId,
+            ip.code AS parameterCode,
+            ip.name AS parameterName,
+            ier.value_text AS valueText,
+            ier.value_number AS valueNumber,
+            ier.test_time AS testTime,
+            ier.operator_id AS operatorId,
+            ier.operator_name AS operatorName,
+            ier.is_abnormal AS abnormal,
+            ier.remark,
+            ier.create_time AS createTime,
+            ier.update_time AS updateTime
+        FROM lm_task t
+                 INNER JOIN lm_inspection_order io ON t.inspection_order_id = io.id AND io.is_deleted = 0
+                 INNER JOIN lm_inspection_scheme_version sv ON io.scheme_version_id = sv.id
+                 INNER JOIN lm_inspection_scheme_parameter isp
+                            ON isp.version_id = io.scheme_version_id AND isp.id = t.parameter_config_id AND
+                               isp.is_deleted = 0
+                 INNER JOIN lm_inspection_scheme_item isi ON isi.id = isp.item_config_id AND isi.is_deleted = 0
+                 INNER JOIN lm_inspection_scheme_data_point sdp
+                            ON sdp.version_id = io.scheme_version_id AND sdp.parameter_config_id = t.parameter_config_id AND
+                               sdp.inspect_item_id = t.inspect_item_id AND
+                               sdp.is_deleted = 0
+                 LEFT JOIN lm_inspection_entry_record ier
+                           ON ier.task_id = t.id AND ier.data_point_config_id = sdp.id AND ier.is_deleted = 0
+                 LEFT JOIN lm_inspect_item ii ON sdp.inspect_item_id = ii.id
+                 LEFT JOIN lm_inspect_parameter ip ON sdp.parameter_id = ip.id
+        WHERE t.id = #{taskId}
+          AND t.is_deleted = 0
+        ORDER BY sdp.id
+    </select>
+
+    <!-- 稳定性任务：按任务ID查询数据点录入记录 -->
+    <select id="selectByTaskIdForStability" resultType="com.bmos.lims2.server.inspect.entry.dto.InspectionEntryRecordDTO">
+        SELECT
+            ier.id,
+            t.inspection_order_id AS inspectionOrderId,
+            io.order_no AS inspectionOrderNo,
+            t.id AS taskId,
+            ssv.scheme_id AS schemeId,
+            io.scheme_version_id AS schemeVersionId,
+            NULL AS packageId,
+            ssi.id AS itemConfigId,
+            ssp.id AS parameterConfigId,
+            ssdp.id AS dataPointConfigId,
+            ssdp.data_point_id AS dataPointId,
+            ssdp.name AS dataPointName,
+            ssdp.point_type AS pointType,
+            ssdp.time_format AS timeFormat,
+            ssdp.date_style AS dateStyle,
+            ssdp.options AS optionsJson,
+            t.inspect_item_id AS inspectItemId,
+            ii.code AS inspectItemCode,
+            ii.name AS inspectItemName,
+            ssdp.parameter_id AS parameterId,
+            ip.code AS parameterCode,
+            ip.name AS parameterName,
+            ier.value_text AS valueText,
+            ier.value_number AS valueNumber,
+            ier.test_time AS testTime,
+            ier.operator_id AS operatorId,
+            ier.operator_name AS operatorName,
+            ier.is_abnormal AS abnormal,
+            ier.remark,
+            ier.create_time AS createTime,
+            ier.update_time AS updateTime
+        FROM lm_task t
+                 INNER JOIN lm_inspection_order io ON t.inspection_order_id = io.id AND io.is_deleted = 0
+                 INNER JOIN lm_stability_scheme_version ssv ON io.scheme_version_id = ssv.id AND ssv.is_deleted = 0
+                 INNER JOIN lm_stability_scheme_parameter ssp
+                            ON ssp.version_id = io.scheme_version_id AND ssp.id = t.parameter_config_id AND ssp.is_deleted = 0
+                 INNER JOIN lm_stability_scheme_item ssi ON ssi.id = ssp.item_config_id AND ssi.is_deleted = 0
+                 INNER JOIN lm_stability_scheme_data_point ssdp
+                            ON ssdp.version_id = io.scheme_version_id AND ssdp.parameter_config_id = t.parameter_config_id AND
+                               ssdp.is_deleted = 0
+                 LEFT JOIN lm_inspection_entry_record ier
+                           ON ier.task_id = t.id AND ier.data_point_config_id = ssdp.id AND ier.is_deleted = 0
+                 LEFT JOIN lm_inspect_item ii ON t.inspect_item_id = ii.id
+                 LEFT JOIN lm_inspect_parameter ip ON ssdp.parameter_id = ip.id
+        WHERE t.id = #{taskId}
+          AND t.is_deleted = 0
+        ORDER BY ssdp.id
+    </select>
+
+    <!-- 根据检验单ID和分析项ID查询数据点录入记录 -->
+    <select id="selectByInspectionOrderIdAndParameterId" resultType="com.bmos.lims2.server.inspect.entry.dto.InspectionEntryRecordDTO">
+        SELECT
+            ier.id,
+            ier.inspection_order_id AS inspectionOrderId,
+            ier.inspection_order_no AS inspectionOrderNo,
+            ier.task_id AS taskId,
+            ier.scheme_id AS schemeId,
+            ier.scheme_version_id AS schemeVersionId,
+            ier.package_id AS packageId,
+            ier.item_config_id AS itemConfigId,
+            ier.parameter_config_id AS parameterConfigId,
+            ier.scheme_data_point_id AS dataPointConfigId,
+            ier.original_data_point_id AS dataPointId,
+            ier.inspect_item_id AS inspectItemId,
+            ier.inspect_item_code AS inspectItemCode,
+            ii.name AS inspectItemName,
+            ier.parameter_id AS parameterId,
+            ier.parameter_code AS parameterCode,
+            ip.name AS parameterName,
+            ier.data_point_id AS dataPointId,
+            ier.data_point_name AS dataPointName,
+            ier.point_type AS pointType,
+            sdp.time_format AS timeFormat,
+            sdp.date_style AS dateStyle,
+            ier.value_text AS valueText,
+            ier.value_number AS valueNumber,
+            ier.test_time AS testTime,
+            ier.operator_id AS operatorId,
+            ier.operator_name AS operatorName,
+            ier.is_abnormal AS abnormal,
+            ier.remark,
+            ier.create_time AS createTime,
+            ier.update_time AS updateTime
+        FROM lm_inspection_entry_record ier
+                 LEFT JOIN lm_inspect_item ii ON ier.inspect_item_id = ii.id
+                 LEFT JOIN lm_inspect_parameter ip ON ier.parameter_id = ip.id
+        WHERE ier.inspection_order_id = #{inspectionOrderId}
+          AND ier.parameter_id = #{parameterId}
+          AND ier.is_deleted = 0
+        ORDER BY ier.data_point_id
+    </select>
+
+    <!-- 统计录入未完成的分析项数量 -->
+    <select id="countIncompleteAnalysisItems" resultType="java.lang.Long">
+        SELECT COUNT(DISTINCT t.id)
+        FROM lm_task t
+        LEFT JOIN lm_inspect_item ii ON t.inspect_item_id = ii.id
+        LEFT JOIN lm_inspect_parameter ip ON t.parameter_id = ip.id
+        LEFT JOIN lm_inspection_order io ON t.inspection_order_id = io.id
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        WHERE t.is_deleted = 0
+        AND t.status IN ('PENDING_COMPLETION', 'IN_PROGRESS')
+        <if test="query.inspectItemName != null and query.inspectItemName != ''">
+            AND ii.name LIKE CONCAT('%', #{query.inspectItemName}, '%')
+        </if>
+        <if test="query.parameterName != null and query.parameterName != ''">
+            AND ip.name LIKE CONCAT('%', #{query.parameterName}, '%')
+        </if>
+        <if test="query.materialIds != null and query.materialIds.size() > 0">
+            AND io.material_id IN
+            <foreach collection="query.materialIds" item="materialId" open="(" close=")" separator=",">
+                #{materialId}
+            </foreach>
+        </if>
+        <if test="query.inspectionOrderNo != null and query.inspectionOrderNo != ''">
+            AND io.order_no LIKE CONCAT('%', #{query.inspectionOrderNo}, '%')
+        </if>
+        <if test="query.batchNo != null and query.batchNo != ''">
+            AND io.batch_no LIKE CONCAT('%', #{query.batchNo}, '%')
+        </if>
+        <if test="query.requestStartTime != null">
+            AND io.create_time >= #{query.requestStartTime}
+        </if>
+        <if test="query.requestEndTime != null">
+            AND io.create_time &lt;= #{query.requestEndTime}
+        </if>
+        <if test="query.currentUserTeamIds != null and query.currentUserTeamIds.size() > 0">
+            AND (
+            EXISTS (
+            SELECT 1 FROM lm_inspection_scheme_item_teams sit
+            INNER JOIN lm_inspection_order io ON t.inspection_order_id = io.id
+            WHERE sit.inspect_item_id = t.inspect_item_id
+            AND sit.version_id = io.scheme_version_id
+            AND sit.is_deleted = 0
+            AND sit.team_id IN
+            <foreach collection="query.currentUserTeamIds" item="teamId" open="(" close=")" separator=",">
+                #{teamId}
+            </foreach>
+            )
+            OR EXISTS (
+            SELECT 1 FROM lm_stability_scheme_item_teams ssit
+            INNER JOIN lm_inspection_order io ON t.inspection_order_id = io.id
+            WHERE ssit.inspect_item_id = t.inspect_item_id
+            AND ssit.version_id = io.scheme_version_id
+            AND ssit.is_deleted = 0
+            AND ssit.team_id IN
+            <foreach collection="query.currentUserTeamIds" item="teamId" open="(" close=")" separator=",">
+                #{teamId}
+            </foreach>
+            )
+            )
+        </if>
+    </select>
+
+    <!-- 统计录入未完成的检验单数量 -->
+    <select id="countIncompleteInspectionOrders" resultType="java.lang.Long">
+        SELECT COUNT(DISTINCT io.id)
+        FROM lm_inspection_order io
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        LEFT JOIN lm_task t ON io.id = t.inspection_order_id
+        LEFT JOIN lm_inspect_item ii ON t.inspect_item_id = ii.id
+        LEFT JOIN lm_inspect_parameter ip ON t.parameter_id = ip.id
+        WHERE io.is_deleted = 0
+        AND t.is_deleted = 0
+        AND t.status IN ('PENDING_COMPLETION', 'IN_PROGRESS')
+        <if test="query.inspectItemName != null and query.inspectItemName != ''">
+            AND ii.name LIKE CONCAT('%', #{query.inspectItemName}, '%')
+        </if>
+        <if test="query.parameterName != null and query.parameterName != ''">
+            AND ip.name LIKE CONCAT('%', #{query.parameterName}, '%')
+        </if>
+        <if test="query.materialIds != null and query.materialIds.size() > 0">
+            AND io.material_id IN
+            <foreach collection="query.materialIds" item="materialId" open="(" close=")" separator=",">
+                #{materialId}
+            </foreach>
+        </if>
+        <if test="query.inspectionOrderNo != null and query.inspectionOrderNo != ''">
+            AND io.order_no LIKE CONCAT('%', #{query.inspectionOrderNo}, '%')
+        </if>
+        <if test="query.batchNo != null and query.batchNo != ''">
+            AND io.batch_no LIKE CONCAT('%', #{query.batchNo}, '%')
+        </if>
+        <if test="query.requestStartTime != null">
+            AND io.create_time >= #{query.requestStartTime}
+        </if>
+        <if test="query.requestEndTime != null">
+            AND io.create_time &lt;= #{query.requestEndTime}
+        </if>
+        <if test="query.currentUserTeamIds != null and query.currentUserTeamIds.size() > 0">
+            AND (
+            EXISTS (
+            SELECT 1 FROM lm_inspection_scheme_item_teams sit
+            INNER JOIN lm_inspection_order io ON t.inspection_order_id = io.id
+            WHERE sit.inspect_item_id = t.inspect_item_id
+            AND sit.version_id = io.scheme_version_id
+            AND sit.is_deleted = 0
+            AND sit.team_id IN
+            <foreach collection="query.currentUserTeamIds" item="teamId" open="(" close=")" separator=",">
+                #{teamId}
+            </foreach>
+            )
+            OR EXISTS (
+            SELECT 1 FROM lm_stability_scheme_item_teams ssit
+            INNER JOIN lm_inspection_order io ON t.inspection_order_id = io.id
+            WHERE ssit.inspect_item_id = t.inspect_item_id
+            AND ssit.version_id = io.scheme_version_id
+            AND ssit.is_deleted = 0
+            AND ssit.team_id IN
+            <foreach collection="query.currentUserTeamIds" item="teamId" open="(" close=")" separator=",">
+                #{teamId}
+            </foreach>
+            )
+            )
+        </if>
+    </select>
+
+    <!-- 统计判定异常的分析项数量 -->
+    <select id="countAbnormalAnalysisItems" resultType="java.lang.Long">
+        SELECT COUNT(DISTINCT t.id)
+        FROM lm_task t
+        LEFT JOIN lm_inspect_item ii ON t.inspect_item_id = ii.id
+        LEFT JOIN lm_inspect_parameter ip ON t.parameter_id = ip.id
+        LEFT JOIN lm_inspection_order io ON t.inspection_order_id = io.id
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        WHERE t.is_deleted = 0
+        AND ((t.judged_abnormal = 1 AND t.status != 'TERMINATED') OR t.status IN ('REVIEW_REJECTED','SAMPLE_AUDIT_REJECTED'))
+        <if test="query.inspectItemName != null and query.inspectItemName != ''">
+            AND ii.name LIKE CONCAT('%', #{query.inspectItemName}, '%')
+        </if>
+        <if test="query.parameterName != null and query.parameterName != ''">
+            AND ip.name LIKE CONCAT('%', #{query.parameterName}, '%')
+        </if>
+        <if test="query.materialIds != null and query.materialIds.size() > 0">
+            AND io.material_id IN
+            <foreach collection="query.materialIds" item="materialId" open="(" close=")" separator=",">
+                #{materialId}
+            </foreach>
+        </if>
+        <if test="query.inspectionOrderNo != null and query.inspectionOrderNo != ''">
+            AND io.order_no LIKE CONCAT('%', #{query.inspectionOrderNo}, '%')
+        </if>
+        <if test="query.batchNo != null and query.batchNo != ''">
+            AND io.batch_no LIKE CONCAT('%', #{query.batchNo}, '%')
+        </if>
+        <if test="query.requestStartTime != null">
+            AND io.create_time >= #{query.requestStartTime}
+        </if>
+        <if test="query.requestEndTime != null">
+            AND io.create_time &lt;= #{query.requestEndTime}
+        </if>
+        <if test="query.currentUserTeamIds != null and query.currentUserTeamIds.size() > 0">
+            AND (
+            EXISTS (
+            SELECT 1 FROM lm_inspection_scheme_item_teams sit
+            INNER JOIN lm_inspection_order io ON t.inspection_order_id = io.id
+            WHERE sit.inspect_item_id = t.inspect_item_id
+            AND sit.version_id = io.scheme_version_id
+            AND sit.is_deleted = 0
+            AND sit.team_id IN
+            <foreach collection="query.currentUserTeamIds" item="teamId" open="(" close=")" separator=",">
+                #{teamId}
+            </foreach>
+            )
+            OR EXISTS (
+            SELECT 1 FROM lm_stability_scheme_item_teams ssit
+            INNER JOIN lm_inspection_order io ON t.inspection_order_id = io.id
+            WHERE ssit.inspect_item_id = t.inspect_item_id
+            AND ssit.version_id = io.scheme_version_id
+            AND ssit.is_deleted = 0
+            AND ssit.team_id IN
+            <foreach collection="query.currentUserTeamIds" item="teamId" open="(" close=")" separator=",">
+                #{teamId}
+            </foreach>
+            )
+            )
+        </if>
+    </select>
+
+    <!-- 统计判定异常的检验单数量 -->
+    <select id="countAbnormalInspectionOrders" resultType="java.lang.Long">
+        SELECT COUNT(DISTINCT io.id)
+        FROM lm_inspection_order io
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        LEFT JOIN lm_task t ON io.id = t.inspection_order_id
+        LEFT JOIN lm_inspect_item ii ON t.inspect_item_id = ii.id
+        LEFT JOIN lm_inspect_parameter ip ON t.parameter_id = ip.id
+        WHERE io.is_deleted = 0
+        AND t.is_deleted = 0
+        AND ((t.judged_abnormal = 1 AND t.status != 'TERMINATED') OR t.status IN ('REVIEW_REJECTED','SAMPLE_AUDIT_REJECTED'))
+        <if test="query.inspectItemName != null and query.inspectItemName != ''">
+            AND ii.name LIKE CONCAT('%', #{query.inspectItemName}, '%')
+        </if>
+        <if test="query.parameterName != null and query.parameterName != ''">
+            AND ip.name LIKE CONCAT('%', #{query.parameterName}, '%')
+        </if>
+        <if test="query.materialIds != null and query.materialIds.size() > 0">
+            AND io.material_id IN
+            <foreach collection="query.materialIds" item="materialId" open="(" close=")" separator=",">
+                #{materialId}
+            </foreach>
+        </if>
+        <if test="query.inspectionOrderNo != null and query.inspectionOrderNo != ''">
+            AND io.order_no LIKE CONCAT('%', #{query.inspectionOrderNo}, '%')
+        </if>
+        <if test="query.batchNo != null and query.batchNo != ''">
+            AND io.batch_no LIKE CONCAT('%', #{query.batchNo}, '%')
+        </if>
+        <if test="query.requestStartTime != null">
+            AND io.create_time >= #{query.requestStartTime}
+        </if>
+        <if test="query.requestEndTime != null">
+            AND io.create_time &lt;= #{query.requestEndTime}
+        </if>
+        <if test="query.currentUserTeamIds != null and query.currentUserTeamIds.size() > 0">
+            AND (
+            EXISTS (
+            SELECT 1 FROM lm_inspection_scheme_item_teams sit
+            INNER JOIN lm_inspection_order io ON t.inspection_order_id = io.id
+            WHERE sit.inspect_item_id = t.inspect_item_id
+            AND sit.version_id = io.scheme_version_id
+            AND sit.is_deleted = 0
+            AND sit.team_id IN
+            <foreach collection="query.currentUserTeamIds" item="teamId" open="(" close=")" separator=",">
+                #{teamId}
+            </foreach>
+            )
+            OR EXISTS (
+            SELECT 1 FROM lm_stability_scheme_item_teams ssit
+            INNER JOIN lm_inspection_order io ON t.inspection_order_id = io.id
+            WHERE ssit.inspect_item_id = t.inspect_item_id
+            AND ssit.version_id = io.scheme_version_id
+            AND ssit.is_deleted = 0
+            AND ssit.team_id IN
+            <foreach collection="query.currentUserTeamIds" item="teamId" open="(" close=")" separator=",">
+                #{teamId}
+            </foreach>
+            )
+            )
+        </if>
+    </select>
+
+
+
+    <!-- 根据用户ID获取权限范围内的任务ID列表 -->
+    <select id="selectAuthorizedTaskIds" resultType="java.lang.Long">
+        SELECT DISTINCT t.id
+        FROM lm_task t
+                 INNER JOIN lm_inspection_team_member itm ON t.inspect_item_id = itm.inspect_item_id
+                 INNER JOIN lm_inspection_team it ON itm.team_id = it.id
+        WHERE itm.user_id = #{userId}
+          AND t.is_deleted = 0
+          AND itm.is_deleted = 0
+          AND it.is_deleted = 0
+    </select>
+
+    <!-- 根据方案数据点配置ID查询录入记录 -->
+    <select id="selectBySchemeDataPointId" resultType="com.bmos.lims2.server.inspect.entry.dto.InspectionEntryRecordDTO">
+        SELECT
+            ier.id,
+            ier.inspection_order_id AS inspectionOrderId,
+            ier.inspection_order_no AS inspectionOrderNo,
+            ier.task_id AS taskId,
+            ier.scheme_id AS schemeId,
+            ier.scheme_version_id AS schemeVersionId,
+            ier.package_id AS packageId,
+            ier.item_config_id AS itemConfigId,
+            ier.parameter_config_id AS parameterConfigId,
+            ier.scheme_data_point_id AS dataPointConfigId,
+            ier.original_data_point_id AS dataPointId,
+            ier.inspect_item_id AS inspectItemId,
+            ier.inspect_item_code AS inspectItemCode,
+            ii.name AS inspectItemName,
+            ier.parameter_id AS parameterId,
+            ier.parameter_code AS parameterCode,
+            ip.name AS parameterName,
+            ier.data_point_id AS dataPointId,
+            ier.data_point_name AS dataPointName,
+            ier.point_type AS pointType,
+            ier.value_text AS valueText,
+            ier.value_number AS valueNumber,
+            ier.test_time AS testTime,
+            ier.operator_id AS operatorId,
+            ier.operator_name AS operatorName,
+            ier.is_abnormal AS abnormal,
+            ier.remark,
+            ier.create_time AS createTime,
+            ier.update_time AS updateTime
+        FROM lm_inspection_entry_record ier
+                 LEFT JOIN lm_inspect_item ii ON ier.inspect_item_id = ii.id
+                 LEFT JOIN lm_inspect_parameter ip ON ier.parameter_id = ip.id
+        WHERE ier.scheme_data_point_id = #{dataPointConfigId}
+          AND ier.is_deleted = 0
+        ORDER BY ier.task_id, ier.create_time
+    </select>
+
+    <!-- 根据方案数据点配置ID和任务ID查询录入记录 -->
+    <select id="selectBySchemeDataPointIdAndTaskId" resultType="com.bmos.lims2.server.inspect.entry.dto.InspectionEntryRecordDTO">
+        SELECT
+            ier.id,
+            ier.inspection_order_id AS inspectionOrderId,
+            ier.inspection_order_no AS inspectionOrderNo,
+            ier.task_id AS taskId,
+            ier.scheme_id AS schemeId,
+            ier.scheme_version_id AS schemeVersionId,
+            ier.package_id AS packageId,
+            ier.item_config_id AS itemConfigId,
+            ier.parameter_config_id AS parameterConfigId,
+            ier.data_point_config_id AS dataPointConfigId,
+            ier.data_point_id AS dataPointId,
+            ier.inspect_item_id AS inspectItemId,
+            ier.inspect_item_code AS inspectItemCode,
+            ii.name AS inspectItemName,
+            ier.parameter_id AS parameterId,
+            ier.parameter_code AS parameterCode,
+            ip.name AS parameterName,
+
+            ier.data_point_id AS dataPointId,
+            ier.data_point_name AS dataPointName,
+            ier.point_type AS pointType,
+            ier.value_text AS valueText,
+            ier.value_number AS valueNumber,
+            ier.test_time AS testTime,
+            ier.operator_id AS operatorId,
+            ier.operator_name AS operatorName,
+            ier.is_abnormal AS abnormal,
+            ier.remark,
+            ier.create_time AS createTime,
+            ier.update_time AS updateTime
+        FROM lm_inspection_entry_record ier
+                 LEFT JOIN lm_inspect_item ii ON ier.inspect_item_id = ii.id
+                 LEFT JOIN lm_inspect_parameter ip ON ier.parameter_id = ip.id
+        WHERE ier.data_point_config_id = #{dataPointConfigId}
+          AND ier.task_id = #{taskId}
+          AND ier.is_deleted = 0
+        ORDER BY ier.create_time
+    </select>
+
+    <!-- 查询用户所在的检验班组ID列表 -->
+    <select id="selectUserInspectionTeamIds" resultType="java.lang.Long">
+        SELECT DISTINCT sit.team_id
+        FROM lm_inspection_scheme_item_teams sit
+                 INNER JOIN lm_inspection_team it ON sit.team_id = it.id
+                 INNER JOIN lm_inspection_team_member itm ON it.id = itm.team_id
+        WHERE itm.user_id = #{userId}
+          AND sit.is_deleted = 0
+          AND it.is_deleted = 0
+          AND itm.is_deleted = 0
+        UNION
+        SELECT DISTINCT ssit.team_id
+        FROM lm_stability_scheme_item_teams ssit
+                 INNER JOIN lm_inspection_team it ON ssit.team_id = it.id
+                 INNER JOIN lm_inspection_team_member itm ON it.id = itm.team_id
+        WHERE itm.user_id = #{userId}
+          AND ssit.is_deleted = 0
+          AND it.is_deleted = 0
+          AND itm.is_deleted = 0
+    </select>
+
+    <!-- 趋势查询：按检品/方案/项目/分析项/数据点名称与时间范围，返回数值型录入及检验单信息（用于趋势图） -->
+    <select id="selectNumericTrendValues" resultType="com.bmos.lims2.server.inspect.entry.dto.TrendValuePointDTO">
+        SELECT
+        io.id AS inspectionOrderId,
+        io.order_no AS inspectionOrderNo,
+        io.batch_no AS batchNo,
+        io.create_time AS requestTime,
+        sv.scheme_id AS schemeId,
+        ier.scheme_version_id AS schemeVersionId,
+        ier.inspect_item_id AS inspectItemId,
+        ier.parameter_id AS parameterId,
+        ier.data_point_name AS dataPointName,
+        ier.value_text AS valueText,
+        COALESCE(ier.value_number, CAST(NULLIF(ier.value_text,'') AS DECIMAL(65,20))) AS valueNumber
+        FROM lm_inspection_entry_record ier
+        INNER JOIN lm_inspection_order io ON ier.inspection_order_id = io.id AND io.is_deleted = 0
+        LEFT JOIN lm_inspection_scheme_version sv ON io.scheme_version_id = sv.id AND sv.is_deleted = 0
+        <where>
+            ier.is_deleted = 0
+            AND ier.point_type = 'NUMBER'
+            <if test="materialId != null">
+                AND io.material_id = #{materialId}
+            </if>
+            <if test="schemeId != null">
+                AND sv.scheme_id = #{schemeId}
+            </if>
+            <if test="inspectItemId != null">
+                AND ier.inspect_item_id = #{inspectItemId}
+            </if>
+            <if test="parameterId != null">
+                AND ier.parameter_id = #{parameterId}
+            </if>
+            <!-- 同名数据点在不同版本视为同一数据点，按名称匹配 -->
+            <if test="dataPointName != null and dataPointName != ''">
+                AND ier.data_point_name = #{dataPointName}
+            </if>
+            <if test="requestStartTime != null">
+                AND io.create_time &gt;= #{requestStartTime}
+            </if>
+            <if test="requestEndTime != null">
+                AND io.create_time &lt;= #{requestEndTime}
+            </if>
+        </where>
+        ORDER BY io.create_time ASC, io.id ASC
+    </select>
+
+</mapper>

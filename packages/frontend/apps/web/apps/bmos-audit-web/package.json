@@ -1,0 +1,52 @@
+{
+  "name": "bmos-audit-web",
+  "version": "0.0.0",
+  "description": "设计追溯",
+  "keywords": [
+    "bmos-audit"
+  ],
+  "license": "MIT",
+  "author": "Ansel",
+  "type": "module",
+  "main": "",
+  "module": "",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "workspaces": [
+    "../../packages"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite dev",
+    "open": "npx @bmos/open open",
+    "test": "npx @bmos/open"
+  },
+  "dependencies": {
+    "@ant-design/icons-vue": "^7.0.0",
+    "@bmos/axios": "workspace:^",
+    "@bmos/components": "workspace:^",
+    "@bmos/i18n": "workspace:^",
+    "@bmos/icons": "workspace:^",
+    "@bmos/messager": "workspace:^",
+    "@bmos/utils": "workspace:^",
+    "ant-design-vue": "^4.2.6",
+    "pinia": "^2.1.7",
+    "vue-router": "^4.2.5"
+  },
+  "devDependencies": {
+    "@bmos/open": "workspace:^",
+    "@vitejs/plugin-vue-jsx": "^4.0.0",
+    "dayjs": "^1.11.10",
+    "less": "^4.2.0",
+    "unplugin-auto-import": "^0.17.2",
+    "unplugin-vue-components": "^0.26.0",
+    "vite-plugin-svg-icons": "^2.0.1"
+  },
+  "vite": {
+    "alias": {
+      "@": "./src"
+    }
+  }
+}

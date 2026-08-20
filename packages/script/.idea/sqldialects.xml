@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SqlDialectMappings">
+    <file url="file://$PROJECT_DIR$/01-MES/01-开发脚本/01-菜单权限/V2.1.5.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/01-开发脚本/01-菜单权限/V3.0.1_patch1.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/01-开发脚本/01-菜单权限/V3.0.1_patch3.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/01-开发脚本/01-菜单权限/V3.0.1_patch4.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/01-开发脚本/01-菜单权限/V3.1.0.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/01-开发脚本/01-菜单权限/project/BELS/V3.0.0_patch1.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/01-开发脚本/01-菜单权限/project/HLYM/V2.1.5.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/01-开发脚本/01-菜单权限/project/LHYY/V3.0.1.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/01-开发脚本/02-参数配置/V2.1.5.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/01-开发脚本/02-参数配置/V3.0.1_patch5.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/01-开发脚本/02-参数配置/project/BELS/V3.0.0_patch1.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/01-开发脚本/03-审批流程/V3.0.0_patch2.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/01-开发脚本/03-审批流程/V3.0.1_patch1.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/01-开发脚本/04-标签配置/V3.0.1.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/01-开发脚本/04-标签配置/V3.0.1_patch1.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/01-开发脚本/04-标签配置/V3.0.1_patch2.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/01-开发脚本/04-标签配置/V3.0.1_patch3.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/01-开发脚本/99-其他脚本/新增账号.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/02-标准版本/V2.1.3_patch8/target/init.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/02-标准版本/V2.1.4/reset/flow.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/02-标准版本/V2.1.4/target/init.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/02-标准版本/V2.1.4/target/upgrade.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/02-标准版本/V2.1.4/upgrade/menu.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/02-标准版本/V2.1.5/reset/flow.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/02-标准版本/V2.1.5/reset/menu.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/02-标准版本/V2.1.5/target/init.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/02-标准版本/V2.1.5/target/upgrade.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/02-标准版本/V2.1.5_patch1/target/upgrade.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/02-标准版本/V2.1.5_patch3/target/upgrade.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/02-标准版本/V2.1.5_patch4/target/init.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/02-标准版本/V2.1.5_patch4/target/upgrade.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/02-标准版本/V3.0.0/reset/label.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/02-标准版本/V3.0.0/target/init.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/02-标准版本/V3.0.0_patch1/reset/config.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/02-标准版本/V3.0.0_patch1/reset/menu.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/02-标准版本/V3.0.0_patch1/reset/schedule.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/02-标准版本/V3.0.0_patch1/target/init.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/02-标准版本/V3.0.0_patch2/target/init.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/02-标准版本/V3.0.1/reset/label.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/02-标准版本/V3.0.1/target/init.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/02-标准版本/V3.0.1_patch1/reset/label.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/02-标准版本/V3.0.1_patch1/target/init.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/02-标准版本/V3.0.1_patch1/target/upgrade.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/02-标准版本/V3.0.1_patch2/target/init.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/02-标准版本/V3.0.1_patch2/target/upgrade.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/02-标准版本/V3.0.1_patch3/target/init.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/02-标准版本/V3.0.1_patch3/target/upgrade.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/02-标准版本/V3.1.0/target/init.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/01-MES/02-标准版本/V3.1.0/upgrade/label.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/02-BSMS/01-开发脚本/02-参数配置/V3.0.1.1.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/02-BSMS/02-标准版本/V2.0.6.3/target/init.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/04-AGENT/01-开发脚本/01-菜单权限/V1.0.0.sql" dialect="MySQL" />
+    <file url="PROJECT" dialect="MySQL" />
+  </component>
+</project>

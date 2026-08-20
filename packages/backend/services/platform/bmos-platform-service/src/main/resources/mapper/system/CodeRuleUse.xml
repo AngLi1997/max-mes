@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.platform.service.system.code.mapper.CodeRuleUseMapper">
+    <select id="selectMaxSeqByResetNo" resultType="com.bmos.expression.pojo.KeyValue">
+        select t1.is_confirm as `key`,
+               max(t1.sequence) as `value`
+        from bp_code_rule_use t1
+        where t1.reset_no = #{resetNo}
+          and t1.is_skip = 'FALSE'
+        and t1.code = #{code}
+        group by t1.is_confirm
+    </select>
+
+    <select id="selectSkipSeqByResetNo" resultType="java.lang.String">
+        select t1.full_no
+        from bp_code_rule_use t1
+        where t1.reset_no = #{resetNo}
+          and is_skip = 'TRUE'
+          and t1.code = #{code}
+    </select>
+
+    <select id="selectWaitConfirmNos" resultType="java.lang.String">
+        select t1.full_no
+        from bp_code_rule_use t1
+        where t1.reset_no = #{resetNo}
+          and is_confirm = 'FALSE'
+          and t1.code = #{code}
+    </select>
+</mapper>

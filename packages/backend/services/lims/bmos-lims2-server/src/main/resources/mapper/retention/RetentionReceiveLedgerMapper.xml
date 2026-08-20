@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.inspect.retention.mapper.RetentionReceiveLedgerMapper">
+
+    <select id="selectReceiveLedgerPageList"
+            resultType="com.bmos.lims2.server.inspect.retention.dto.RetentionReceiveLedgerListDTO">
+        SELECT
+            l.sample_no AS sampleNo,
+            l.batch_no AS batchNo,
+            l.material_name AS materialName,
+            l.material_code AS materialCode,
+            l.material_spec AS materialSpec,
+            l.quantity,
+            l.unit_id AS unitId,
+            l.sampler_id AS samplerId,
+            l.sampling_time AS samplingTime,
+            l.receiver_id AS receiverId,
+            l.receive_time AS receiveTime,
+            l.storage_location AS storageLocation
+        FROM lm_retention_receive_ledger l
+        WHERE 1=1
+        <if test="materialIds != null and materialIds.size() > 0">
+            AND l.material_id IN
+            <foreach collection="materialIds" item="materialId" open="(" separator="," close=")">
+                #{materialId}
+            </foreach>
+        </if>
+        <if test="batchNo != null and batchNo != ''">
+            AND l.batch_no LIKE CONCAT('%', #{batchNo}, '%')
+        </if>
+        <if test="sampleNo != null and sampleNo != ''">
+            AND l.sample_no LIKE CONCAT('%', #{sampleNo}, '%')
+        </if>
+        <if test="receiveStartDate != null">
+            AND l.receive_time >= CONCAT(#{receiveStartDate}, ' 00:00:00')
+        </if>
+        <if test="receiveEndDate != null">
+            AND l.receive_time &lt;= CONCAT(#{receiveEndDate}, ' 23:59:59')
+        </if>
+        ORDER BY l.receive_time DESC
+    </select>
+
+</mapper>

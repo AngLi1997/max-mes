@@ -1,0 +1,27 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "baseUrl": "./",
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "module": "esnext",
+    "jsx": "preserve",
+    "types": ["vite"],
+    "paths": {
+      "@/*": ["./src/*"],
+      "@bmos/*": ["../../packages/*/src"]
+    },
+    "experimentalDecorators": true
+  },
+  "include": [
+    "components.d.ts",
+    "auto-imports.d.ts",
+    "src/**/*.ts",
+    "src/**/*.d.ts",
+    "src/**/*.tsx",
+    "src/**/*.vue" // 这里需要包含 .vue 文件
+  ],
+  "exclude": ["node_modules"]
+}

@@ -1,0 +1,1 @@
+alter table bm_procedure_condition_instance_history change step_task_id procedure_step_model_id bigint null comment '步骤模型id';

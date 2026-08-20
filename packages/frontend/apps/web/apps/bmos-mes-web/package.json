@@ -1,0 +1,71 @@
+{
+  "name": "bmos-mes-web",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "build-only": "vite build",
+    "dev": "vite",
+    "format": "prettier --write src/",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
+    "preview": "vite preview",
+    "type-check": "vue-tsc --noEmit -p tsconfig.app.json --composite false"
+  },
+  "dependencies": {
+    "@ant-design/icons-vue": "^7.0.0",
+    "@bmos/axios": "workspace:^",
+    "@bmos/components": "workspace:^",
+    "@bmos/i18n": "workspace:^",
+    "@bmos/icons": "workspace:^",
+    "@bmos/messager": "workspace:^",
+    "@bmos/utils": "workspace:^",
+    "ant-design-vue": "^4.2.6",
+    "bignumber.js": "^9.1.2",
+    "date-fns": "^3.6.0",
+    "echarts": "^5.5.0",
+    "exceljs": "^4.4.0",
+    "file-saver": "^2.0.5",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^2.5.1",
+    "luckyexcel": "^1.0.1",
+    "pdfjs-dist": "^4.0.379",
+    "pinia": "^2.1.6",
+    "tinymce": "^7.5.1",
+    "vue": "3.5.12",
+    "vue-router": "^4.2.4"
+  },
+  "devDependencies": {
+    "@antv/x6": "^2.15.3",
+    "@antv/x6-plugin-clipboard": "^2.1.6",
+    "@antv/x6-plugin-dnd": "^2.1.1",
+    "@antv/x6-plugin-export": "^2.1.6",
+    "@antv/x6-plugin-history": "^2.2.4",
+    "@antv/x6-plugin-keyboard": "^2.2.1",
+    "@antv/x6-plugin-selection": "^2.2.1",
+    "@antv/x6-plugin-snapline": "^2.1.7",
+    "@antv/x6-plugin-stencil": "^2.1.4",
+    "@antv/x6-plugin-transform": "^2.1.8",
+    "@antv/x6-vue-shape": "^2.1.1",
+    "@types/sortablejs": "^1.15.4",
+    "@vitejs/plugin-vue": "^5.0.5",
+    "@vitejs/plugin-vue-jsx": "^4.0.0",
+    "@vue/tsconfig": "^0.4.0",
+    "dayjs": "^1.11.10",
+    "eslint-plugin-vue": "^9.17.0",
+    "npm-run-all2": "^6.0.6",
+    "sortablejs": "^1.15.0",
+    "typescript": "~5.2.0",
+    "unplugin-auto-import": "^0.16.6",
+    "unplugin-vue-components": "^0.25.2",
+    "vite": "^5.3.1",
+    "vite-plugin-svg-icons": "^2.0.1",
+    "vite-plugin-top-level-await": "^1.4.4",
+    "vue-tsc": "^2.0.21"
+  },
+  "vite": {
+    "alias": {
+      "@": "./src"
+    }
+  }
+}

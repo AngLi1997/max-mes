@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.platform.service.system.user.mapper.UserMapper">
+
+    <select id="selectUserPage" resultType="com.bmos.platform.service.system.user.vo.UserPageVO">
+        select id,user_id,user_name,login_name,gender,phone,
+               active_status status, state,email,remark
+        from bp_user
+        where is_deleted = 0 and id != 1
+        <if test="id != null and id != ''">
+            and user_id = #{id}
+        </if>
+        <if test="userName != null and userName != ''">
+            and user_name like concat('%',#{userName},'%')
+        </if>
+        <if test="loginName != null and loginName != ''">
+            and login_name like concat('%',#{loginName},'%')
+        </if>
+        <if test="phone != null and phone != ''">
+            and phone like concat('%',#{phone},'%')
+        </if>
+        <if test="status != null">
+            and active_status = #{status}
+        </if>
+        <if test="state != null">
+            and state = #{state}
+        </if>
+        <if test="gender != null">
+            and gender = #{gender}
+        </if>
+        order by create_time desc ,id asc
+    </select>
+
+    <select id="selectUserImport" resultType="com.bmos.platform.service.system.user.vo.UserImportVO">
+        select user_name,login_name,gender,phone,email,
+               remark,active_status status, state
+        from bp_user
+        where is_deleted = 0
+    </select>
+
+    <select id="validateUser" resultType="java.lang.Long">
+        select id
+        from bp_user
+        where is_deleted = 0
+        and binary login_name = #{userName}
+    </select>
+
+    <select id="relateRoleData" resultType="java.lang.Long">
+        select distinct role_id
+        from bp_user_role
+        where is_deleted = 0
+          and user_id = #{userId}
+    </select>
+
+    <select id="relateDeptData" resultType="java.lang.Long">
+        select distinct dept_id
+        from bp_user_dept
+        where is_deleted = 0
+          and user_id = #{userId}
+    </select>
+
+    <select id="getMenuByUserId" resultType="com.bmos.platform.service.system.menu.vo.MenuVO">
+        select distinct t3.NAME,t3.parent_id,t3.is_menu,t3.sort
+        from bp_user_role t1
+            join bp_role_menu t2 on t1.role_id = t2.role_id
+            join bp_menu t3 on t2.menu_id = t3.id
+        where t1.user_id=#{userId}
+          and t1.is_deleted=0
+          and t3.is_deleted=0
+        <if test="menuId != null and menuId != ''">
+            and t3.parent_id = #{menuId}
+        </if>
+        <if test="menuId == null or menuId == ''">
+            and t3.parent_id = #{parentId}
+        </if>
+    </select>
+    <select id="selectByRole" resultType="com.bmos.platform.service.system.user.vo.UserListItemVO">
+        select
+            u.user_id,
+            u.user_name,
+            u.login_name
+        from bp_user u
+        join bp_user_role r on u.user_id = r.user_id and r.is_deleted = 0
+        where u.is_deleted = 0
+        and r.role_id = #{roleId}
+    </select>
+    <select id="selectByDeptIds" resultType="com.bmos.platform.service.system.user.vo.UserListItemVO">
+        SELECT DISTINCT
+        u.user_id,
+        u.user_name,
+        u.login_name
+        FROM
+        bp_user u
+        JOIN bp_user_dept d ON u.user_id = d.user_id
+        WHERE
+        u.is_deleted = 0
+        and d.is_deleted = 0
+        <if test="deptIds != null and deptIds.size() > 0">
+            and d.dept_id in
+            <foreach collection="deptIds" open="(" separator="," close=")" item="deptId">
+                #{deptId}
+            </foreach>
+        </if>
+    </select>
+    <select id="selectByRoleIds" resultType="com.bmos.platform.service.system.user.vo.UserListItemVO">
+        SELECT DISTINCT
+        u.user_id,
+        u.user_name,
+        u.login_name
+        FROM bp_user u
+        join bp_user_role r on u.user_id = r.user_id and r.is_deleted = 0
+        where u.is_deleted = 0
+        <if test="roleIds != null and roleIds.size() > 0">
+            and r.role_id in
+            <foreach collection="roleIds" open="(" separator="," close=")" item="rId">
+                #{rId}
+            </foreach>
+        </if>
+    </select>
+
+</mapper>

@@ -1,0 +1,12 @@
+i18n:
+  locations:
+    - data-id: exception_mes_zh_CN.properties
+      group: backend-i18n
+    - data-id: flow_category_zh_CN.properties
+      group: backend-i18n
+    - data-id: mes_enum_zh_CN.properties
+      group: backend-i18n
+    - data-id: mes_custom_string_zh_CN.properties
+      group: backend-i18n
+    - data-id: flow_category_zh_CN.properties
+      group: backend-i18n

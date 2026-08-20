@@ -1,0 +1,358 @@
+# 生产领用导入菜单及权限
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted, alias, icon) VALUES (120030015, '生产领用导入', '120030015', 120030, 0, 1, 0, null, 130130205, now(), now(), '1', '1', 0, null, null);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted, alias, icon) VALUES (120030015000001, '文件导入', '120030015000001', 120030015, 0, 0, 0, null, 120030015110, now(), now(), '1', '1', 0, null, null);
+INSERT INTO bmos_platform.bp_menu (id, name, code, parent_id, terminal_type, is_menu, is_outside, outside_url, sort, create_time, update_time, create_by, update_by, is_deleted, alias, icon) VALUES (120030015000002, '查看', '120030015000002', 120030015, 0, 0, 0, null, 120030015120, now(), now(), '1', '1', 0, null, null);
+
+# 清除联环项目非必要菜单 by lilong 250624
+DELETE FROM bmos_platform.bp_menu WHERE bmos_platform.bp_menu.id not in (
+'100',
+'111',
+'120',
+'121',
+'160',
+'100010',
+'100020',
+'100030',
+'100040',
+'111010',
+'111020',
+'120010',
+'120020',
+'120030',
+'120050',
+'121020',
+'160010',
+'160030',
+'100010002',
+'100010005',
+'100020007',
+'100020010',
+'100030001',
+'100030002',
+'100030003',
+'100030004',
+'100030005',
+'100030006',
+'100040001',
+'100040002',
+'111010001',
+'111010002',
+'111020001',
+'111020003',
+'120010001',
+'120010002',
+'120010003',
+'120020004',
+'120020005',
+'120020008',
+'120020010',
+'120020012',
+'120030007',
+'120030008',
+'120030013',
+'120030014',
+'120030015',
+'120050003',
+'120050004',
+'120050005',
+'121020002',
+'121020004',
+'121020005',
+'121020006',
+'121020007',
+'121020008',
+'160010001',
+'160010002',
+'160030001',
+'160030002',
+'160030003'
+) and is_menu =1;
+
+
+DELETE FROM bmos_platform.bp_menu WHERE bmos_platform.bp_menu.parent_id not in (
+'100',
+'111',
+'120',
+'121',
+'160',
+'100010',
+'100020',
+'100030',
+'100040',
+'111010',
+'111020',
+'120010',
+'120020',
+'120030',
+'120050',
+'121020',
+'160010',
+'160030',
+'100010002',
+'100010005',
+'100020007',
+'100020010',
+'100030001',
+'100030002',
+'100030003',
+'100030004',
+'100030005',
+'100030006',
+'100040001',
+'100040002',
+'111010001',
+'111010002',
+'111020001',
+'111020003',
+'120010001',
+'120010002',
+'120010003',
+'120020004',
+'120020005',
+'120020008',
+'120020010',
+'120020012',
+'120030007',
+'120030008',
+'120030013',
+'120030014',
+'120030015',
+'120050003',
+'120050004',
+'120050005',
+'121020002',
+'121020004',
+'121020005',
+'121020006',
+'121020007',
+'121020008',
+'160010001',
+'160010002',
+'160030001',
+'160030002',
+'160030003'
+) and is_menu =0;
+
+# 清除没角色、菜单的关联数据
+DELETE FROM bmos_platform.bp_auth_role_menu WHERE role_id NOT IN (SELECT id FROM bmos_platform.bp_role );
+DELETE FROM bmos_platform.bp_auth_role_menu WHERE menu_id NOT IN (SELECT id FROM bmos_platform.bp_menu );
+DELETE FROM bmos_platform.bp_role_menu WHERE role_id NOT IN (SELECT id FROM bmos_platform.bp_role );
+DELETE FROM bmos_platform.bp_role_menu WHERE menu_id NOT IN (SELECT id FROM bmos_platform.bp_menu );
+
+delete from bmos_mes.bm_flow_audit_category where bmos_mes.bm_flow_audit_category.id in (
+'12003001',
+'12004001',
+'12005001',
+'12002000101',
+'12002000201',
+'12002000401',
+'12003000101',
+'12004000101',
+'12005000101'
+    );
+UPDATE bmos_platform.bp_tag_define SET preview_html = '
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+
+<body>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    .fields-item {
+      margin-bottom: 0px;
+    }
+
+    #tag {
+      width: 640px;
+      height: 480px;
+      box-sizing: border-box;
+      background-color: #f8f8f8;
+      border: 1px solid #e1e1e1;
+      border-radius: 6px;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      font-size: 24px;
+    }
+  </style>
+  <div id="tag">
+    <div style="float: left; width: 440px; padding: 10px 10px; box-sizing: border-box">
+      <div id="field1" class="fields-item"></div>
+      <div id="field2" class="fields-item"></div>
+      <div id="field3" class="fields-item"></div>
+      <div id="field4" class="fields-item"></div>
+      <div id="field5" class="fields-item"></div>
+      <div id="field6" class="fields-item"></div>
+      <div id="field7" class="fields-item"></div>
+      <div id="field8" class="fields-item"></div>
+      <div id="field9" class="fields-item"></div>
+      <div id="field10" class="fields-item"></div>
+      <div id="field11" class="fields-item"></div>
+      <div id="field12" class="fields-item"></div>
+      <div id="field13" class="fields-item"></div>
+    </div>
+    <div style="float: right; width: 200px; padding: 10px; box-sizing: border-box; position: relative; height: 460px;">
+      <img id="qrCode" width="160" height="160" src=""
+        style="position: absolute; top: 50%; left: 50%; margin-top: -80px; margin-left: -80px;" />
+    </div>
+  </div>
+</body>
+
+</html>' WHERE id = 1;
+
+UPDATE bmos_platform.bp_tag_define SET tag_width =80, tag_height = 60 WHERE id = 1;
+
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121001014022, 121001014, 'requirementSieveMesh', '筛目', 'String', '40', now(), null, null, null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121001014023, 121001014, 'weighSerialNo', '称量序列号', 'String', '20250623001', now(), null, null, null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121001015022, 121001015, 'requirementSieveMesh', '筛目', 'String', '40', now(), null, null, null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121001015023, 121001015, 'weighSerialNo', '称量序列号', 'String', '20250623001', now(), null, null, null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121001016022, 121001016, 'requirementSieveMesh', '筛目', 'String', '40', now(), null, null, null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121001016023, 121001016, 'weighSerialNo', '称量序列号', 'String', '20250623001', now(), null, null, null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121002018022, 121002018, 'requirementSieveMesh', '筛目', 'String', '40', now(), null, null, null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121002018023, 121002018, 'weighSerialNo', '称量序列号', 'String', '20250623001', now(), null, null, null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121002019022, 121002019, 'requirementSieveMesh', '筛目', 'String', '40', now(), null, null, null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121002019023, 121002019, 'weighSerialNo', '称量序列号', 'String', '20250623001', now(), null, null, null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121002020022, 121002020, 'requirementSieveMesh', '筛目', 'String', '40', now(), null, null, null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121002020023, 121002020, 'weighSerialNo', '称量序列号', 'String', '20250623001', now(), null, null, null, 0);
+
+UPDATE bmos_platform.bp_tag_instance SET config_fields = '[{"label":"品种品名：","defineField":"field1","dataSourceField":"requirementProductName","consumeValue":null},{"label":"物料名称：","defineField":"field2","dataSourceField":"materialName","consumeValue":null},{"label":"需求用途：","defineField":"field3","dataSourceField":"requirementUsage","consumeValue":null},{"label":"筛目：","defineField":"field4","dataSourceField":"requirementSieveMesh","consumeValue":null},{"label":"批号：","defineField":"field5","dataSourceField":"materialBatchNo","consumeValue":null},{"label":"有效期：","defineField":"field6","dataSourceField":"expiredDate","consumeValue":null},{"label":"序列号：","defineField":"field7","dataSourceField":"weighSerialNo","consumeValue":null},{"label":"皮重：","defineField":"field8","dataSourceField":"tareWeightWithUnit","consumeValue":null},{"label":"净重：","defineField":"field9","dataSourceField":"netWeightWithUnit","consumeValue":null},{"label":"毛重：","defineField":"field10","dataSourceField":"grossWeightWithUnit","consumeValue":null},{"label":"操作人：","defineField":"field11","dataSourceField":"weigherName","consumeValue":null},{"label":"复核人：","defineField":"field12","dataSourceField":"reCheckerName","consumeValue":null},{"label":"日期：","defineField":"field13","dataSourceField":"weighTime","consumeValue":null}]' WHERE id = 121001014;
+UPDATE bmos_platform.bp_tag_instance SET config_fields = '[{"label":"品种品名：","defineField":"field1","dataSourceField":"requirementProductName","consumeValue":null},{"label":"物料名称：","defineField":"field2","dataSourceField":"materialName","consumeValue":null},{"label":"需求用途：","defineField":"field3","dataSourceField":"requirementUsage","consumeValue":null},{"label":"筛目：","defineField":"field4","dataSourceField":"requirementSieveMesh","consumeValue":null},{"label":"批号：","defineField":"field5","dataSourceField":"materialBatchNo","consumeValue":null},{"label":"有效期：","defineField":"field6","dataSourceField":"expiredDate","consumeValue":null},{"label":"序列号：","defineField":"field7","dataSourceField":"weighSerialNo","consumeValue":null},{"label":"皮重：","defineField":"field8","dataSourceField":"tareWeightWithUnit","consumeValue":null},{"label":"净重：","defineField":"field9","dataSourceField":"netWeightWithUnit","consumeValue":null},{"label":"毛重：","defineField":"field10","dataSourceField":"grossWeightWithUnit","consumeValue":null},{"label":"操作人：","defineField":"field11","dataSourceField":"weigherName","consumeValue":null},{"label":"复核人：","defineField":"field12","dataSourceField":"reCheckerName","consumeValue":null},{"label":"日期：","defineField":"field13","dataSourceField":"weighTime","consumeValue":null}]' WHERE id = 121001015;
+UPDATE bmos_platform.bp_tag_instance SET config_fields = '[{"label":"品种品名：","defineField":"field1","dataSourceField":"requirementProductName","consumeValue":null},{"label":"物料名称：","defineField":"field2","dataSourceField":"materialName","consumeValue":null},{"label":"需求用途：","defineField":"field3","dataSourceField":"requirementUsage","consumeValue":null},{"label":"筛目：","defineField":"field4","dataSourceField":"requirementSieveMesh","consumeValue":null},{"label":"批号：","defineField":"field5","dataSourceField":"materialBatchNo","consumeValue":null},{"label":"有效期：","defineField":"field6","dataSourceField":"expiredDate","consumeValue":null},{"label":"序列号：","defineField":"field7","dataSourceField":"weighSerialNo","consumeValue":null},{"label":"皮重：","defineField":"field8","dataSourceField":"tareWeightWithUnit","consumeValue":null},{"label":"净重：","defineField":"field9","dataSourceField":"netWeightWithUnit","consumeValue":null},{"label":"毛重：","defineField":"field10","dataSourceField":"grossWeightWithUnit","consumeValue":null},{"label":"操作人：","defineField":"field11","dataSourceField":"weigherName","consumeValue":null},{"label":"复核人：","defineField":"field12","dataSourceField":"reCheckerName","consumeValue":null},{"label":"日期：","defineField":"field13","dataSourceField":"weighTime","consumeValue":null}]' WHERE id = 121001016;
+UPDATE bmos_platform.bp_tag_instance SET config_fields = '[{"label":"品种品名：","defineField":"field1","dataSourceField":"requirementProductName","consumeValue":null},{"label":"物料名称：","defineField":"field2","dataSourceField":"materialName","consumeValue":null},{"label":"需求用途：","defineField":"field3","dataSourceField":"requirementUsage","consumeValue":null},{"label":"筛目：","defineField":"field4","dataSourceField":"requirementSieveMesh","consumeValue":null},{"label":"批号：","defineField":"field5","dataSourceField":"materialBatchNo","consumeValue":null},{"label":"有效期：","defineField":"field6","dataSourceField":"expiredDate","consumeValue":null},{"label":"序列号：","defineField":"field7","dataSourceField":"weighSerialNo","consumeValue":null},{"label":"皮重：","defineField":"field8","dataSourceField":"tareWeightWithUnit","consumeValue":null},{"label":"净重：","defineField":"field9","dataSourceField":"netWeightWithUnit","consumeValue":null},{"label":"毛重：","defineField":"field10","dataSourceField":"grossWeightWithUnit","consumeValue":null},{"label":"操作人：","defineField":"field11","dataSourceField":"weigherName","consumeValue":null},{"label":"复核人：","defineField":"field12","dataSourceField":"reCheckerName","consumeValue":null},{"label":"日期：","defineField":"field13","dataSourceField":"weighTime","consumeValue":null}]' WHERE id = 121002018;
+UPDATE bmos_platform.bp_tag_instance SET config_fields = '[{"label":"品种品名：","defineField":"field1","dataSourceField":"requirementProductName","consumeValue":null},{"label":"物料名称：","defineField":"field2","dataSourceField":"materialName","consumeValue":null},{"label":"需求用途：","defineField":"field3","dataSourceField":"requirementUsage","consumeValue":null},{"label":"筛目：","defineField":"field4","dataSourceField":"requirementSieveMesh","consumeValue":null},{"label":"批号：","defineField":"field5","dataSourceField":"materialBatchNo","consumeValue":null},{"label":"有效期：","defineField":"field6","dataSourceField":"expiredDate","consumeValue":null},{"label":"序列号：","defineField":"field7","dataSourceField":"weighSerialNo","consumeValue":null},{"label":"皮重：","defineField":"field8","dataSourceField":"tareWeightWithUnit","consumeValue":null},{"label":"净重：","defineField":"field9","dataSourceField":"netWeightWithUnit","consumeValue":null},{"label":"毛重：","defineField":"field10","dataSourceField":"grossWeightWithUnit","consumeValue":null},{"label":"操作人：","defineField":"field11","dataSourceField":"weigherName","consumeValue":null},{"label":"复核人：","defineField":"field12","dataSourceField":"reCheckerName","consumeValue":null},{"label":"日期：","defineField":"field13","dataSourceField":"weighTime","consumeValue":null}]' WHERE id = 121002019;
+UPDATE bmos_platform.bp_tag_instance SET config_fields = '[{"label":"品种品名：","defineField":"field1","dataSourceField":"requirementProductName","consumeValue":null},{"label":"物料名称：","defineField":"field2","dataSourceField":"materialName","consumeValue":null},{"label":"需求用途：","defineField":"field3","dataSourceField":"requirementUsage","consumeValue":null},{"label":"筛目：","defineField":"field4","dataSourceField":"requirementSieveMesh","consumeValue":null},{"label":"批号：","defineField":"field5","dataSourceField":"materialBatchNo","consumeValue":null},{"label":"有效期：","defineField":"field6","dataSourceField":"expiredDate","consumeValue":null},{"label":"序列号：","defineField":"field7","dataSourceField":"weighSerialNo","consumeValue":null},{"label":"皮重：","defineField":"field8","dataSourceField":"tareWeightWithUnit","consumeValue":null},{"label":"净重：","defineField":"field9","dataSourceField":"netWeightWithUnit","consumeValue":null},{"label":"毛重：","defineField":"field10","dataSourceField":"grossWeightWithUnit","consumeValue":null},{"label":"操作人：","defineField":"field11","dataSourceField":"weigherName","consumeValue":null},{"label":"复核人：","defineField":"field12","dataSourceField":"reCheckerName","consumeValue":null},{"label":"日期：","defineField":"field13","dataSourceField":"weighTime","consumeValue":null}]' WHERE id = 121002020;
+UPDATE bmos_platform.bp_tag_instance SET config_fields = '[{"label":"品种品名：","defineField":"field1","dataSourceField":"requirementProductName","consumeValue":null},{"label":"物料名称：","defineField":"field2","dataSourceField":"materialName","consumeValue":null},{"label":"需求用途：","defineField":"field3","dataSourceField":"requirementUsage","consumeValue":null},{"label":"筛目：","defineField":"field4","dataSourceField":"requirementSieveMesh","consumeValue":null},{"label":"批号：","defineField":"field5","dataSourceField":"materialBatchNo","consumeValue":null},{"label":"有效期：","defineField":"field6","dataSourceField":"expiredDate","consumeValue":null},{"label":"序列号：","defineField":"field7","dataSourceField":"weighSerialNo","consumeValue":null},{"label":"皮重：","defineField":"field8","dataSourceField":"tareWeightWithUnit","consumeValue":null},{"label":"净重：","defineField":"field9","dataSourceField":"netWeightWithUnit","consumeValue":null},{"label":"毛重：","defineField":"field10","dataSourceField":"grossWeightWithUnit","consumeValue":null},{"label":"操作人：","defineField":"field11","dataSourceField":"weigherName","consumeValue":null},{"label":"复核人：","defineField":"field12","dataSourceField":"reCheckerName","consumeValue":null},{"label":"日期：","defineField":"field13","dataSourceField":"weighTime","consumeValue":null}]' WHERE id = 121001012;
+UPDATE bmos_platform.bp_tag_instance SET config_fields = '[{"label":"品种品名：","defineField":"field1","dataSourceField":"requirementProductName","consumeValue":null},{"label":"物料名称：","defineField":"field2","dataSourceField":"materialName","consumeValue":null},{"label":"需求用途：","defineField":"field3","dataSourceField":"requirementUsage","consumeValue":null},{"label":"筛目：","defineField":"field4","dataSourceField":"requirementSieveMesh","consumeValue":null},{"label":"批号：","defineField":"field5","dataSourceField":"materialBatchNo","consumeValue":null},{"label":"有效期：","defineField":"field6","dataSourceField":"expiredDate","consumeValue":null},{"label":"序列号：","defineField":"field7","dataSourceField":"weighSerialNo","consumeValue":null},{"label":"皮重：","defineField":"field8","dataSourceField":"tareWeightWithUnit","consumeValue":null},{"label":"净重：","defineField":"field9","dataSourceField":"netWeightWithUnit","consumeValue":null},{"label":"毛重：","defineField":"field10","dataSourceField":"grossWeightWithUnit","consumeValue":null},{"label":"操作人：","defineField":"field11","dataSourceField":"weigherName","consumeValue":null},{"label":"复核人：","defineField":"field12","dataSourceField":"reCheckerName","consumeValue":null},{"label":"日期：","defineField":"field13","dataSourceField":"weighTime","consumeValue":null}]' WHERE id = 121001013;
+UPDATE bmos_platform.bp_tag_instance SET config_fields = '[{"label":"品种品名：","defineField":"field1","dataSourceField":"requirementProductName","consumeValue":null},{"label":"物料名称：","defineField":"field2","dataSourceField":"materialName","consumeValue":null},{"label":"需求用途：","defineField":"field3","dataSourceField":"requirementUsage","consumeValue":null},{"label":"筛目：","defineField":"field4","dataSourceField":"requirementSieveMesh","consumeValue":null},{"label":"批号：","defineField":"field5","dataSourceField":"materialBatchNo","consumeValue":null},{"label":"有效期：","defineField":"field6","dataSourceField":"expiredDate","consumeValue":null},{"label":"序列号：","defineField":"field7","dataSourceField":"weighSerialNo","consumeValue":null},{"label":"皮重：","defineField":"field8","dataSourceField":"tareWeightWithUnit","consumeValue":null},{"label":"净重：","defineField":"field9","dataSourceField":"netWeightWithUnit","consumeValue":null},{"label":"毛重：","defineField":"field10","dataSourceField":"grossWeightWithUnit","consumeValue":null},{"label":"操作人：","defineField":"field11","dataSourceField":"weigherName","consumeValue":null},{"label":"复核人：","defineField":"field12","dataSourceField":"reCheckerName","consumeValue":null},{"label":"日期：","defineField":"field13","dataSourceField":"weighTime","consumeValue":null}]' WHERE id = 121002016;
+UPDATE bmos_platform.bp_tag_instance SET config_fields = '[{"label":"品种品名：","defineField":"field1","dataSourceField":"requirementProductName","consumeValue":null},{"label":"物料名称：","defineField":"field2","dataSourceField":"materialName","consumeValue":null},{"label":"需求用途：","defineField":"field3","dataSourceField":"requirementUsage","consumeValue":null},{"label":"筛目：","defineField":"field4","dataSourceField":"requirementSieveMesh","consumeValue":null},{"label":"批号：","defineField":"field5","dataSourceField":"materialBatchNo","consumeValue":null},{"label":"有效期：","defineField":"field6","dataSourceField":"expiredDate","consumeValue":null},{"label":"序列号：","defineField":"field7","dataSourceField":"weighSerialNo","consumeValue":null},{"label":"皮重：","defineField":"field8","dataSourceField":"tareWeightWithUnit","consumeValue":null},{"label":"净重：","defineField":"field9","dataSourceField":"netWeightWithUnit","consumeValue":null},{"label":"毛重：","defineField":"field10","dataSourceField":"grossWeightWithUnit","consumeValue":null},{"label":"操作人：","defineField":"field11","dataSourceField":"weigherName","consumeValue":null},{"label":"复核人：","defineField":"field12","dataSourceField":"reCheckerName","consumeValue":null},{"label":"日期：","defineField":"field13","dataSourceField":"weighTime","consumeValue":null}]' WHERE id = 121002017;
+# 联环物料接收的规规格
+UPDATE bmos_platform.bp_tag_instance SET config_fields = '[{"label":"物料信息：","defineField":"field1","dataSourceField":"fullName","consumeValue":null},{"label":"物料规格：","defineField":"field2","dataSourceField":"pieceSpecification","consumeValue":null},{"label":"物料批号：","defineField":"field3","dataSourceField":"materialBatchNo","consumeValue":null},{"label":"物料件号：","defineField":"field4","dataSourceField":"materialNo","consumeValue":null},{"label":"物料量：","defineField":"field5","dataSourceField":"quantityWithUnit","consumeValue":null},{"label":"有效期至：","defineField":"field6","dataSourceField":"expiredDate","consumeValue":null},{"label":"暂存货位：","defineField":"field7","dataSourceField":"positionFullName","consumeValue":null},{"label":null,"defineField":"field8","dataSourceField":null,"consumeValue":null},{"label":null,"defineField":"field9","dataSourceField":null,"consumeValue":null}]' WHERE id = 121001010;
+UPDATE bmos_platform.bp_tag_instance SET config_fields = '[{"label":"物料信息：","defineField":"field1","dataSourceField":"fullName","consumeValue":null},{"label":"物料规格：","defineField":"field2","dataSourceField":"pieceSpecification","consumeValue":null},{"label":"物料批号：","defineField":"field3","dataSourceField":"materialBatchNo","consumeValue":null},{"label":"物料件号：","defineField":"field4","dataSourceField":"materialNo","consumeValue":null},{"label":"物料量：","defineField":"field5","dataSourceField":"quantityWithUnit","consumeValue":null},{"label":"有效期至：","defineField":"field6","dataSourceField":"expiredDate","consumeValue":null},{"label":"暂存货位：","defineField":"field7","dataSourceField":"positionFullName","consumeValue":null},{"label":null,"defineField":"field8","dataSourceField":null,"consumeValue":null},{"label":null,"defineField":"field9","dataSourceField":null,"consumeValue":null}]' WHERE id = 121002014;
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121001010021, 121001010, 'positionFullName', '规格', 'String', '25kg/件', now(), null, null, null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121002014021, 121002014, 'positionFullName', '规格', 'String', '25kg/件', now(), null, null, null, 0);
+
+# 联环生产领用导入
+INSERT INTO bmos_platform.bp_tag_instance (id, tag_name, tag_type_id, tag_scene_id, tag_define_id, config_fields, is_enable, create_time, update_time, create_by, update_by, is_deleted) VALUES (121001020, '原辅包生产领用导入打印标签', 1, 121001020, 1, '[{"label":"物料信息：","defineField":"field1","dataSourceField":"fullName","consumeValue":null},{"label":"物料规格：","defineField":"field2","dataSourceField":"pieceSpecification","consumeValue":null},{"label":"物料批号：","defineField":"field3","dataSourceField":"materialBatchNo","consumeValue":null},{"label":"物料件号：","defineField":"field4","dataSourceField":"materialNo","consumeValue":null},{"label":"物料量：","defineField":"field5","dataSourceField":"quantityWithUnit","consumeValue":null},{"label":"有效期至：","defineField":"field6","dataSourceField":"expiredDate","consumeValue":null},{"label":"暂存货位：","defineField":"field7","dataSourceField":"positionFullName","consumeValue":null},{"label":null,"defineField":"field8","dataSourceField":null,"consumeValue":null},{"label":null,"defineField":"field9","dataSourceField":null,"consumeValue":null}]', 'TRUE', now(), now(), null, null, 0);
+INSERT INTO bmos_platform.bp_tag_scene (id, tag_scene_name, tag_scene_desc, tag_type_id, data_source_service_name, data_source_interface, qr_code_field, sort, create_time, update_time, create_by, update_by, is_deleted) VALUES (121001020, '原辅包生产领用导入打印标签', '原辅包生产领用导入打印标签', 1, 'bmos-mes-service', '/api/app/mes/tag/print/STORAGE_MATERIAL', 'materialNo', 1300, now(), null, null, null, 0);
+
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121001020001, 121001020, 'fullName', '物料全称', 'String', 'W01-氯化钠', now(), null, null, null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121001020002, 121001020, 'materialName', '物料名称', 'String', '氯化钠', now(), null, null, null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121001020003, 121001020, 'materialMergeCode', '物料编码', 'String', 'W01', now(), null, null, null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121001020004, 121001020, 'materialSpecification', '物料规格', 'String', '25kg/袋', now(), null, null, null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121001020005, 121001020, 'materialBatchNo', '物料批号', 'String', 'WH01-221001', now(), null, null, null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121001020006, 121001020, 'materialNo', '物料件号', 'String', '10086', now(), null, null, null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121001020007, 121001020, 'quantityWithUnit', '物料量(带单位)', 'String', '15.780kg', now(), null, null, null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121001020008, 121001020, 'netWeightWithUnit', '净重(带单位)', 'String', '15.780kg', now(), null, null, null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121001020009, 121001020, 'tareWeightWithUnit', '皮重(带单位)', 'String', '5.180kg', now(), null, null, null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121001020010, 121001020, 'grossWeightWithUnit', '毛重(带单位)', 'String', '20.960kg', now(), null, null, null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121001020011, 121001020, 'weigherName', '称量人员', 'String', '张三', now(), null, null, null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121001020012, 121001020, 'reCheckerName', '称量复核人员', 'String', '李四', now(), null, null, null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121001020013, 121001020, 'weighTime', '称量时间', 'String', '2024-02-02 14:36:42', now(), null, null, null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121001020014, 121001020, 'productName', '产品名称', 'String', '氯化钠溶液', now(), null, null, null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121001020015, 121001020, 'productMergeCode', '产品编码', 'String', 'C01', now(), null, null, null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121001020016, 121001020, 'productSpecification', '产品规格', 'String', '0.9%', now(), null, null, null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121001020017, 121001020, 'processName', '工艺名称', 'String', '氯化钠溶液配置工艺', now(), null, null, null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121001020018, 121001020, 'batchNo', '生产批号', 'String', 'C01230101', now(), null, null, null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121001020019, 121001020, 'expiredDate', '有效期至', 'String', '2025-10-31', now(), null, null, null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121001020020, 121001020, 'positionFullName', '暂存货位', 'String', 'KQ10-01-氯化钠货位', now(), null, null, null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121001020021, 121001020, 'positionFullName', '规格', 'String', '25kg/件', now(), null, null, null, 0);
+
+
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121001012020, 121001012, 'requirementSieveMesh', '筛目', 'String', '40', now(), null, null, null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121001012021, 121001012, 'weighSerialNo', '称量序列号', 'String', '20250623001', now(), null, null, null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121001013020, 121001013, 'requirementSieveMesh', '筛目', 'String', '40', now(), null, null, null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121001013021, 121001013, 'weighSerialNo', '称量序列号', 'String', '20250623001', now(), null, null, null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121002016020, 121002016, 'requirementSieveMesh', '筛目', 'String', '40', now(), null, null, null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121002016021, 121002016, 'weighSerialNo', '称量序列号', 'String', '20250623001', now(), null, null, null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121002017020, 121002017, 'requirementSieveMesh', '筛目', 'String', '40', now(), null, null, null, 0);
+INSERT INTO bmos_platform.bp_tag_scene_field (id, tag_scene_id, field, label, type, example_value, create_time, update_time, create_by, update_by, is_deleted) VALUES (121002017021, 121002017, 'weighSerialNo', '称量序列号', 'String', '20250623001', now(), null, null, null, 0);
+
+UPDATE bmos_platform.bp_tag_instance SET config_fields = '[{"label":"品种品名：","defineField":"field1","dataSourceField":"extProductName","consumeValue":null},{"label":"物料名称：","defineField":"field2","dataSourceField":"materialName","consumeValue":null},{"label":"需求用途：","defineField":"field3","dataSourceField":"requirementUsage","consumeValue":null},{"label":"筛目：","defineField":"field4","dataSourceField":"requirementSieveMesh","consumeValue":null},{"label":"批号：","defineField":"field5","dataSourceField":"materialBatchNo","consumeValue":null},{"label":"有效期：","defineField":"field6","dataSourceField":"expiredDate","consumeValue":null},{"label":"序列号：","defineField":"field7","dataSourceField":"weighSerialNo","consumeValue":null},{"label":"皮重：","defineField":"field8","dataSourceField":"tareWeightWithUnit","consumeValue":null},{"label":"净重：","defineField":"field9","dataSourceField":"netWeightWithUnit","consumeValue":null},{"label":"毛重：","defineField":"field10","dataSourceField":"grossWeightWithUnit","consumeValue":null},{"label":"操作人：","defineField":"field11","dataSourceField":"weigherName","consumeValue":null},{"label":"复核人：","defineField":"field12","dataSourceField":"reCheckerName","consumeValue":null},{"label":"日期：","defineField":"field13","dataSourceField":"weighTime","consumeValue":null}]' WHERE id = 121001012;
+UPDATE bmos_platform.bp_tag_instance SET config_fields = '[{"label":"品种品名：","defineField":"field1","dataSourceField":"extProductName","consumeValue":null},{"label":"物料名称：","defineField":"field2","dataSourceField":"materialName","consumeValue":null},{"label":"需求用途：","defineField":"field3","dataSourceField":"requirementUsage","consumeValue":null},{"label":"筛目：","defineField":"field4","dataSourceField":"requirementSieveMesh","consumeValue":null},{"label":"批号：","defineField":"field5","dataSourceField":"materialBatchNo","consumeValue":null},{"label":"有效期：","defineField":"field6","dataSourceField":"expiredDate","consumeValue":null},{"label":"序列号：","defineField":"field7","dataSourceField":"weighSerialNo","consumeValue":null},{"label":"皮重：","defineField":"field8","dataSourceField":"tareWeightWithUnit","consumeValue":null},{"label":"净重：","defineField":"field9","dataSourceField":"netWeightWithUnit","consumeValue":null},{"label":"毛重：","defineField":"field10","dataSourceField":"grossWeightWithUnit","consumeValue":null},{"label":"操作人：","defineField":"field11","dataSourceField":"weigherName","consumeValue":null},{"label":"复核人：","defineField":"field12","dataSourceField":"reCheckerName","consumeValue":null},{"label":"日期：","defineField":"field13","dataSourceField":"weighTime","consumeValue":null}]' WHERE id = 121001013;
+UPDATE bmos_platform.bp_tag_instance SET config_fields = '[{"label":"品种品名：","defineField":"field1","dataSourceField":"extProductName","consumeValue":null},{"label":"物料名称：","defineField":"field2","dataSourceField":"materialName","consumeValue":null},{"label":"需求用途：","defineField":"field3","dataSourceField":"requirementUsage","consumeValue":null},{"label":"筛目：","defineField":"field4","dataSourceField":"requirementSieveMesh","consumeValue":null},{"label":"批号：","defineField":"field5","dataSourceField":"materialBatchNo","consumeValue":null},{"label":"有效期：","defineField":"field6","dataSourceField":"expiredDate","consumeValue":null},{"label":"序列号：","defineField":"field7","dataSourceField":"weighSerialNo","consumeValue":null},{"label":"皮重：","defineField":"field8","dataSourceField":"tareWeightWithUnit","consumeValue":null},{"label":"净重：","defineField":"field9","dataSourceField":"netWeightWithUnit","consumeValue":null},{"label":"毛重：","defineField":"field10","dataSourceField":"grossWeightWithUnit","consumeValue":null},{"label":"操作人：","defineField":"field11","dataSourceField":"weigherName","consumeValue":null},{"label":"复核人：","defineField":"field12","dataSourceField":"reCheckerName","consumeValue":null},{"label":"日期：","defineField":"field13","dataSourceField":"weighTime","consumeValue":null}]' WHERE id = 121002016;
+UPDATE bmos_platform.bp_tag_instance SET config_fields = '[{"label":"品种品名：","defineField":"field1","dataSourceField":"extProductName","consumeValue":null},{"label":"物料名称：","defineField":"field2","dataSourceField":"materialName","consumeValue":null},{"label":"需求用途：","defineField":"field3","dataSourceField":"requirementUsage","consumeValue":null},{"label":"筛目：","defineField":"field4","dataSourceField":"requirementSieveMesh","consumeValue":null},{"label":"批号：","defineField":"field5","dataSourceField":"materialBatchNo","consumeValue":null},{"label":"有效期：","defineField":"field6","dataSourceField":"expiredDate","consumeValue":null},{"label":"序列号：","defineField":"field7","dataSourceField":"weighSerialNo","consumeValue":null},{"label":"皮重：","defineField":"field8","dataSourceField":"tareWeightWithUnit","consumeValue":null},{"label":"净重：","defineField":"field9","dataSourceField":"netWeightWithUnit","consumeValue":null},{"label":"毛重：","defineField":"field10","dataSourceField":"grossWeightWithUnit","consumeValue":null},{"label":"操作人：","defineField":"field11","dataSourceField":"weigherName","consumeValue":null},{"label":"复核人：","defineField":"field12","dataSourceField":"reCheckerName","consumeValue":null},{"label":"日期：","defineField":"field13","dataSourceField":"weighTime","consumeValue":null}]' WHERE id = 121002017;
+
+
+UPDATE bmos_platform.bp_tag_scene_field SET field = 'pieceSpecification' WHERE id = 121001010021;
+UPDATE bmos_platform.bp_tag_scene_field SET field = 'pieceSpecification' WHERE id = 121002014021;
+UPDATE bmos_platform.bp_tag_scene_field SET field = 'pieceSpecification' WHERE id = 121001020021;
+
+
+UPDATE bmos_platform.bp_tag_instance SET config_fields = '[{"label":"物料名称：","defineField":"field1","dataSourceField":"materialName","consumeValue":null},{"label":"批号：","defineField":"field2","dataSourceField":"materialBatchNo","consumeValue":null},{"label":"有效期：","defineField":"field3","dataSourceField":"expiredDate","consumeValue":null},{"label":"物料件号：","defineField":"field4","dataSourceField":"materialNo","consumeValue":null},{"label":"皮重：","defineField":"field5","dataSourceField":"tareWeightWithUnit","consumeValue":null},{"label":"净重：","defineField":"field6","dataSourceField":"netWeightWithUnit","consumeValue":null},{"label":"毛重：","defineField":"field7","dataSourceField":"grossWeightWithUnit","consumeValue":null},{"label":"操作人：","defineField":"field8","dataSourceField":"weigherName","consumeValue":null},{"label":"复核人：","defineField":"field9","dataSourceField":"reCheckerName","consumeValue":null},{"label":"日期：","defineField":"field10","dataSourceField":"weighTime","consumeValue":null}]' WHERE id = 121001017;
+UPDATE bmos_platform.bp_tag_instance SET config_fields = '[{"label":"物料名称：","defineField":"field1","dataSourceField":"materialName","consumeValue":null},{"label":"批号：","defineField":"field2","dataSourceField":"materialBatchNo","consumeValue":null},{"label":"有效期：","defineField":"field3","dataSourceField":"expiredDate","consumeValue":null},{"label":"物料件号：","defineField":"field4","dataSourceField":"materialNo","consumeValue":null},{"label":"皮重：","defineField":"field5","dataSourceField":"tareWeightWithUnit","consumeValue":null},{"label":"净重：","defineField":"field6","dataSourceField":"netWeightWithUnit","consumeValue":null},{"label":"毛重：","defineField":"field7","dataSourceField":"grossWeightWithUnit","consumeValue":null},{"label":"操作人：","defineField":"field8","dataSourceField":"weigherName","consumeValue":null},{"label":"复核人：","defineField":"field9","dataSourceField":"reCheckerName","consumeValue":null},{"label":"日期：","defineField":"field10","dataSourceField":"weighTime","consumeValue":null}]' WHERE id = 121001018;
+UPDATE bmos_platform.bp_tag_instance SET config_fields = '[{"label":"物料名称：","defineField":"field1","dataSourceField":"materialName","consumeValue":null},{"label":"批号：","defineField":"field2","dataSourceField":"materialBatchNo","consumeValue":null},{"label":"有效期：","defineField":"field3","dataSourceField":"expiredDate","consumeValue":null},{"label":"物料件号：","defineField":"field4","dataSourceField":"materialNo","consumeValue":null},{"label":"皮重：","defineField":"field5","dataSourceField":"tareWeightWithUnit","consumeValue":null},{"label":"净重：","defineField":"field6","dataSourceField":"netWeightWithUnit","consumeValue":null},{"label":"毛重：","defineField":"field7","dataSourceField":"grossWeightWithUnit","consumeValue":null},{"label":"操作人：","defineField":"field8","dataSourceField":"weigherName","consumeValue":null},{"label":"复核人：","defineField":"field9","dataSourceField":"reCheckerName","consumeValue":null},{"label":"日期：","defineField":"field10","dataSourceField":"weighTime","consumeValue":null}]' WHERE id = 121001019;
+UPDATE bmos_platform.bp_tag_instance SET config_fields = '[{"label":"物料名称：","defineField":"field1","dataSourceField":"materialName","consumeValue":null},{"label":"批号：","defineField":"field2","dataSourceField":"materialBatchNo","consumeValue":null},{"label":"有效期：","defineField":"field3","dataSourceField":"expiredDate","consumeValue":null},{"label":"物料件号：","defineField":"field4","dataSourceField":"materialNo","consumeValue":null},{"label":"皮重：","defineField":"field5","dataSourceField":"tareWeightWithUnit","consumeValue":null},{"label":"净重：","defineField":"field6","dataSourceField":"netWeightWithUnit","consumeValue":null},{"label":"毛重：","defineField":"field7","dataSourceField":"grossWeightWithUnit","consumeValue":null},{"label":"操作人：","defineField":"field8","dataSourceField":"weigherName","consumeValue":null},{"label":"复核人：","defineField":"field9","dataSourceField":"reCheckerName","consumeValue":null},{"label":"日期：","defineField":"field10","dataSourceField":"weighTime","consumeValue":null}]' WHERE id = 121002021;
+UPDATE bmos_platform.bp_tag_instance SET config_fields = '[{"label":"物料名称：","defineField":"field1","dataSourceField":"materialName","consumeValue":null},{"label":"批号：","defineField":"field2","dataSourceField":"materialBatchNo","consumeValue":null},{"label":"有效期：","defineField":"field3","dataSourceField":"expiredDate","consumeValue":null},{"label":"物料件号：","defineField":"field4","dataSourceField":"materialNo","consumeValue":null},{"label":"皮重：","defineField":"field5","dataSourceField":"tareWeightWithUnit","consumeValue":null},{"label":"净重：","defineField":"field6","dataSourceField":"netWeightWithUnit","consumeValue":null},{"label":"毛重：","defineField":"field7","dataSourceField":"grossWeightWithUnit","consumeValue":null},{"label":"操作人：","defineField":"field8","dataSourceField":"weigherName","consumeValue":null},{"label":"复核人：","defineField":"field9","dataSourceField":"reCheckerName","consumeValue":null},{"label":"日期：","defineField":"field10","dataSourceField":"weighTime","consumeValue":null}]' WHERE id = 121002022;
+UPDATE bmos_platform.bp_tag_instance SET config_fields = '[{"label":"物料名称：","defineField":"field1","dataSourceField":"materialName","consumeValue":null},{"label":"批号：","defineField":"field2","dataSourceField":"materialBatchNo","consumeValue":null},{"label":"有效期：","defineField":"field3","dataSourceField":"expiredDate","consumeValue":null},{"label":"物料件号：","defineField":"field4","dataSourceField":"materialNo","consumeValue":null},{"label":"皮重：","defineField":"field5","dataSourceField":"tareWeightWithUnit","consumeValue":null},{"label":"净重：","defineField":"field6","dataSourceField":"netWeightWithUnit","consumeValue":null},{"label":"毛重：","defineField":"field7","dataSourceField":"grossWeightWithUnit","consumeValue":null},{"label":"操作人：","defineField":"field8","dataSourceField":"weigherName","consumeValue":null},{"label":"复核人：","defineField":"field9","dataSourceField":"reCheckerName","consumeValue":null},{"label":"日期：","defineField":"field10","dataSourceField":"weighTime","consumeValue":null}]' WHERE id = 121002023;
+
+UPDATE bmos_platform.bp_tag_define SET preview_html = '
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+
+<body>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    .fields-item {
+      margin-bottom: 0px;
+    }
+
+    #tag {
+      width: 640px;
+      height: 480px;
+      box-sizing: border-box;
+      background-color: #f8f8f8;
+      border: 1px solid #e1e1e1;
+      border-radius: 6px;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      font-size: 20px;
+    }
+  </style>
+  <div id="tag">
+    <div style="float: left; width: 440px; padding: 10px 10px; box-sizing: border-box">
+      <div id="field1" class="fields-item"></div>
+      <div id="field2" class="fields-item"></div>
+      <div id="field3" class="fields-item"></div>
+      <div id="field4" class="fields-item"></div>
+      <div id="field5" class="fields-item"></div>
+      <div id="field6" class="fields-item"></div>
+      <div id="field7" class="fields-item"></div>
+      <div id="field8" class="fields-item"></div>
+      <div id="field9" class="fields-item"></div>
+      <div id="field10" class="fields-item"></div>
+      <div id="field11" class="fields-item"></div>
+      <div id="field12" class="fields-item"></div>
+      <div id="field13" class="fields-item"></div>
+    </div>
+    <div style="float: right; width: 200px; padding: 10px; box-sizing: border-box; position: relative; height: 460px;">
+      <img id="qrCode" width="160" height="160" src=""
+        style="position: absolute; top: 50%; left: 50%; margin-top: -80px; margin-left: -80px;" />
+    </div>
+  </div>
+</body>
+
+</html>' WHERE id = 1;

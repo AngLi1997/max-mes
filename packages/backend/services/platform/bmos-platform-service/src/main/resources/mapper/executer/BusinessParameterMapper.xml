@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.platform.service.execute.parameter.mapper.BusinessParameterMapper">
+    <select id="page" resultType="com.bmos.platform.service.execute.parameter.vo.BusinessParameterPageVO">
+        select
+            t1.id,
+            t1.code,
+            t1.value,
+            t1.value_type,
+            t1.business_type,
+            t1.belong,
+            t1.description,
+            t1.value_range,
+            t1.name
+        from bp_business_parameter t1
+        where t1.is_deleted = 0
+        and t1.is_display = 1
+          <if test="name != null and name != ''">
+              and t1.name like concat('%',#{name},'%')
+          </if>
+        <if test="code != null and code != ''">
+            and t1.code like concat('%',#{code},'%')
+        </if>
+        <if test="valueType != null and valueType != ''">
+            and t1.value_type = #{valueType}
+        </if>
+        <if test="businessType != null and businessType != ''">
+            and t1.business_type = #{businessType}
+        </if>
+        <if test="belong != null and belong != ''">
+            and t1.belong = #{belong}
+        </if>
+        order by t1.sort asc
+    </select>
+
+    <select id="detail" resultType="com.bmos.platform.service.execute.parameter.vo.BusinessParameterDetailVO">
+        select
+            t1.code,
+            t1.value_range,
+            t1.name
+        from bp_business_parameter t1
+        where t1.id = #{id}
+    </select>
+
+    <select id="detailByCode"
+            resultType="com.bmos.platform.service.execute.parameter.vo.BusinessParameterDetailVO">
+        select
+            t1.code,
+            t1.value_range,
+            t1.value,
+            t1.value_type,
+            t1.name
+        from bp_business_parameter t1
+        where t1.code = #{code}
+    </select>
+</mapper>

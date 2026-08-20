@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.plan.team.mapper.InstructionTeamMapper">
+    <delete id="deleteByInstructionId">
+        delete from bm_product_instruction_team
+        where instruction_id = #{instructionId}
+    </delete>
+
+    <delete id="deleteByProductPlanId">
+        delete from bm_product_instruction_team
+        where product_plan_id = #{productPlanId}
+    </delete>
+
+    <resultMap id="baseMap" type="com.bmos.mes.service.plan.team.model.InstructionTeam">
+        <id property="id" column="id"/>
+        <result property="instructionId" column="instruction_id"/>
+        <result property="productPlanId" column="product_plan_id"/>
+        <result property="nodeId" column="node_id"/>
+        <result property="procedureId" column="procedure_id"/>
+        <result property="procedureModelId" column="procedure_model_id"/>
+        <result property="nodeStepId" column="node_step_id"/>
+        <result property="procedureStepId" column="procedure_step_id"/>
+        <result property="procedureStepModelId" column="procedure_step_model_id"/>
+        <result property="procedureStepModelName" column="procedure_step_model_name"/>
+        <result property="procedureStepTime" column="procedure_step_time"/>
+        <result property="procedureStepTimeUnit" column="procedure_step_time_unit"/>
+        <result property="teamIds" column="team_ids" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler" />
+        <result property="sort" column="sort"/>
+
+    </resultMap>
+
+    <select id="getInstructionDetailByUserTeamId" resultMap="baseMap">
+        SELECT
+            t1.id,
+            t1.procedure_model_id,
+            t1.procedure_step_model_id,
+            IFNULL( t2.team_ids, t1.team_ids ) as team_ids,
+            t1.node_id,
+            t1.node_step_id,
+            t1.product_plan_id
+        FROM
+            bm_product_instruction_team AS t1
+        LEFT JOIN bm_product_change_team AS t2 ON t1.id = t2.product_instruction_team_id
+        WHERE
+            t1.is_deleted = 0
+        <if test="planIds != null and planIds.size() > 0">
+            and t1.product_plan_id in
+            <foreach collection="planIds" open="(" close=")" separator="," item="planId">
+                #{planId}
+            </foreach>
+        </if>
+        ORDER BY
+            change_team_type ASC,
+            change_team_number DESC
+    </select>
+</mapper>

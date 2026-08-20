@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.process.mapper.ProcedureStepMapper">
+    <select id="selectTraceInfoListByProcedureStepIds"
+            resultType="com.bmos.mes.service.process.vo.ProcedureStepTraceVO">
+        select bm_procedure_step.*,
+               bm_procedure.name as procedure_name,
+               bm_process.name   as process_name
+        from bm_procedure_step
+                 left join bm_procedure on bm_procedure_step.procedure_id = bm_procedure.id
+                 left join bm_process on bm_procedure_step.process_id = bm_process.id and bm_process.is_deleted = 0
+        <where>
+            <if test="procedureStepIds != null and procedureStepIds.size() != 0">
+                and bm_procedure_step.id in
+                <foreach collection="procedureStepIds" item="procedureStepId" open="(" close=")" separator=",">
+                    #{procedureStepId}
+                </foreach>
+            </if>
+            <if test="procedureStepIds == null or procedureStepIds.size() == 0">
+                and bm_procedure_step.id = -1
+            </if>
+        </where>
+    </select>
+</mapper>

@@ -1,0 +1,10 @@
+front:
+  i18n:
+    web:
+      locations:
+        - data-id: bmos-web_zh_CN.json
+          group: frontend-i18n
+        - data-id: bmos-web_en_US.json
+          group: frontend-i18n
+        - data-id: bmos-web_ru_RU.json
+          group: frontend-i18n          

@@ -1,0 +1,4 @@
+# PropertySource Loaders
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.bmos.mes.mq.config.RocketMqAutoConfig,\
+com.bmos.mes.mq.spring.SpringContextUtil

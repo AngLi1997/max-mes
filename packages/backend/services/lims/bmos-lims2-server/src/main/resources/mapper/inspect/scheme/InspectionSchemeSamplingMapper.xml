@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.inspect.scheme.mapper.InspectionSchemeSamplingMapper">
+
+
+    <select id="listBySchemeVersion"
+            resultType="com.bmos.lims2.server.inspect.scheme.dto.InspectionSchemeSamplingDTO">
+
+        SELECT id,
+               scheme_id         AS schemeId,
+               version_id        AS versionId,
+               inspect_item_id   AS inspectItemId,
+               sampling_amount   AS samplingAmount,
+               sampling_unit     AS samplingUnit,
+               sampling_count    AS samplingCount
+        FROM lm_inspection_scheme_sampling
+        WHERE scheme_id = #{schemeId} and version_id = #{versionId}
+        ORDER BY create_time ASC
+    </select>
+    <select id="selectBySchemeVersion"
+            resultType="com.bmos.lims2.server.inspect.scheme.dto.InspectionSchemeSamplingDTO">
+        select *, lm_inspect_item.name as inspectItemName, lm_inspect_item.code as inspectItemCode from lm_inspection_scheme_sampling
+        left join lm_inspect_item on lm_inspect_item.id = lm_inspection_scheme_sampling.inspect_item_id
+        where scheme_id = #{schemeId} and version_id = #{versionId}
+        and lm_inspection_scheme_sampling.is_deleted = 0
+        order by lm_inspection_scheme_sampling.create_time ASC
+    </select>
+</mapper>

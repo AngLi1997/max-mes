@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.process.mapper.task.ProcedureTaskInstanceHistoryMapper">
+
+
+    <select id="selectAuditProgressDetailVO"
+            resultType="com.bmos.mes.service.plan.info.vo.PlanAuditProgressDetailVO">
+        SELECT * FROM (
+            SELECT
+            t1.name AS procedureStepName,
+            t1.active_time AS startTime,
+            t1.update_by AS auditUserId,
+            t1.complete_time,
+            t1.flow_state,
+            t2.node_function,
+            t3.name AS procedureName,
+            t1.process_change_number,
+            t1.procedure_change_number,
+            ROW_NUMBER() OVER (PARTITION BY t1.process_change_number, t1.procedure_change_number, t1.procedure_step_model_id ORDER BY t1.create_time DESC) AS rn
+            FROM
+            bm_procedure_task_instance_history t1
+            JOIN bm_procedure_step_model t2 ON t1.procedure_step_model_id = t2.id
+            JOIN bm_procedure_model t3 ON t2.procedure_model_id = t3.id
+            WHERE
+            t1.is_deleted = 0
+            AND t2.is_deleted = 0
+            AND (t2.node_function = '1' OR t2.node_function = '2')
+            AND t1.plan_id = #{productPlanId}
+            <if test="procedureName != null and procedureName != ''">
+                AND t3.name LIKE concat('%', #{procedureName}, '%')
+            </if>
+            <if test="procedureStepName != null and procedureStepName != ''">
+                AND t1.name LIKE concat('%', #{procedureStepName}, '%')
+            </if>
+        ) t
+        WHERE t.rn = 1
+        <if test="orderBy != null and orderBy != ''">
+            order by ${orderBy} ${dir}
+        </if>
+        <if test="!(orderBy != null and orderBy != '')">
+            ORDER BY startTime DESC;
+        </if>
+    </select>
+    <select id="selectAuditingCount" resultType="com.bmos.mes.service.plan.info.vo.PlanAuditingCountVO">
+        select count(t1.id) as auditingCount,t1.plan_id as id
+        from bm_procedure_task_instance_history t1
+        left join bm_procedure_step_model t2 on t1.procedure_step_model_id = t2.id
+        where
+        t1.is_deleted = 0
+        and t2.is_deleted = 0
+        and (t2.node_function = '1' or t2.node_function = '2')
+        and t1.flow_state != 'COMPLETE'
+        and
+        t1.plan_id in
+        <foreach collection="ids" open="(" separator="," close=")" item="planId">
+            #{planId}
+        </foreach>
+        GROUP BY t1.plan_id
+    </select>
+    <select id="selectPlanSubRecord" resultType="com.bmos.mes.service.workflow.vo.PlanSubRecordVO">
+        select t1.name as procedureStepName,t1.start_time,t1.complete_time as endTime,t1.procedure_step_model_id
+               t1.update_by as completeUserId,t1.process_change_number,t1.procedure_change_number,
+               t3.name as procedureName
+        from bm_procedure_task_instance_history t1
+        left join bm_procedure_step_model t2 on t1.procedure_step_model_id = t2.id
+        left join bm_procedure_model t3 on t1.procedure_model_id = t3.id
+        where t1.is_deleted = 0
+          and t1.plan_id = #{productPlanId}
+        and t2.node_function = #{nodeFunction}
+        <if test="procedureName != null and procedureName != ''">
+            and t3.name like concat('%',#{procedureName}, '%')
+        </if>
+        <if test="procedureStepName != null and procedureStepName != ''">
+            and t2.name like concat('%',#{procedureStepName}, '%')
+        </if>
+        order by t1.complete_time desc
+    </select>
+
+    <select id="queryListPlanIdAndCompleteState" resultType="com.bmos.mes.service.process.model.task.ProcedureTaskInstanceHistory">
+        SELECT
+            t1.*,
+            t2.node_id AS nodeId,
+            t2.`name` as procedureName
+        FROM
+            bm_procedure_task_instance_history AS t1
+            JOIN bm_procedure_model AS t2 ON t1.procedure_model_id = t2.id
+        WHERE
+            t1.is_deleted = 0
+            AND t2.is_deleted = 0
+            AND t1.plan_id =#{planId}
+            and t1.flow_state =#{state}
+        GROUP BY
+		    t1.procedure_model_id,t1.process_change_number
+    </select>
+
+    <select id="queryListByPlanId" resultType="com.bmos.mes.service.plan.info.vo.PlanRetraceExecutePageVO">
+        SELECT
+            t2.`name` as procedureName,
+            t1.`name` as procedureStepName,
+            t1.process_change_number as processChangeNum,
+            t1.procedure_change_number as procedureStepNum,
+            t1.active_time as procedureStepStartTime,
+            t1.complete_time as procedureStepEndTime,
+            t1.update_by as completer
+        FROM
+            bm_procedure_task_instance_history AS t1
+            JOIN bm_procedure_model AS t2 ON t1.procedure_model_id = t2.id
+        where
+            t1.is_deleted = 0
+            and t2.is_deleted = 0
+            and t1.flow_state = 'COMPLETE'
+            and t1.plan_id =#{planId}
+    </select>
+
+</mapper>

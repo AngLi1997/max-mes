@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.platform.service.dict.mapper.DictDetailMapper">
+
+    <select id="listDictDetail" resultType="com.bmos.platform.service.dict.vo.DictDetailListVO">
+        SELECT
+            id as id,
+            dict_label as dictLabel,
+            dict_value as dictValue,
+            dict_id as dictId
+        FROM
+            bp_dict_detail
+        WHERE
+            is_deleted = 0
+        and dict_id=#{dictId}
+        <if test="dictLabel != null and dictLabel != '' ">
+            and dict_label like concat('%',#{dictLabel},'%')
+        </if>
+        <if test="dictValue != null and dictValue != '' ">
+            and dict_value like concat('%',#{dictValue},'%')
+        </if>
+        order by create_time desc
+    </select>
+
+    <select id="listDictDetailDown" resultType="com.bmos.platform.service.dict.vo.DictVO">
+        select
+            id as id,
+            dict_label as label,
+            dict_value as value
+        from
+            bp_dict_detail
+        where
+            is_deleted = 0
+        and dict_id=#{dictId}
+    </select>
+
+    <delete id="deleteDictDetail">
+        update bp_dict_detail
+        set del_flag = id,
+            is_deleted = 1,
+        update_time = now(),
+        update_by = #{userId}
+        where id = #{id}
+    </delete>
+</mapper>

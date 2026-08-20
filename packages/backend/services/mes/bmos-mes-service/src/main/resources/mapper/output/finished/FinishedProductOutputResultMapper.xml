@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.output.finished.mapper.FinishedProductOutputResultMapper">
+
+    <select id="selectByProductPlanIds"
+            resultType="com.bmos.mes.service.output.finished.vo.FinishedProductOutputResultVO">
+        select bm_output_finished_product_result.*,
+               bm_output_finished_product.product_plan_id
+        from bm_output_finished_product_result
+                 left join bm_output_finished_product on bm_output_finished_product_result.output_finished_product_id = bm_output_finished_product.id
+            and bm_output_finished_product.is_deleted = 0
+        where bm_output_finished_product_result.is_deleted = 0
+        <if test="productPlanIds != null and productPlanIds.size() > 0">
+            and bm_output_finished_product.product_plan_id in
+            <foreach collection="productPlanIds" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="productPlanIds == null or productPlanIds.size() == 0">
+            and 1 = 0
+        </if>
+    </select>
+</mapper>

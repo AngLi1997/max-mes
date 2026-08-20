@@ -1,0 +1,2 @@
+# 增加登录时是否开启验证码验证参数 by zhongjie 251017
+INSERT INTO bmos_platform.bp_business_parameter (id, code, name, value, value_type, business_type, belong, description, sort, value_range, is_display, create_by, update_by, create_time, update_time, is_deleted) VALUES (100036, 'platform.sys.captcha-status', '是否开启验证码', 'true', 'STRING', 'SYSTEM', '平台', '登录时是否开启验证码验证', 100036, '', 1, null, null, now(), now(), 0);

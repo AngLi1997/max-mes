@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.platform.service.system.code.mapper.CodeRuleVersionMapper">
+    <select id="page" resultType="com.bmos.platform.service.system.code.vo.CodeRuleVersionPageVO">
+        select
+            t1.id,
+            t1.version,
+            t1.description,
+            t1.version_status,
+            t1.status as status_int_value
+        from bp_code_rule_version t1
+        where t1.is_deleted = 0
+        <if test="code != null and code != ''">
+            and t1.rule_code = #{code}
+        </if>
+        order by t1.create_time desc
+    </select>
+
+    <delete id="delete">
+        update bp_code_rule_version
+        set del_version_flag = id,
+            is_deleted      = 1,
+            update_time   = now(),
+            update_by     = #{userId}
+        where id = #{id}
+    </delete>
+</mapper>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.platform.service.factory.mapper.BpFactoryRoomEnvPropertyMapper">
+
+    <select id="selectByRoomIds"
+            resultType="com.bmos.platform.service.factory.service.dto.RoomEnvPropertyWithAcquitPointDTO">
+        select bfrep.room_id,
+        bfrep.env_property_code,
+        bfrep.equipment_id,
+        bfrep.equipment_data_property_code,
+        bap.data_point_name,
+        bap.acquisition_platform,
+        bei.name as equipment_name,
+        bei.code as equipment_code,
+        bap.code as acquisition_point_code,
+        bap.id   as acquisition_point_id,
+        bepi.name as equipmentDataPropertyName
+        from bp_factory_room_env_property bfrep
+        left join bp_equipment_property_info bepi
+        on bfrep.equipment_id = bepi.equipment_id and
+        bfrep.equipment_data_property_code = bepi.property_code
+        and bepi.is_deleted = 0
+        left join bp_equipment_info bei on bfrep.equipment_id = bei.id and bei.is_deleted = 0
+        left join bp_acquisition_point bap on bepi.value = bap.id and bap.is_deleted = 0
+        left join bp_factory_room room on room.id = bfrep.room_id and room.is_deleted = 0
+        where room_id in
+        <foreach collection="roomIds" open="(" close=")" separator="," item="roomId">
+            #{roomId}
+        </foreach>
+        and bfrep.is_deleted = 0
+    </select>
+</mapper>
+

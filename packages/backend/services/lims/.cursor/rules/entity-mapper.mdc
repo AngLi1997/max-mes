@@ -1,0 +1,170 @@
+---
+description:
+globs:*.java,*.xml
+alwaysApply:true
+---
+
+# entity 规范
+- 命名与表结构一一对应，继承 BaseDO（如有）。
+- 使用 @TableName、@TableId、@TableField、@TableLogic 注解。
+- 字段注释齐全。
+
+# mybatis-plus 用法
+- 简单查询用 mybatis-plus API，复杂查询用 xml 或自定义方法。
+- entity实体类需要严格对应数据库表字段，如果有连表查询的需求，需要定义一个DTO类进行数据接收
+- 数据库不允许直接返回VO对象，dao层和service层数据传输使用DTO对象
+
+# mapper 规范
+- 命名、继承、注释规范。
+
+# 批量操作
+- 批量操作优先，避免循环单条操作。
+
+# 公共字段与基类
+- 所有实体类应继承 BaseDO（或 BaseBO），公共字段（如id、createTime、updateTime、createBy、updateBy、deleted等）由基础类统一管理。
+- 子类只需声明业务字段，避免重复声明公共字段。
+- 需要注意，连表的时候，因为每张表都有公共字段，所以查询语句中需要指明公共字段使用主表的字段
+
+# 实体类规范
+
+## 基本规范
+- 实体类必须继承BaseDO
+- 类名与表名一一对应，使用单数形式
+- 必须添加类注释，包含描述、作者、时间
+- 使用Lombok注解简化代码（@Getter、@Setter）
+
+## 注解使用
+- @TableName：指定数据库表名
+- @TableId：主键字段，使用IdType.ASSIGN_ID（雪花算法）
+- @TableField：指定数据库字段名，fill属性指定自动填充策略
+- @TableLogic：逻辑删除字段
+- @JsonFormat：日期格式化
+
+## 字段规范
+- 所有字段必须添加注释
+- 使用包装类型而非基本类型（Boolean而非boolean）
+- 日期类型统一使用LocalDateTime
+- 金额类型使用BigDecimal
+- 枚举字段使用枚举类型
+
+## 基础字段
+所有实体类通过继承BaseDO获得以下基础字段：
+```java
+@TableId(type = IdType.ASSIGN_ID)
+private Long id;
+
+@TableField(fill = FieldFill.INSERT)
+@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+private LocalDateTime createTime;
+
+@TableField(fill = FieldFill.INSERT_UPDATE)
+@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+private LocalDateTime updateTime;
+
+@TableField(fill = FieldFill.INSERT)
+private String createBy;
+
+@TableField(fill = FieldFill.INSERT_UPDATE)
+private String updateBy;
+
+@TableLogic
+@TableField("is_deleted")
+private Boolean deleted;
+```
+
+# Mapper层规范
+
+## 基本规范
+- 继承BaseMapperX<T>获得基础CRUD方法
+- 接口上必须添加@Mapper注解
+- 添加类注释说明功能
+- 所有方法必须添加方法注释
+- entity只表示单表的字段，如果需要表示其他明细或关联关系，建一个DTO类来表达
+
+## 查询方法规范
+- 简单查询使用MyBatis-Plus API
+- 复杂查询使用XML配置
+- 连表查询返回DTO对象
+- 单表查询返回实体对象
+- 查询方法命名规范：
+  - 单个查询：getById、selectByXxx
+  - 列表查询：listByXxx、selectList
+  - 分页查询：page、selectPage
+  - 统计查询：countByXxx
+  - 存在性判断：existsXxx
+
+## XML映射文件规范
+- 文件位置：resources/mapper/业务模块/XxxMapper.xml
+- 使用SQL片段复用SQL语句
+- 使用动态SQL减少代码重复
+- 查询字段使用字段片段
+- 必要时添加字段别名
+- 连表查询指定主表字段
+
+示例：
+```xml
+<mapper namespace="com.bmos.lims2.server.material.mapper.MaterialMapper">
+    <!-- 基础字段片段 -->
+    <sql id="BASE_COLUM">
+        id, name, code, create_time, update_time, is_deleted
+    </sql>
+
+    <!-- 动态查询条件 -->
+    <select id="selectByParam" resultType="Material">
+        SELECT <include refid="BASE_COLUM" />
+        FROM lm_inspect_material
+        <where>
+            <if test="param.name != null and param.name != ''">
+                AND name LIKE CONCAT('%', #{param.name}, '%')
+            </if>
+            AND is_deleted = 0
+        </where>
+    </select>
+</mapper>
+```
+
+## 性能优化规范
+- 使用批量操作替代循环单条操作
+- 合理使用分页查询
+- 避免大表连接查询
+- 建立合适的索引
+- 使用explain分析SQL执行计划
+
+## 多表查询规范
+- 创建专门的DTO类接收多表查询结果
+- 在连表查询时指定使用主表的公共字段
+- 使用LEFT JOIN避免数据丢失
+- 连表查询必须指定字段别名
+
+## 代码示例
+```java
+@Mapper
+public interface MaterialMapper extends BaseMapperX<Material> {
+    
+    /**
+     * 分页连表查询检品及分类名称
+     * @param param 查询参数
+     * @return 检品信息列表
+     */
+    List<MaterialDTO> selectPageWithCategory(@Param("param") MaterialParamDTO param);
+
+    /**
+     * 根据分类ID列表查询检品
+     * @param categoryIdList 分类ID列表
+     * @return 检品列表
+     */
+    default List<Material> selectByCategoryIds(List<Long> categoryIdList) {
+        return selectList(new LambdaQueryWrapperX<Material>()
+                .in(Material::getCategoryId, categoryIdList));
+    }
+}
+```
+
+
+
+
+
+
+
+
+

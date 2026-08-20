@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.inspect.scheme.mapper.InspectionSchemeDataPointMapper">
+    
+    <select id="listByParameterConfigId" resultType="com.bmos.lims2.server.inspect.scheme.dto.InspectionSchemeDataPointDTO">
+        SELECT 
+            dp.id,
+            dp.scheme_id AS schemeId,
+            dp.version_id AS versionId,
+            dp.package_id AS packageId,
+            dp.inspect_item_id AS inspectItemId,
+            dp.parameter_id AS parameterId,
+            dp.parameter_config_id AS parameterConfigId,
+            dp.data_point_id AS dataPointId,
+            dp.name,
+            dp.point_type AS pointType,
+            dp.trend_line_config AS trendLineConfig,
+            dp.options,
+            dp.time_format AS timeFormat,
+            dp.date_style AS dateStyle,
+            dp.rounding_up AS roundingUp,
+            dp.report_display AS reportDisplay,
+            dp.record_id AS recordId,
+            dp.record_version_id AS recordVersionId,
+            dp.component_id AS componentId,
+            dp.record_item_id AS recordItemId,
+            dp.field_id AS fieldId,
+            EXISTS (
+                SELECT 1
+                FROM lm_inspection_scheme_judgment j
+                WHERE j.is_deleted = 0
+                  AND j.parameter_config_id = dp.parameter_config_id
+                  AND j.data_point_config_id = dp.id
+
+            ) AS referencedByJudgment
+        FROM lm_inspection_scheme_data_point dp
+        WHERE dp.parameter_config_id = #{parameterConfigId}
+        AND dp.is_deleted = 0
+        ORDER BY id ASC
+    </select>
+</mapper> 

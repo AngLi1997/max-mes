@@ -1,0 +1,1 @@
+import{H as a}from"./index-eacb5835.js";const e=e=>a.post("/api/app/mes/weigh/data/saveData",e,{header:{"Bmos-MenuId":"121010001","Bmos-Operation":1,"Bmos-Operation-Business":"1"===e.mode?"称量数据-手动称量":"称量数据-秤具称量"}}),s=e=>a.get("/api/app/mes/weigh/data/getWeighList",e);export{s as g,e as s};

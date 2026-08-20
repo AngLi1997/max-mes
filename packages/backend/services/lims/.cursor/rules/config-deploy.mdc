@@ -1,0 +1,202 @@
+---
+description:
+globs:*.java,*.xml
+alwaysApply:false
+---
+
+# 配置文件
+- 采用 yml 格式，分环境管理，支持 nacos 配置中心。
+- 端口、上下文路径、文件上传等基础配置在 application.yml 中统一管理。
+
+# 依赖管理
+- 采用 Maven，spring-boot、mybatis-plus、lombok、fastjson、swagger、redis、rocketmq、skywalking 等。
+
+# 部署
+- Docker 容器化、Jenkins 部署。
+
+# 配置规范
+
+## 配置文件结构
+```yaml
+# application.yml - 基础配置
+server:
+  port: 60800
+  servlet:
+    context-path: /api/app/lims2
+
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant-path-matcher
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+```
+
+## 多环境配置
+- application.yml：基础配置
+- application-dev.yml：开发环境
+- application-test.yml：测试环境
+- application-prod.yml：生产环境
+
+## Nacos配置中心
+```yaml
+spring:
+  cloud:
+    nacos:
+      config:
+        server-addr: ${nacos.server}
+        namespace: ${nacos.namespace}
+        group: DEFAULT_GROUP
+        file-extension: yml
+```
+
+## 配置项管理
+- 敏感配置加密
+- 环境变量注入
+- 配置动态刷新
+- 配置版本管理
+
+# 依赖管理
+
+## Maven配置
+```xml
+<properties>
+    <revision>1.0-SNAPSHOT</revision>
+    <bmos.version>1.15.0-SNAPSHOT</bmos.version>
+    <spring.boot.version>2.6.15</spring.boot.version>
+    <mybatis-plus.version>3.5.3.2</mybatis-plus.version>
+    <fastjson.version>1.2.83</fastjson.version>
+</properties>
+
+<dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>com.bmos</groupId>
+            <artifactId>bmos-cloud-dependency</artifactId>
+            <version>${bmos.version}</version>
+        </dependency>
+    </dependencies>
+</dependencyManagement>
+```
+
+## 依赖规范
+- 统一版本管理
+- 避免依赖冲突
+- 精简依赖项
+- 定期升级依赖
+
+# 构建规范
+
+## Maven构建
+```xml
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+        </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+                <source>8</source>
+                <target>8</target>
+            </configuration>
+        </plugin>
+    </plugins>
+</build>
+```
+
+## 构建流程
+- 代码检查
+- 单元测试
+- 打包构建
+- 制作镜像
+
+# 部署规范
+
+## Docker部署
+```dockerfile
+FROM openjdk:8-jdk-alpine
+WORKDIR /app
+COPY target/*.jar app.jar
+ENTRYPOINT ["java","-jar","app.jar"]
+```
+
+## 容器配置
+- 资源限制
+- 环境变量
+- 端口映射
+- 数据持久化
+
+## Jenkins部署
+- 代码拉取
+- 自动构建
+- 镜像制作
+- 服务部署
+
+## 环境管理
+- 开发环境
+- 测试环境
+- 预发环境
+- 生产环境
+
+# 运维规范
+
+## 服务监控
+- 应用监控
+- 容器监控
+- 资源监控
+- 业务监控
+
+## 日志管理
+- 日志收集
+- 日志分析
+- 日志存储
+- 日志告警
+
+## 备份策略
+- 数据备份
+- 配置备份
+- 定时备份
+- 备份验证
+
+## 应急预案
+- 故障转移
+- 服务降级
+- 限流熔断
+- 快速回滚
+
+# CI/CD规范
+
+## 持续集成
+- 代码提交
+- 自动构建
+- 单元测试
+- 代码检查
+
+## 持续部署
+- 环境部署
+- 服务启动
+- 健康检查
+- 自动回滚
+
+## 发布流程
+- 版本管理
+- 灰度发布
+- 回滚机制
+- 发布确认
+
+## 环境隔离
+- 资源隔离
+- 网络隔离
+- 数据隔离
+- 配置隔离
+
+
+
+# 部署
+- Docker 容器化、Jenkins 部署。
+

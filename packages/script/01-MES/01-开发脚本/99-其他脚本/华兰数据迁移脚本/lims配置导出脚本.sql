@@ -1,0 +1,1 @@
+mysqldump -uroot -pIsysc0re123 --databases bmos_lims --tables bm_basic_analyze bm_basic_category bm_basic_inspect bm_basic_inspect_analyze bm_basic_package bm_basic_package_inspect bm_basic_products bm_basic_products_package > /root/db_back/lims.sql

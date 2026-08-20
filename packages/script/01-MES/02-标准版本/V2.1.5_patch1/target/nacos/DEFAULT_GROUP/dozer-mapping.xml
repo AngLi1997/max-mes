@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mappings xmlns="http://dozer.sourceforge.net" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://dozer.sourceforge.net
+          http://dozer.sourceforge.net/schema/beanmapping.xsd">
+    <mapping date-format="yyyy-MM-dd" map-id="HlInspectOrderSendBack">
+        <class-a>com.bmos.api.server.open.lims.dto.InspectOrderSendBackDTO</class-a>
+        <class-b>com.bmos.mes.inspect.dto.InspectRejectDTO</class-b>
+    </mapping>
+
+    <mapping date-format="yyyy-MM-dd" map-id="HlInspectResultSendBack">
+        <class-a>com.bmos.api.server.open.lims.dto.InspectResultSendBackDTO</class-a>
+        <class-b>com.bmos.mes.inspect.dto.InspectResultCallBackDTO</class-b>
+        <field custom-converter="com.bmos.api.server.converter.HlInspectResultSendBackTestCodeConverter">
+            <a>testCode</a>
+            <b>testCode</b>
+        </field>
+    </mapping>
+
+    <mapping date-format="yyyy-MM-dd" map-id="HlInspectOrderSend">
+        <class-a>com.bmos.api.common.dto.MesInspectRequestOrderDTO</class-a>
+        <class-b>com.bmos.api.server.outer.lims.dto.InspectRequestOrderDTO</class-b>
+    </mapping>
+</mappings>

@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.storage.manage.mapper.IStorageMaterialMapper">
+    <sql id="commonQuery">
+        select distinct bm_storage_material.id,
+                        bm_material.id                         as material_id,
+                        bm_material.name                       as material_name,
+                        bm_material.code                       as material_code,
+                        bm_material.merge_code                 as merge_code,
+                        bm_material.specification              as material_specification,
+                        bm_material.material_category_id       as material_category_id,
+                        bm_material_category.name              as material_category_name,
+                        bm_material_category.category_type     as material_category_type,
+                        cast(bm_storage_material.no as signed) as material_no,
+                        bm_storage_material_batch.id           as material_batch_id,
+                        bm_storage_material_batch.material_batch_no,
+                        bm_storage_material.unit_id,
+                        bm_storage_material.unit_extend_id,
+                        bm_storage_material.init_quantity,
+                        bm_storage_material.consume_quantity,
+                        bm_storage_material.available_quantity,
+                        bm_storage_material.reserve_quantity,
+                        bm_storage_material_batch.expired_date,
+                        bm_storage_material.material_position_id,
+                        bm_storage_material.container,
+                        bm_storage_material.container_id,
+                        bm_storage_material.sign_status,
+                        bm_storage_material_batch.original_batch_no,
+                        bm_storage_material_batch.factory_batch_no,
+                        bm_storage_material_reserve.batch_id   as product_plan_id
+        from bm_storage_material
+                 left join bm_storage_material_batch
+                           on bm_storage_material_batch.id = bm_storage_material.storage_material_batch_id and
+                              bm_storage_material_batch.is_deleted = 0
+                 left join bm_material
+                           on bm_material.id = bm_storage_material.material_id and bm_material.is_deleted = 0
+                 left join bm_material_category
+                           on bm_material_category.id = bm_material.material_category_id and bm_material.is_deleted = 0
+                 left join bm_cargo_position on bm_storage_material.material_position_id = bm_cargo_position.id and
+                                                bm_cargo_position.is_deleted = 0
+                 left join bm_resource_permission on bm_cargo_position.id = bm_resource_permission.resource_id
+                 left join bm_storage_material_reserve
+                           on bm_storage_material_reserve.storage_material_id = bm_storage_material.id and
+                              bm_storage_material_reserve.is_deleted = 0
+    </sql>
+
+    <select id="queryList" resultType="com.bmos.mes.service.storage.manage.vo.StorageMaterialVO">
+        <include refid="commonQuery"/>
+        <where>
+            bm_storage_material_batch.is_deleted = 0
+              and bm_material.is_deleted = 0
+              and bm_storage_material.is_deleted = 0
+              and bm_storage_material_batch.id = #{query.storageMaterialBatchId}
+              and (bm_storage_material.available_quantity + bm_storage_material.reserve_quantity) != 0
+              and bm_cargo_position.is_deleted = 0
+              and bm_cargo_position.is_enable = 'TRUE'
+
+
+            <if test="positionIds == null or positionIds.size() == 0">
+                and 1 = 2
+            </if>
+            <if test="positionIds != null and positionIds.size() > 0">
+                and bm_storage_material.material_position_id in
+
+
+                <foreach collection="positionIds" open="(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="query.materialNo != null and query.materialNo != ''">
+                and bm_storage_material.no like concat('%'
+                    , #{query.materialNo}
+                    , '%')
+            </if>
+            order by bm_storage_material.create_time desc, material_no desc
+        </where>
+    </select>
+
+    <select id="queryPageWithPosition" resultType="com.bmos.mes.service.storage.manage.vo.StorageMaterialVO">
+        <include refid="commonQuery"/>
+        <where>
+            bm_storage_material_batch.is_deleted = 0
+              and bm_material.is_deleted = 0
+              and (bm_storage_material.sign_status is null or bm_storage_material.sign_status = 1)
+              and bm_storage_material.is_deleted = 0
+              and (bm_storage_material.available_quantity + bm_storage_material.reserve_quantity) != 0
+              and bm_cargo_position.is_deleted = 0
+              and bm_cargo_position.is_enable = 'TRUE'
+            <if test="query.storageMaterialBatchId != null">
+                and bm_storage_material.storage_material_batch_id = #{query.storageMaterialBatchId}
+            </if>
+            <if test="query.materialNo != null and query.materialNo != ''">
+                and bm_storage_material.no like concat('%'
+                    , #{query.materialNo}
+                    , '%')
+            </if>
+            <if test="positionIds == null or positionIds.size() == 0">
+                and 1 = 2
+            </if>
+            <if test="positionIds != null and positionIds.size() > 0">
+                and bm_storage_material.material_position_id in
+                <foreach collection="positionIds" open="(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+            order by bm_storage_material.create_time desc, material_no desc
+        </where>
+    </select>
+
+    <select id="queryInfoById" resultType="com.bmos.mes.service.storage.manage.vo.StorageMaterialVO">
+        <include refid="commonQuery"/>
+        <where>
+            bm_storage_material_batch.is_deleted = 0
+              and bm_material.is_deleted = 0
+              and bm_storage_material.is_deleted = 0
+              and bm_storage_material.id = #{id}
+        </where>
+    </select>
+
+    <select id="queryIdByMaterialNo" resultType="java.lang.Long">
+        select id
+        from bm_storage_material
+        where no = #{materialNo}
+          and is_deleted = 0
+    </select>
+    <select id="selectAvailableMaterial"
+            resultType="com.bmos.mes.service.storage.manage.vo.BatchReservedAvailableMaterialVO">
+        select distinct sm.id                 as storageMaterialId,
+                        sm.no                 as materialNo,
+                        sm.material_position_id,
+                        sm.available_quantity as quantity,
+                        b.material_batch_no,
+                        sm.unit_id,
+                        sm.unit_extend_id,
+                        b.expired_date,
+                        b.material_id,
+                        p.position            as materialPositionName,
+                        p.code                as materialPositionCode,
+                        b.hydration,
+                        b.no_hydration_content,
+                        b.supplier,
+                        b.producer
+        from bm_storage_material sm
+                 left join bm_cargo_position p on sm.material_position_id = p.id
+                 left join bm_resource_permission rp on rp.resource_id = p.id
+                 left join bm_storage_material_batch b on sm.storage_material_batch_id = b.id
+        where sm.available_quantity != 0
+          and b.available = true
+        <if test="materialId != null">
+            and sm.material_id = #{materialId}
+        </if>
+        <if test="deptIds != null and deptIds.size() > 0">
+            and rp.dept_id in
+            <foreach collection="deptIds" open="(" close=")" separator="," item="item">
+                #{item}
+            </foreach>
+        </if>
+        order by b.material_batch_no ASC, CAST(sm.no AS UNSIGNED) ASC
+    </select>
+
+    <select id="queryPage" resultType="com.bmos.mes.service.storage.manage.vo.StorageMaterialManageVO">
+        select bm_storage_material.id                                                                    as storage_material_id,
+               cast(bm_storage_material.no as signed)                                                    as storage_material_no,
+               bm1.id                                                                                    as material_id,
+               bm1.merge_code,
+               bm1.name                                                                                  as material_name,
+               bm_storage_material_batch.material_batch_no,
+               (bm_storage_material.available_quantity = 0 and bm_storage_material.reserve_quantity = 0) as use_up,
+               bm_storage_material.init_quantity,
+               bm_storage_material.consume_quantity,
+               bm_storage_material.available_quantity,
+               bm_storage_material.reserve_quantity,
+               bm_storage_material.container                                                             as container_name,
+               if(bm_storage_material.unit_extend_id is null, bm_storage_material.unit_id,
+                  bm_storage_material.unit_extend_id)                                                    as unit_id,
+               concat(bm_cargo_position.code, '-', bm_cargo_position.position)                           as position,
+               bm2.name                                                                                  as reserve_product_name,
+               bm_storage_material_reserve.batch_no                                                      as reserve_batch_no,
+               bm_storage_material_reserve.reserve_user_id,
+               bm_storage_material_reserve.reserve_time
+        from bm_storage_material
+                 left join bm_storage_material_batch
+                           on bm_storage_material.storage_material_batch_id = bm_storage_material_batch.id and
+                              bm_storage_material_batch.is_deleted = 0
+                 left join bm_cargo_position on bm_storage_material.material_position_id = bm_cargo_position.id and
+                                                bm_cargo_position.is_deleted = 0
+                 left join bm_storage_material_reserve
+                           on bm_storage_material_reserve.storage_material_id = bm_storage_material.id and
+                              bm_storage_material_reserve.is_deleted = 0
+                 left join bm_material bm1 on bm_storage_material.material_id = bm1.id and bm1.is_deleted = 0
+                 left join bm_material bm2 on bm_storage_material_reserve.product_id = bm2.id and bm2.is_deleted = 0
+        where bm_storage_material.is_deleted = 0
+          and (bm_storage_material.sign_status is null or bm_storage_material.sign_status = 1)
+        <if test="pageQuery.storageMaterialBatchId != null != null">
+            and bm_storage_material.storage_material_batch_id = #{pageQuery.storageMaterialBatchId}
+        </if>
+        <if test="pageQuery.storageMaterialNo != null and pageQuery.storageMaterialNo != ''">
+            and bm_storage_material.no like concat('%'
+                , #{pageQuery.storageMaterialNo}
+                , '%')
+        </if>
+        order by bm_storage_material.create_time desc, storage_material_no desc
+    </select>
+
+    <update id="scrapBatch">
+        update bm_storage_material
+        set consume_quantity     = consume_quantity + reserve_quantity,
+            reserve_quantity     = 0,
+            container            = null,
+            material_position_id = null
+        where id in
+        <foreach collection="scrapStorageMaterialIdList" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <select id="queryInfoByIds" resultType="com.bmos.mes.service.storage.manage.vo.StorageMaterialVO">
+        <include refid="commonQuery"/>
+        <where>
+            bm_storage_material_batch.is_deleted = 0
+              and bm_material.is_deleted = 0
+              and bm_storage_material.is_deleted = 0
+            <!--            and bm_cargo_position.is_deleted = 0-->
+            <!--            and bm_cargo_position.is_enable = 'TRUE'-->
+            and bm_storage_material.id in
+            <foreach collection="ids" open="(" separator="," close=")" item="item">
+                #{item}
+            </foreach>
+        </where>
+    </select>
+    <select id="selectDetailInfoByIdList"
+            resultType="com.bmos.mes.service.record.business.model.StorageMaterialDetailInfo">
+        SELECT distinct bm_storage_material_batch.id              AS materialBatchId,
+                        bm_storage_material_batch.material_id,
+                        sum(bm_storage_material.reserve_quantity) as reserveQuantity,
+                        bm_storage_material.unit_id,
+                        bm_storage_material_batch.material_batch_no,
+                        bm_storage_material_batch.hydration,
+                        bm_storage_material_batch.no_hydration_content,
+                        bm_storage_material_batch.supplier,
+                        bm_storage_material_batch.producer,
+                        bm_storage_material_batch.expired_date,
+                        bm_storage_material_batch.factory_batch_no,
+                        bm_storage_material_batch.original_batch_no,
+                        bm_storage_material_batch.report_no,
+                        bm_storage_material_batch.licence_no,
+                        bm_material.merge_code
+        FROM bm_storage_material_batch
+                 LEFT JOIN bm_storage_material
+                           ON bm_storage_material.storage_material_batch_id = bm_storage_material_batch.id
+                 left join bm_material on bm_material.id = bm_storage_material_batch.material_id
+        where
+        bm_storage_material.id in
+        <foreach collection="storageMaterialIdList" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        GROUP BY bm_storage_material_batch.id
+        order by
+        <foreach collection="storageMaterialIdList" item="id" open="field(bm_storage_material.id," close=")"
+                 separator=",">
+            #{id}
+        </foreach>
+    </select>
+    <select id="selectByBatchIdsAndReservePlanId"
+            resultType="com.bmos.mes.service.storage.manage.model.StorageMaterial">
+        select distinct bm_storage_material.*
+        from bm_storage_material
+        left join bm_storage_material_reserve on bm_storage_material_reserve.storage_material_id = bm_storage_material.id
+        where
+        bm_storage_material_reserve.is_deleted = 0
+        and bm_storage_material.storage_material_batch_id in
+        <foreach collection="batchIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        and bm_storage_material_reserve.batch_id = #{productPlanId}
+    </select>
+</mapper>

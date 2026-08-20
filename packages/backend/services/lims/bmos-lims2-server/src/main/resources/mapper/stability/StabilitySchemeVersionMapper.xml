@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.stability.scheme.mapper.StabilitySchemeVersionMapper">
+
+    <resultMap id="BaseResultMap" type="com.bmos.lims2.server.stability.scheme.entity.StabilitySchemeVersion">
+        <id column="id" property="id"/>
+        <result column="scheme_id" property="schemeId"/>
+        <result column="version_no" property="versionNo"/>
+        <result column="status" property="status"/>
+        <result column="process_instance_id" property="processInstanceId"/>
+        <result column="parent_version_id" property="parentVersionId"/>
+        <result column="description" property="description"/>
+        <result column="effective_date" property="effectiveDate"/>
+        <result column="material_id" property="materialId"/>
+        <result column="material_name" property="materialName"/>
+        <result column="material_code" property="materialCode"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="is_deleted" property="deleted"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, scheme_id, version_no, status, process_instance_id, parent_version_id, description,
+        effective_date, material_id, material_name, material_code,
+        create_time, update_time, create_by, update_by, is_deleted
+    </sql>
+
+    <select id="selectBySchemeId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM lm_stability_scheme_version
+        WHERE scheme_id = #{schemeId} AND is_deleted = 0
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="selectBySchemeIdAndVersionNo" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM lm_stability_scheme_version
+        WHERE scheme_id = #{schemeId} AND version_no = #{versionNo} AND is_deleted = 0
+    </select>
+
+    <select id="countBySchemeIdAndStatus" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM lm_stability_scheme_version
+        WHERE scheme_id = #{schemeId} AND status = #{status} AND is_deleted = 0
+    </select>
+
+    <select id="selectLatestVersionNo" resultType="java.lang.String">
+        SELECT version_no
+        FROM lm_stability_scheme_version
+        WHERE scheme_id = #{schemeId} AND is_deleted = 0
+        ORDER BY create_time DESC
+        LIMIT 1
+    </select>
+
+    <select id="selectActiveVersions" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM lm_stability_scheme_version
+        WHERE scheme_id = #{schemeId} AND status = 'ACTIVE' AND is_deleted = 0
+        ORDER BY create_time DESC
+    </select>
+
+</mapper>

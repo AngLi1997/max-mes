@@ -1,0 +1,26 @@
+server:
+  port: 60200
+  servlet:
+    context-path: /api/app/mes
+  tomcat:
+    threads:
+      # 最小空闲线程数，默认值为 10
+      min-spare: 50
+      # 最大工作线程数，默认值为 200
+      max: 300
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant-path-matcher
+  servlet:
+    multipart:
+      max-file-size: 20971520
+      max-request-size: 20971520
+rocketmq:
+  name-server: ${ROCKETMQ_HOST:172.30.1.160}:9876
+  producer:
+    group: ${spring.application.name}
+    max-message-size: 15728640
+pagehelper:
+  helper-dialect: mysql
+debug: false

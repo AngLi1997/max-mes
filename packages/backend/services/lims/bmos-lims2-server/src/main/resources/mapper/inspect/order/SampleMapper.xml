@@ -1,0 +1,542 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.inspect.order.mapper.SampleMapper">
+
+    <!-- 根据检验单ID查询样品信息（包含关联信息） -->
+    <select id="selectByInspectionOrderIdWithRelation" resultType="com.bmos.lims2.server.inspect.sample.dto.SampleDTO">
+        SELECT 
+            s.*,
+            ii.name as inspect_item_name,
+            ii.code as inspect_item_code
+        FROM lm_sample s
+        LEFT JOIN lm_inspect_item ii ON s.inspect_item_id = ii.id
+        WHERE s.inspection_order_id = #{inspectionOrderId}
+        AND s.is_deleted = 0
+        and s.discarded = 0
+        ORDER BY s.create_time ASC
+    </select>
+
+
+    <!-- 根据样品编号查询样品扫码结果 -->
+    <select id="selectSampleScanResult" resultType="com.bmos.lims2.server.inspect.sample.dto.SampleScanResultDTO">
+        SELECT
+            s.id,
+            s.sample_no AS sampleNo,
+            s.sample_name AS sampleName,
+            s.inspection_order_id AS inspectionOrderId,
+            io.order_no AS orderNo,
+            m.name AS materialName,
+            m.code AS materialCode,
+            m.specification AS materialSpec,
+            io.batch_no AS batchNo,
+            COALESCE(io.finished_time, io.terminate_time) AS orderEndTime,
+            s.inspect_item_id AS inspectItemId,
+            ii.name AS inspectItemName,
+            s.quantity,
+            s.plan_quantity AS planQuantity,
+            s.unit_id AS unitId,
+            io.finished,
+            io.create_time AS inspectionRequestTime,
+            io.create_by AS inspectionRequestBy,
+            s.sampled,
+            s.received,
+            s.recycled,
+            s.processed,
+            CASE
+                WHEN s.processed = 1 THEN 3
+                WHEN s.recycled = 1 THEN 2
+                ELSE 1
+            END AS status,
+            s.recycled_time AS recycledTime,
+            s.recycled_by AS recycledBy,
+            s.recycle_quantity AS recycleQuantity,
+            s.recycle_unit_id AS recycleUnitId,
+            s.recycle_remark AS recycleRemark,
+            s.process_time AS processTime,
+            s.process_by AS processBy,
+            s.process_method AS processMethod,
+            s.process_remark AS processRemark,
+            s.sampler_name AS samplerName,
+            s.sampling_time AS samplingTime,
+            s.receiver_name AS receiverName,
+            s.receive_time AS receiveTime,
+            s.tag_printed AS tagPrinted
+        FROM lm_sample s
+                 LEFT JOIN lm_inspection_order io ON s.inspection_order_id = io.id
+                 LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+                 LEFT JOIN lm_inspect_item ii ON s.inspect_item_id = ii.id
+        WHERE s.sample_no = #{sampleNo}
+          AND s.is_deleted = 0
+    </select>
+
+
+    <!-- 根据样品编号查询样品扫码结果 -->
+    <select id="selectSamplePrintTagResult" resultType="com.bmos.lims2.server.inspect.sample.dto.SamplePrintTagResultDTO">
+        SELECT
+            s.id,
+            s.sample_no AS sampleNo,
+            s.sample_name AS sampleName,
+            s.inspection_order_id AS inspectionOrderId,
+            io.order_no AS orderNo,
+            m.name AS materialName,
+            m.code AS materialCode,
+            m.specification AS materialSpec,
+            io.batch_no AS batchNo,
+            COALESCE(io.finished_time, io.terminate_time) AS orderEndTime,
+            s.inspect_item_id AS inspectItemId,
+            ii.name AS inspectItemName,
+            ii.code AS inspectItemCode,
+            s.quantity,
+            s.plan_quantity AS planQuantity,
+            s.unit_id AS unitId,
+            io.finished,
+            io.create_time AS inspectionRequestTime,
+            io.create_by AS inspectionRequestBy,
+            s.sampled,
+            s.received,
+            s.recycled,
+            s.processed,
+            CASE
+                WHEN s.processed = 1 THEN 3
+                WHEN s.recycled = 1 THEN 2
+                ELSE 1
+                END AS status,
+            s.recycled_time AS recycledTime,
+            s.recycled_by AS recycledBy,
+            s.recycle_quantity AS recycleQuantity,
+            s.recycle_unit_id AS recycleUnitId,
+            s.recycle_remark AS recycleRemark,
+            s.process_time AS processTime,
+            s.process_by AS processBy,
+            s.process_method AS processMethod,
+            s.process_remark AS processRemark,
+            s.sampler_name AS samplerName,
+            s.sampling_time AS samplingTime,
+            s.receiver_name AS receiverName,
+            s.receive_time AS receiveTime,
+            s.tag_printed AS tagPrinted
+        FROM lm_sample s
+                 LEFT JOIN lm_inspection_order io ON s.inspection_order_id = io.id
+                 LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+                 LEFT JOIN lm_inspect_item ii ON s.inspect_item_id = ii.id
+        WHERE s.sample_no = #{sampleNo}
+          AND s.is_deleted = 0
+    </select>
+
+    <!-- 根据样品ID查询样品扫码结果（详情用） -->
+    <select id="selectSampleScanResultById" resultType="com.bmos.lims2.server.inspect.sample.dto.SampleScanResultDTO">
+        SELECT
+            s.id,
+            s.sample_no AS sampleNo,
+            s.sample_name AS sampleName,
+            s.inspection_order_id AS inspectionOrderId,
+            io.order_no AS orderNo,
+            m.name AS materialName,
+            m.code AS materialCode,
+            m.specification AS materialSpec,
+            io.batch_no AS batchNo,
+            COALESCE(io.finished_time, io.terminate_time, io.sample_audit_time) AS orderEndTime,
+            s.inspect_item_id AS inspectItemId,
+            ii.name AS inspectItemName,
+            s.quantity,
+            s.plan_quantity AS planQuantity,
+            s.unit_id AS unitId,
+            io.create_time AS inspectionRequestTime,
+            io.create_by AS inspectionRequestBy,
+            s.sampled,
+            s.received,
+            s.recycled,
+            s.processed,
+            CASE
+                WHEN s.processed = 1 THEN 3
+                WHEN s.recycled = 1 THEN 2
+                ELSE 1
+            END AS status,
+            s.recycled_time AS recycledTime,
+            s.recycled_by AS recycledBy,
+            s.recycle_quantity AS recycleQuantity,
+            s.recycle_unit_id AS recycleUnitId,
+            s.recycle_remark AS recycleRemark,
+            s.process_time AS processTime,
+            s.process_by AS processBy,
+            s.process_method AS processMethod,
+            s.process_remark AS processRemark,
+            s.sampler_name AS samplerName,
+            s.sampling_time AS samplingTime,
+            s.receiver_name AS receiverName,
+            s.receive_time AS receiveTime,
+            s.tag_printed AS tagPrinted
+        FROM lm_sample s
+                 LEFT JOIN lm_inspection_order io ON s.inspection_order_id = io.id
+                 LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+                 LEFT JOIN lm_inspect_item ii ON s.inspect_item_id = ii.id
+        WHERE s.id = #{sampleId}
+          AND s.is_deleted = 0
+    </select>
+
+    <!-- 分页查询可领取的样品列表 -->
+    <select id="selectCollectionPageList" resultType="com.bmos.lims2.server.inspect.sample.dto.SampleCollectionListDTO">
+        SELECT 
+            s.id,
+            s.sample_no AS sampleNo,
+            s.sample_name AS sampleName,
+            s.inspection_order_id AS inspectionOrderId,
+            io.order_no AS orderNo,
+            s.inspect_item_id AS inspectItemId,
+            ii.code AS inspectItemCode,
+            ii.name AS inspectItemName,
+            m.name AS materialName,
+            m.code AS materialCode,
+            m.specification AS materialSpec,
+            io.batch_no AS batchNo,
+            s.quantity,
+            s.unit_id AS unitId,
+            io.create_time AS requestTime,
+            io.create_by AS requestUserId,
+            s.receive_time AS receiveTime,
+            s.receiver_name AS receiverName,
+            s.create_time AS createTime,
+            s.tag_printed AS tagPrinted
+        FROM lm_sample s
+        LEFT JOIN lm_inspection_order io ON s.inspection_order_id = io.id
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        LEFT JOIN lm_inspect_item ii ON s.inspect_item_id = ii.id
+        WHERE s.is_deleted = 0
+        AND s.received = 1
+        AND s.collected = 0
+        AND s.discarded = 0
+        AND s.inspect_item_id IS NOT NULL
+        <if test="inspectItemId != null">
+            AND s.inspect_item_id = #{inspectItemId}
+        </if>
+        <if test="inspectItemName != null and inspectItemName != ''">
+            AND ii.name LIKE CONCAT('%', #{inspectItemName}, '%')
+        </if>
+        <if test="sampleNo != null and sampleNo != ''">
+            AND s.sample_no LIKE CONCAT('%', #{sampleNo}, '%')
+        </if>
+        <if test="orderNo != null and orderNo != ''">
+            AND io.order_no LIKE CONCAT('%', #{orderNo}, '%')
+        </if>
+        <if test="materialName != null and materialName != ''">
+            AND m.name LIKE CONCAT('%', #{materialName}, '%')
+        </if>
+        <if test="batchNo != null and batchNo != ''">
+            AND io.batch_no LIKE CONCAT('%', #{batchNo}, '%')
+        </if>
+        <if test="inspectionRequestTimeStart != null">
+            AND io.create_time >= #{inspectionRequestTimeStart}
+        </if>
+        <if test="inspectionRequestTimeEnd != null">
+            AND io.create_time &lt;=  #{inspectionRequestTimeEnd}
+        </if>
+        <if test="materialIds != null and materialIds.size() > 0">
+            AND m.id IN
+            <foreach item="item" collection="materialIds" separator="," open="(" close=")" index="index">
+                #{item}
+            </foreach>
+        </if>
+        ORDER BY ii.code ASC, io.create_time ASC
+    </select>
+
+    <!-- 根据检验单ID查询该检验单下所有样品的扫码结果信息 -->
+    <select id="selectSampleScanResultsByOrderId" resultType="com.bmos.lims2.server.inspect.sample.dto.SampleScanResultDTO">
+        SELECT
+            s.id,
+            s.sample_no AS sampleNo,
+            s.sample_name AS sampleName,
+            s.inspection_order_id AS inspectionOrderId,
+            io.order_no AS orderNo,
+            m.name AS materialName,
+            m.code AS materialCode,
+            m.specification AS materialSpec,
+            io.batch_no AS batchNo,
+            s.inspect_item_id AS inspectItemId,
+            ii.name AS inspectItemName,
+            s.quantity,
+            s.plan_quantity AS planQuantity,
+            s.unit_id AS unitId,
+            io.create_time AS inspectionRequestTime,
+            io.create_by AS inspectionRequestBy,
+            s.sampled,
+            s.received,
+            s.recycled,
+            s.processed,
+            s.recycled_time AS recycledTime,
+            s.recycled_by AS recycledBy,
+            s.recycle_quantity AS recycleQuantity,
+            s.recycle_unit_id AS recycleUnitId,
+            s.recycle_remark AS recycleRemark,
+            s.process_time AS processTime,
+            s.process_by AS processBy,
+            s.process_method AS processMethod,
+            s.process_remark AS processRemark,
+            s.sampler_name AS samplerName,
+            s.sampling_time AS samplingTime,
+            s.receiver_name AS receiverName,
+            s.receive_time AS receiveTime,
+            s.tag_printed AS tagPrinted
+        FROM lm_sample s
+                 LEFT JOIN lm_inspection_order io ON s.inspection_order_id = io.id
+                 LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+                 LEFT JOIN lm_inspect_item ii ON s.inspect_item_id = ii.id
+        WHERE s.inspection_order_id = #{inspectionOrderId}
+          AND s.discarded = 0
+          AND s.is_deleted = 0
+        ORDER BY s.create_time ASC
+    </select>
+
+    <!-- 分页查询可进行样品处理的样品列表，按检验单结束时间正序排序 -->
+    <select id="selectHandlePageList" resultType="com.bmos.lims2.server.inspect.sample.dto.SampleHandleListDTO">
+        SELECT
+            s.id,
+            s.sample_no AS sampleNo,
+            s.sample_name AS sampleName,
+            s.inspection_order_id AS inspectionOrderId,
+            io.order_no AS orderNo,
+            io.material_id AS materialId,
+            m.name AS materialName,
+           m.code AS materialCode,
+           m.specification AS materialSpec,
+            io.batch_no AS batchNo,
+            COALESCE(io.finished_time, io.terminate_time) AS orderEndTime,
+            s.plan_quantity AS planQuantity,
+            s.quantity,
+            s.unit_id AS unitId,
+            s.recycle_quantity AS recycleQuantity,
+            s.recycle_unit_id AS recycleUnitId,
+            s.recycled_time AS recycledTime,
+            s.process_method AS processMethod,
+            s.process_time AS processTime,
+            s.tag_printed AS tagPrinted,
+            CASE
+                WHEN s.processed = 1 THEN 3
+                WHEN s.recycled = 1 THEN 2
+                ELSE 1
+            END AS status
+        FROM lm_sample s
+        LEFT JOIN lm_inspection_order io ON s.inspection_order_id = io.id
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        WHERE s.is_deleted = 0
+          AND s.received = 1
+          AND (
+              io.order_status = 'TERMINATED' OR io.finished = 1 OR io.order_status = 'COMPLETED'
+          )
+        <if test="materialIds != null and materialIds.size() > 0">
+            AND io.material_id IN
+            <foreach item="item" collection="materialIds" separator="," open="(" close=")" index="index">
+                #{item}
+            </foreach>
+        </if>
+        <if test="orderNo != null and orderNo != ''">
+            AND io.order_no LIKE CONCAT('%', #{orderNo}, '%')
+        </if>
+        <if test="batchNo != null and batchNo != ''">
+            AND io.batch_no LIKE CONCAT('%', #{batchNo}, '%')
+        </if>
+        <if test="sampleNo != null and sampleNo != ''">
+            AND s.sample_no LIKE CONCAT('%', #{sampleNo}, '%')
+        </if>
+        <if test="endTimeStart != null">
+            AND COALESCE(io.finished_time, io.terminate_time) &gt;= #{endTimeStart}
+        </if>
+        <if test="endTimeEnd != null">
+            AND COALESCE(io.finished_time, io.terminate_time) &lt;= #{endTimeEnd}
+        </if>
+        <if test="status != null and status != 0">
+            <choose>
+                <when test="status == 1">
+                    AND (s.recycled = 0 AND s.processed = 0)
+                </when>
+                <when test="status == 2">
+                    AND (s.recycled = 1 AND s.processed = 0)
+                </when>
+                <when test="status == 3">
+                    AND s.processed = 1
+                </when>
+            </choose>
+        </if>
+        ORDER BY COALESCE(io.finished_time, io.terminate_time) DESC
+    </select>
+
+    <!-- 统计样品处理状态数量（待回收/待处理/已处理），复用列表筛选条件，忽略状态筛选 -->
+    <select id="selectHandleStatusCount" resultType="com.bmos.lims2.server.inspect.sample.dto.SampleHandleStatusCountDTO">
+        SELECT
+            COALESCE(SUM(CASE WHEN s.processed = 0 AND s.recycled = 0 THEN 1 ELSE 0 END), 0) AS toRecycleCount,
+            COALESCE(SUM(CASE WHEN s.processed = 0 AND s.recycled = 1 THEN 1 ELSE 0 END), 0) AS toProcessCount,
+            COALESCE(SUM(CASE WHEN s.processed = 1 THEN 1 ELSE 0 END), 0) AS processedCount
+        FROM lm_sample s
+        LEFT JOIN lm_inspection_order io ON s.inspection_order_id = io.id
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        WHERE s.is_deleted = 0
+          AND s.received = 1
+          AND (
+              io.order_status = 'TERMINATED' OR io.finished = 1 OR io.order_status = 'COMPLETED'
+          )
+        <if test="materialIds != null and materialIds.size() > 0">
+            AND io.material_id IN
+            <foreach item="item" collection="materialIds" separator="," open="(" close=")" index="index">
+                #{item}
+            </foreach>
+        </if>
+        <if test="orderNo != null and orderNo != ''">
+            AND io.order_no LIKE CONCAT('%', #{orderNo}, '%')
+        </if>
+        <if test="batchNo != null and batchNo != ''">
+            AND io.batch_no LIKE CONCAT('%', #{batchNo}, '%')
+        </if>
+        <if test="sampleNo != null and sampleNo != ''">
+            AND s.sample_no LIKE CONCAT('%', #{sampleNo}, '%')
+        </if>
+        <if test="endTimeStart != null">
+            AND COALESCE(io.finished_time, io.terminate_time) &gt;= #{endTimeStart}
+        </if>
+        <if test="endTimeEnd != null">
+            AND COALESCE(io.finished_time, io.terminate_time) &lt;= #{endTimeEnd}
+        </if>
+    </select>
+
+    <!-- 分页查询留样接收列表 -->
+    <select id="selectRetentionReceivePageList" resultType="com.bmos.lims2.server.inspect.sample.dto.SampleCollectionListDTO">
+        SELECT
+            s.id,
+            s.sample_no AS sampleNo,
+            s.sample_name AS sampleName,
+            s.inspection_order_id AS inspectionOrderId,
+            io.order_no AS orderNo,
+            s.inspect_item_id AS inspectItemId,
+            ii.code AS inspectItemCode,
+            ii.name AS inspectItemName,
+            m.name AS materialName,
+            m.code AS materialCode,
+            m.specification AS materialSpec,
+            io.batch_no AS batchNo,
+            s.quantity,
+            s.unit_id AS unitId,
+            s.sampler_id AS samplerId,
+            s.sampling_time AS samplingTime,
+            s.receiver_id AS receiverId,
+            s.receive_time AS receiveTime,
+            io.create_time AS requestTime,
+            io.create_by AS requestUserId,
+            s.create_time AS createTime,
+            s.tag_printed AS tagPrinted
+        FROM lm_sample s
+        LEFT JOIN lm_inspection_order io ON s.inspection_order_id = io.id
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        LEFT JOIN lm_inspect_item ii ON s.inspect_item_id = ii.id
+        WHERE s.is_deleted = 0
+          AND s.sampled = 1
+          AND s.received = 0
+          AND s.discarded = 0
+          <!-- 留样检验项目ID，参见 InspectItemConstants.RETENTION_INSPECT_ITEM_ID -->
+          AND s.inspect_item_id = 2000000000000000001
+        <if test="sampleNo != null and sampleNo != ''">
+            AND s.sample_no LIKE CONCAT('%', #{sampleNo}, '%')
+        </if>
+        <if test="materialIds != null and materialIds.size() > 0">
+            AND io.material_id IN
+            <foreach item="item" collection="materialIds" separator="," open="(" close=")" index="index">
+                #{item}
+            </foreach>
+        </if>
+        <if test="batchNo != null and batchNo != ''">
+            AND io.batch_no LIKE CONCAT('%', #{batchNo}, '%')
+        </if>
+        ORDER BY s.sampling_time DESC, s.sample_no ASC
+    </select>
+
+    <!-- 分页查询留样样品管理列表 -->
+    <select id="selectRetentionSampleManagePageList" resultType="com.bmos.lims2.server.inspect.retention.dto.RetentionSampleManageListDTO">
+        SELECT
+            s.id,
+            s.sample_no AS sampleNo,
+            io.batch_no AS batchNo,
+            m.name AS materialName,
+            m.code AS materialCode,
+            m.specification AS materialSpec,
+            s.quantity,
+            s.current_quantity AS currentQuantity,
+            s.unit_id AS unitId,
+            s.receive_time AS retentionTime,
+            s.receiver_id AS retentionUserId,
+            s.retention_expiry_date AS retentionExpiryDate,
+            s.storage_location AS storageLocation,
+            s.received,
+            s.destroyed,
+            <!-- 待销毁状态：当前日期 > 留样期限 且未销毁 -->
+            CASE
+                WHEN s.retention_expiry_date IS NOT NULL
+                     AND CURDATE() > s.retention_expiry_date
+                     AND s.destroyed = 0
+                THEN 1
+                ELSE 0
+            END AS toBeDestroyed
+        FROM lm_sample s
+        LEFT JOIN lm_inspection_order io ON s.inspection_order_id = io.id
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        WHERE s.is_deleted = 0
+          AND s.discarded = 0
+          <!-- 留样检验项目ID，参见 InspectItemConstants.RETENTION_INSPECT_ITEM_ID -->
+          AND s.inspect_item_id = 2000000000000000001
+          <!-- 状态筛选：已接收、待销毁、已销毁 -->
+          <choose>
+              <when test="status == 'received'">
+                  AND s.received = 1
+                  AND s.destroyed = 0
+                  AND (s.retention_expiry_date IS NULL OR CURDATE() &lt;= s.retention_expiry_date)
+              </when>
+              <when test="status == 'to_be_destroyed'">
+                  AND s.received = 1
+                  AND s.destroyed = 0
+                  AND s.retention_expiry_date IS NOT NULL
+                  AND CURDATE() &gt; s.retention_expiry_date
+              </when>
+              <when test="status == 'destroyed'">
+                  AND s.destroyed = 1
+              </when>
+              <otherwise>
+                  <!-- 不传状态默认查询：已接收、待销毁、已销毁 -->
+                  AND (s.received = 1 OR s.destroyed = 1)
+              </otherwise>
+          </choose>
+        <if test="sampleNo != null and sampleNo != ''">
+            AND s.sample_no LIKE CONCAT('%', #{sampleNo}, '%')
+        </if>
+        <if test="materialIds != null and materialIds.size() > 0">
+            AND io.material_id IN
+            <foreach item="item" collection="materialIds" separator="," open="(" close=")" index="index">
+                #{item}
+            </foreach>
+        </if>
+        <if test="batchNo != null and batchNo != ''">
+            AND io.batch_no LIKE CONCAT('%', #{batchNo}, '%')
+        </if>
+        ORDER BY s.receive_time DESC, s.sample_no ASC
+    </select>
+
+
+    <!-- 查询留样样品打印标签信息 -->
+    <select id="selectRetentionSamplePrintTagResult" resultType="com.bmos.lims2.server.inspect.retention.dto.RetentionSamplePrintTagResultDTO">
+        SELECT
+            s.sample_no AS sampleNo,
+            m.name AS materialName,
+            m.code AS materialCode,
+            m.specification AS materialSpec,
+            io.batch_no AS batchNo,
+            s.current_quantity AS quantity,
+            s.unit_id AS unitId,
+            s.sampling_time AS samplingTime,
+            s.receiver_id AS receiverId,
+            s.receive_time AS retentionTime,
+            s.retention_expiry_date AS retentionExpiryDate,
+            s.storage_location AS storageLocation
+        FROM lm_sample s
+        LEFT JOIN lm_inspection_order io ON s.inspection_order_id = io.id
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        WHERE s.sample_no = #{sampleNo}
+          AND s.is_deleted = 0
+          AND s.inspect_item_id = 2000000000000000001
+    </select>
+
+</mapper>

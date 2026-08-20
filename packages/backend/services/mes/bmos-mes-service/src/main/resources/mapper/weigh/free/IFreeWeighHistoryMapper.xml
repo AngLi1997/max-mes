@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.weigh.free.mapper.IFreeWeighHistoryMapper">
+    <select id="queryHistoryPage" resultType="com.bmos.mes.service.weigh.free.vo.FreeWeighHistoryPage">
+        select bm_storage_material.id                      as storage_material_id,
+               bm_storage_material.no                      as storage_material_no,
+               bm_free_weigh_history.weigh_time,
+               bm_material.merge_code,
+               bm_material.name                            as material_name,
+               bm_storage_material_batch.material_batch_no as storage_material_batch_no,
+               bm_free_weigh_history.tare_weight,
+               bm_free_weigh_history.net_weight,
+               bm_free_weigh_history.gross_weight,
+               bm_free_weigh_history.unit_id,
+               bm_free_weigh_history.weigher_id,
+               bm_free_weigh_history.re_checker_id,
+               bm_free_weigh_history.container_name,
+               bm_free_weigh_history.position_name,
+               bm_material_category.category_type
+        from bm_free_weigh_history
+                 left join bm_storage_material
+                           on bm_free_weigh_history.storage_material_id = bm_storage_material.id and
+                              bm_storage_material.is_deleted = 0
+                 left join bm_material
+                           on bm_storage_material.material_id = bm_material.id and bm_material.is_deleted = 0
+                 left join bm_material_category on bm_material_category.id = bm_material.material_category_id and
+                                                   bm_material_category.is_deleted = 0
+                 left join bm_storage_material_batch
+                           on bm_storage_material.storage_material_batch_id = bm_storage_material_batch.id and
+                              bm_storage_material_batch.is_deleted = 0
+        where bm_free_weigh_history.is_deleted = 0
+        <if test="pageQuery.storageMaterialNo != null and pageQuery.storageMaterialNo != ''">
+            and bm_storage_material.no like concat('%',#{pageQuery.storageMaterialNo},'%')
+        </if>
+        <if test="pageQuery.storageMaterialBatchNo != null and pageQuery.storageMaterialBatchNo != ''">
+            and bm_storage_material_batch.material_batch_no like concat('%',#{pageQuery.storageMaterialBatchNo},'%')
+        </if>
+        <if test="pageQuery.weighDateStart != null and pageQuery.weighDateStart != ''">
+            and bm_free_weigh_history.weigh_time &gt; concat(#{pageQuery.weighDateStart}, ' 00:00:00')
+        </if>
+        <if test="pageQuery.weighDateEnd != null and pageQuery.weighDateEnd != ''">
+            and bm_free_weigh_history.weigh_time &lt;= concat(#{pageQuery.weighDateEnd}, ' 23:59:59')
+        </if>
+        order by bm_free_weigh_history.create_time desc
+    </select>
+</mapper>

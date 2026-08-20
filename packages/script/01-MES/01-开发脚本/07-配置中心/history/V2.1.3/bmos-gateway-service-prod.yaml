@@ -1,0 +1,61 @@
+spring:
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: bmos-mes-route
+          uri: lb://bmos-mes-service
+          predicates:
+            - Path=/api/app/mes/**
+        - id: bmos-platform-route
+          uri: lb://bmos-platform-service
+          predicates:
+            - Path=/api/app/platform/**
+        - id: bmos-lims-route
+          uri: lb://bmos-lims-service
+          predicates:
+            - Path=/api/app/lims/**
+        - id: bmos-wms-route
+          uri: lb://bmos-wms-service
+          predicates:
+            - Path=/api/app/wms/**
+bmos:
+  auth:
+    exclude-urls:
+      - /api/app/mes/swagger-ui/**
+      - /api/app/mes/swagger-resources/**
+      - /api/app/mes/api-docs
+      - /api/app/mes/v3/api-docs
+      - /api/app/platform/swagger-ui/**
+      - /api/app/platform/swagger-resources/**
+      - /api/app/platform/api-docs
+      - /api/app/platform/v3/api-docs
+      - /api/app/platform/user/login
+      - /api/app/platform/user/resetPassword2
+      - /api/app/platform/user/loginNoValidate
+      - /api/app/platform/user/active
+      - /api/app/platform/user/actived
+      - /api/app/lims/active/active
+      - /api/app/lims/active/actived
+      - /api/app/mes/user/active
+      - /api/app/mes/user/actived
+      - /api/app/mes/user/mac
+      - /api/app/platform/user/mac
+      - /api/app/platform/param/app/version
+      - /api/app/mes/log/mysqlToEs
+      - /api/app/mes/material/log/mysqlToEs
+      - /api/app/mes/storage/log/mysqlToEs
+      - /api/app/platform/log/login/mysqlToEs
+      - /api/app/platform/log/operation/mysqlToEs
+      - /api/app/platform/signature/mysqlToEs
+      - /api/app/platform/business/parameter/detailByCode/**
+      - /api/app/wms/user/actived
+    enable: true

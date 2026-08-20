@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.process.mapper.ProcedureStepConfigMapper">
+
+    <select id="selectComponentsByProcedureStepId"
+            resultType="com.bmos.mes.service.process.vo.ComponentConfigDetailVO">
+        select distinct
+        t1.id,
+        t1.parent_id,
+        t1.used,
+        t1.record_item_id,
+        t1.record_version_id,
+        t1.record_version,
+        t1.record_id,
+        t1.component_type,
+        t1.component_name,
+        t1.field_id,
+        t1.formula_precision,
+        t1.component_detail,
+        t1.is_result,
+        t1.formula_id,
+        t1.formula_field,
+        t1.formula_expression,
+        t1.formula_type,
+        t1.round_code,
+        t3.config_info
+        from bm_batch_record_component t1
+        inner join bm_procedure_step_model t2 on t1.record_item_id = t2.record_item_id
+        and t1.record_version_id = t2.record_version_id
+        and t2.is_deleted = 0
+        left join bm_procedure_step_config t3 on t3.component_id = t1.id
+        and t3.process_id = t2.process_id and t3.version = t2.process_version
+        and t3.is_deleted = 0
+        <if test="reusable != null and !reusable">
+            and t3.procedure_step_model_id = #{id}
+        </if>
+        <if test="reusable != null and reusable">
+            and t3.procedure_step_model_id = 0
+        </if>
+        <where>
+            t2.process_id = #{processId}
+            and t2.process_version = #{processVersion}
+            and t1.is_deleted = 0
+            <if test="reusable != null and !reusable">
+                and t2.id = #{id}
+            </if>
+            <if test="reusable != null and reusable">
+                and t2.reusable = #{reusable}
+            </if>
+            and t2.record_item_id = #{recordItemId}
+            and t2.record_version_id = #{recordVersionId}
+        </where>
+    </select>
+    <select id="selectListByProcedureStepModel"
+            resultType="com.bmos.mes.service.process.model.ProcedureStepConfig">
+        select * from bm_procedure_step_config
+        <where>
+            process_id = #{processId}
+            and version = #{processVersion}
+            and record_item_id = #{recordItemId}
+            and record_version_id = #{recordVersionId}
+            <if test="reusable != null and reusable">
+                and procedure_step_model_id = 0
+            </if>
+            <if test="reusable != null and !reusable">
+                and procedure_step_model_id = #{id}
+            </if>
+            and is_deleted = 0
+        </where>
+    </select>
+    <select id="selectComponentConfigByProcedureStepModel"
+            resultMap="businessConfig">
+        select procedure_step_id,process_id,component_id,record_item_id,config_info,field_id
+        from bm_procedure_step_config
+        <where>
+            process_id = #{processId}
+            and version = #{processVersion}
+            and record_item_id = #{recordItemId}
+            and record_version_id = #{recordVersionId}
+            <if test="reusable != null and reusable">
+                and procedure_step_model_id = 0
+            </if>
+            <if test="reusable != null and !reusable">
+                and procedure_step_model_id = #{id}
+            </if>
+            and is_deleted = 0
+        </where>
+    </select>
+
+    <resultMap id="businessConfig" type="com.bmos.mes.service.execute.vo.BusinessComponentConfigDetailVO">
+        <result property="procedureStepId" column="procedure_step_id"/>
+        <result property="processId" column="process_id"/>
+        <result property="componentId" column="component_id"/>
+        <result property="fieldId" column="field_id"/>
+        <result property="recordItemId" column="record_item_id"/>
+        <result property="configInfo" column="config_info"/>
+    </resultMap>
+</mapper>

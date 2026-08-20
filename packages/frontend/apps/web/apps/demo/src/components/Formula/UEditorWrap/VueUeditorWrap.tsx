@@ -1,0 +1,381 @@
+import {
+  LoadEvent,
+  asyncSeries,
+  debounce,
+  isObject,
+  objectEach,
+} from '@bmos/utils';
+import {
+  PropType,
+  VNode,
+  VueElement,
+  defineComponent,
+  nextTick,
+  onBeforeUnmount,
+  onDeactivated,
+  ref,
+  toRef,
+  watch,
+} from 'vue';
+import { randomString } from '../../../utils';
+import { MODE, STATUS_MAP } from './enum';
+import { loadCss, loadScript } from './loader';
+import { EditorContent, ModeType } from './type';
+
+export default defineComponent({
+  name: 'UeditorWrap',
+  // expose:['insert','getContent'],
+  props: {
+    // 手动设置 UEditor ID
+    editorId: String,
+    // 主要用于表单中 http://fex.baidu.com/ueditor/#start-submit
+    name: String,
+    modelValue: {
+      type: String,
+      default: '',
+    },
+    // http://fex.baidu.com/ueditor/#start-config
+    config: Object as PropType<UEDITOR_CONFIG>,
+    // 监听富文本内容变化的方式
+    mode: {
+      type: Number as PropType<ModeType>,
+      default: 0,
+      validator: (value: string) => {
+        // 1. observer 借助 MutationObserver API https://developer.mozilla.org/zh-CN/docs/Web/API/MutationObserver
+        // 2. listener 借助 UEditor 的 contentChange 事件 https://ueditor.baidu.com/doc/#UE.Editor:contentChange
+        return Object.values(MODE).indexOf(value) !== -1;
+      },
+    },
+    // MutationObserver 的配置 https://developer.mozilla.org/en-US/docs/Web/API/MutationObserverInit
+    observerOptions: {
+      type: Object as PropType<MutationObserverInit>,
+      default: () => {
+        return {
+          attributes: true, // 是否监听 DOM 元素的属性变化
+          attributeFilter: ['src', 'style', 'type', 'name'], // 只有在该数组中的属性值的变化才会监听
+          characterData: true, // 是否监听文本节点
+          childList: true, // 是否监听子节点
+          subtree: true, // 是否监听后代元素
+        };
+      },
+    },
+    // MutationObserver 的回调函数防抖间隔
+    observerDebounceTime: {
+      type: Number,
+      default: 50,
+      validator: (value: number) => {
+        return value >= 20;
+      },
+    },
+    //  SSR 项目，服务端实例化组件时组件内部不会对 UEditor 进行初始化，仅在客户端初始化 UEditor，这个参数设置为 true 可以跳过环境检测，直接初始化
+    forceInit: Boolean,
+    // 是否在组建销毁时销毁 UEditor 实例
+    destroy: {
+      type: Boolean,
+      default: true,
+    },
+    // 指定 UEditor 依赖的静态资源，js & css
+    editorDependencies: {
+      type: Array as PropType<string[]>,
+    },
+    // 检测依赖的静态资源是否加载完成的方法
+    editorDependenciesChecker: {
+      type: Function as PropType<() => boolean>,
+    },
+  },
+
+  emits: ['update:modelValue', 'before-init', 'ready', 'change'],
+
+  setup(props, { emit, expose }) {
+    let status = STATUS_MAP.UN_READY;
+    let editor: any;
+    let observer: MutationObserver;
+    let innerValue: string;
+    const container = ref<HTMLElement>();
+
+    // 默认要加载的资源
+    const defaultEditorDependencies = [
+      'UEditor/ueditor.config.js',
+      'UEditor/ueditor.all.js',
+    ];
+    // 判断上面的默认资源是否已经加载过的校验函数
+    const defaultEditorDependenciesChecker = () => {
+      // 判断 ueditor.config.js 和 ueditor.all.js 是否均已加载
+      // 仅加载完ueditor.config.js时UE对象和UEDITOR_CONFIG对象存在,仅加载完ueditor.all.js时UEDITOR_CONFIG对象存在,但为空对象
+      return (
+        window.UE &&
+        window.UE.getEditor &&
+        window.UEDITOR_CONFIG &&
+        Object.keys(window.UEDITOR_CONFIG).length !== 0
+      );
+    };
+
+    const modelValue = toRef(props, 'modelValue');
+
+    // 创建加载资源的事件通信载体
+    if (!window.$loadEventBus) {
+      window.$loadEventBus = new LoadEvent();
+    }
+
+    // 加载 UEditor 相关的静态资源
+    const loadEditorDependencies = () => {
+      return new Promise<void>((resolve, reject) => {
+        if (
+          props.editorDependencies &&
+          props.editorDependenciesChecker &&
+          props.editorDependenciesChecker()
+        ) {
+          resolve();
+          return;
+        }
+
+        if (!props.editorDependencies && defaultEditorDependenciesChecker()) {
+          resolve();
+          return;
+        }
+
+        // 把 js 和 css 分组
+        const { jsLinks, cssLinks } = (
+          props.editorDependencies || defaultEditorDependencies
+        ).reduce<{
+          jsLinks: string[];
+          cssLinks: string[];
+        }>(
+          (res, link) => {
+            // 如果不是完整的 URL 就在前面补上 UEDITOR_HOME_URL, 完整的 URL 形如：
+            // 1. http://www.example.com/xxx.js
+            // 2. https://www.example.com/xxx.js
+            // 3. //www.example.com/xxx.js
+            // 4. www.example.com/xxx.js
+            const isFullUrl =
+              /^((https?:)?\/\/)?[-a-zA-Z0-9]+(\.[-a-zA-Z0-9]+)+\//.test(link);
+            if (!isFullUrl) {
+              link = (props.config?.UEDITOR_HOME_URL || '') + link;
+            }
+
+            if (link.slice(-3) === '.js') {
+              res.jsLinks.push(link);
+            } else if (link.slice(-4) === '.css') {
+              res.cssLinks.push(link);
+            }
+            return res;
+          },
+          {
+            jsLinks: [],
+            cssLinks: [],
+          },
+        );
+
+        Promise.all([
+          Promise.all(cssLinks.map(link => loadCss(link))),
+          // 依次加载依赖的 JS 文件，JS 执行是有顺序要求的，比如 ueditor.all.js 就要晚于 ueditor.config.js 执行
+          // 动态创建 script 是先加载完的先执行，所以不可以一次性创建所有资源的引入脚本
+          asyncSeries(jsLinks.map(link => () => loadScript(link))),
+        ])
+          .then(() => resolve())
+          .catch(reject);
+      });
+    };
+
+    // 基于 UEditor 的 contentChange 事件
+    const observerContentChangeHandler = () => {
+      innerValue = editor.getContent();
+      emtiUpdate(innerValue);
+    };
+
+    const normalChangeListener = () => {
+      editor.addListener('contentChange', observerContentChangeHandler);
+    };
+
+    // 基于 MutationObserver API
+    const changeHandle = () => {
+      if (editor.document.getElementById('baidu_pastebin')) {
+        return;
+      }
+      innerValue = editor.getContent();
+      emtiUpdate(innerValue);
+    };
+
+    const observerChangeListener = () => {
+      observer = new MutationObserver(
+        debounce(changeHandle, props.observerDebounceTime),
+      );
+      observer.observe(editor.body, props.observerOptions);
+    };
+
+    const emtiUpdate = (val: any) => {
+      emit('change', 'innerValue');
+      emit('update:modelValue', innerValue);
+    };
+
+    // 实例化编辑器
+    const initEditor = () => {
+      const editorId = props.editorId || 'editor_' + randomString(8);
+      container.value!.id = editorId;
+      emit('before-init', editorId);
+      editor = window.UE.getEditor(editorId, props.config);
+      console.log(editor, 'editor');
+
+      editor.addListener('ready', () => {
+        if (status === STATUS_MAP.READY) {
+          // 使用 keep-alive 组件会出现这种情况
+          editor.setContent(props.modelValue);
+        } else {
+          status = STATUS_MAP.READY;
+          emit('ready', editor);
+          if (props.modelValue) {
+            editor.setContent(props.modelValue);
+          }
+        }
+        if (props.mode === MODE.listener && window.MutationObserver) {
+          observerChangeListener();
+        } else {
+          normalChangeListener();
+        }
+      });
+    };
+
+    watch(
+      modelValue,
+      value => {
+        if (status === STATUS_MAP.UN_READY) {
+          status = STATUS_MAP.PENDING;
+          (props.forceInit || typeof window !== 'undefined') && container.value
+            ? initEditor()
+            : nextTick(() => initEditor());
+          // loadEditorDependencies()
+          //   .then(() => {
+          //     container.value ? initEditor() : nextTick(() => initEditor());
+          //   })
+          //   .catch(() => {
+          //     throw new Error(
+          //       '[ueditor-wrap] UEditor 资源加载失败！请检查资源是否存在，UEDITOR_HOME_URL 是否配置正确！',
+          //     );
+          //   });
+        } else if (status === STATUS_MAP.READY) {
+          value === innerValue || editor.setContent(value || '');
+        }
+      },
+      {
+        immediate: true,
+      },
+    );
+
+    onDeactivated(() => {
+      editor &&
+        editor.removeListener('contentChange', observerContentChangeHandler);
+      observer && observer.disconnect();
+    });
+
+    onBeforeUnmount(() => {
+      if (observer && observer.disconnect) {
+        observer.disconnect();
+      }
+      if (props.destroy && editor && editor.destroy) {
+        editor.destroy();
+      }
+    });
+
+    const insert = (val: string | VNode | VueElement) => {
+      if (editor && val !== void 0) {
+        const val_type = typeof val;
+        let content = val
+        if(val_type==='object'){
+          if(val instanceof VueElement){
+            
+          }
+        }
+        editor.setContent(content);
+      }
+    };
+
+    const getContent = (type: 0 | 1): EditorContent => {
+      let content: EditorContent = '';
+      if (editor) {
+        content = editor.getContent();
+        if (type === 1) {
+          content = editor.getContentJSON();
+        }
+      }
+      return content;
+    };
+
+    const getNodeById = (id: string) => {
+      try {
+        const rootNode = editor.getContentJSON();
+        const node = rootNode.getNodeById(rootNode, id);
+        return node;
+      } catch (error) {
+        return void 0;
+      }
+    };
+
+    /**
+     * 根据id 删除节点
+     * @param id
+     * @returns
+     */
+    const deleteNode = (id: string) => {
+      if (!id) throw 'the property id is required';
+      if (!editor) return;
+      const node = getNodeById(id);
+
+      if (!node) return false;
+
+      try {
+        node.parentNode.removeChild(node);
+        return true;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+    };
+
+    const setStyle = (node: any, style: object | string) => {
+      let attrvalue = style;
+      if (isObject(style)) {
+        objectEach(style, (v, k) => {
+          attrvalue += k + ':' + v;
+        });
+      }
+      node.setAttr('style', attrvalue);
+    };
+
+    /**
+     * 根据id修改样式
+     * @param id 唯一ID
+     * @param stlye
+     * @returns
+     */
+    const setNodeStyle = (id: string, stlye: CSSStyleDeclaration) => {
+      if (!id || !stlye) throw 'the property of id or style is required';
+
+      const node = getNodeById(id);
+      if (!node) {
+        console.log('The node does not exist,id:',id);
+        return
+      };
+
+      setStyle(node, stlye);
+    };
+
+    const isFocus = () => {
+      if (!editor) return false;
+      return editor.isFocus();
+    };
+
+    expose({
+      insert,
+      getContent,
+      deleteNode,
+      setNodeStyle,
+      isFocus,
+    });
+
+    return () => (
+      <div>
+        <div ref={container} name={props.name} />
+      </div>
+    );
+  },
+});

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.eln.record.mapper.BatchRecordMapper">
+
+   <select id="getRecordPage" resultType="com.bmos.lims2.server.eln.record.vo.RecordListVO">
+        SELECT
+            t1.id as recordId,
+            t1.name as name,
+            t1.code as code,
+            t1.category_id as categoryId,
+            t2.id as versionId,
+            t2.remark as remark,
+            t2.version as version,
+            t2.state as state,
+            t2.instance_id as instanceId,
+            t2.create_by as createBy,
+            t2.effective_time as effectiveTime
+        FROM
+            bm_batch_record AS t1
+            JOIN bm_batch_record_version AS t2 ON t1.id = t2.record_id
+        where
+            t1.is_deleted = 0
+        and t2.is_deleted = 0
+        <if test="name != null and name != ''">
+            and t1.name like concat('%',#{name},'%')
+        </if>
+        <if test="categoryId != null and categoryId != ''">
+            and t1.category_id =#{categoryId}
+        </if>
+       <if test="recordState != null">
+           and t2.state = #{recordState}
+       </if>
+        <if test="recordId != null and recordId != ''">
+           and t2.record_id =#{recordId}
+           order by t2.create_time desc
+        </if>
+   </select>
+    <select id="getFirstRecord" resultType="com.bmos.lims2.server.eln.record.vo.RecordListVO">
+        SELECT DISTINCT
+            t1.id as recordId,
+            t1.name as name,
+            t1.code as code,
+            t1.category_id as categoryId
+        FROM
+            bm_batch_record AS t1
+            join lm_resource_permission t2 on t1.id = t2.resource_id
+        where
+            t1.is_deleted = 0
+        and t2.dept_id in
+        <foreach collection="deptIds" open="(" close=")" separator="," item="item">
+            #{item}
+        </foreach>
+        <if test="name != null and name != ''">
+            and t1.name like concat('%',#{name},'%')
+        </if>
+        <if test="code != null and code != ''">
+            and t1.code like concat('%',#{code},'%')
+        </if>
+        <if test="categoryList != null and categoryList.size() > 0">
+            and t1.category_id in
+            <foreach collection="categoryList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+            order by t1.create_time desc
+    </select>
+
+    <select id="queryNameByVersionId" resultType="java.lang.String">
+        SELECT
+            t2.`name`
+        FROM
+            bm_batch_record_version AS t1
+            JOIN bm_batch_record AS t2 ON t1.record_id = t2.id
+        WHERE
+            t1.is_deleted = 0
+            AND t2.is_deleted = 0
+            AND t1.id =#{versionId}
+    </select>
+
+    <select id="selectByRecordIdList" resultType="com.bmos.lims2.server.eln.record.entity.BatchRecord">
+        SELECT DISTINCT
+            t1.id as id,
+            t1.name as name
+        FROM
+        bm_batch_record AS t1
+        join lm_resource_permission t2 on t1.id = t2.resource_id
+        where
+        t1.is_deleted = 0
+        and t2.dept_id in
+        <foreach collection="deptIds" open="(" close=")" separator="," item="item">
+            #{item}
+        </foreach>
+        and t1.id in
+        <foreach collection="recordIdList" open="(" close=")" separator="," item="item">
+            #{item}
+        </foreach>
+    </select>
+    <select id="selectListWithPermission" resultType="com.bmos.lims2.server.eln.record.entity.BatchRecord">
+        SELECT DISTINCT
+        t1.id,
+        t1.name,
+        t1.category_id
+        FROM
+        bm_batch_record AS t1
+        join lm_resource_permission t2 on t1.id = t2.resource_id
+        where
+        t1.is_deleted = 0
+        <if test="deptIds != null and deptIds.size() >0">
+            and t2.dept_id in
+            <foreach collection="deptIds" open="(" close=")" separator="," item="item">
+                #{item}
+            </foreach>
+        </if>
+        <if test="!(deptIds != null and deptIds.size() >0)">
+           and 1 = -1
+        </if>
+    </select>
+</mapper>

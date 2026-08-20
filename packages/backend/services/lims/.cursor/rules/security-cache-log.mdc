@@ -1,0 +1,226 @@
+---
+description:
+globs:*.java,*.xml
+alwaysApply:false
+---
+
+# 安全规范
+
+## 认证授权
+- 使用Spring Security框架
+- JWT Token认证
+- 基于角色的权限控制
+- 会话管理和并发控制
+
+## 密码安全
+```java
+@Configuration
+public class SecurityConfig {
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+}
+```
+
+## 接口安全
+- 所有接口必须认证
+- 重要操作需要授权
+- 防止重放攻击
+- 接口访问频率限制
+
+## 数据安全
+- 敏感数据加密存储
+- 传输数据HTTPS加密
+- 防止SQL注入
+- 防止XSS攻击
+- 防止CSRF攻击
+
+## 安全配置
+```yaml
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${auth-server-url}/.well-known/jwks.json
+```
+
+# 缓存规范
+
+## Redis缓存
+- 使用Spring Cache注解
+- 合理设置过期时间
+- 统一的key命名规范
+- 避免缓存雪崩和击穿
+
+### 缓存注解使用
+```java
+@Cacheable(value = "material", key = "#id")
+public MaterialDTO getById(Long id) {
+    return materialMapper.selectById(id);
+}
+
+@CacheEvict(value = "material", key = "#dto.id")
+public void update(MaterialUpdateDTO dto) {
+    materialMapper.updateById(dto);
+}
+
+@CachePut(value = "material", key = "#result.id")
+public MaterialDTO save(MaterialSaveDTO dto) {
+    Material material = convertToEntity(dto);
+    materialMapper.insert(material);
+    return convertToDTO(material);
+}
+```
+
+### Redis配置
+```yaml
+spring:
+  redis:
+    host: localhost
+    port: 6379
+    database: 0
+    timeout: 10000ms
+    lettuce:
+      pool:
+        max-active: 8
+        max-wait: -1ms
+        max-idle: 8
+        min-idle: 0
+```
+
+## 本地缓存
+- 使用Caffeine缓存
+- 配置最大容量
+- 配置过期策略
+- 监控缓存命中率
+
+```java
+@Configuration
+public class CacheConfig {
+    @Bean
+    public Cache<String, Object> caffeineCache() {
+        return Caffeine.newBuilder()
+            .maximumSize(10000)
+            .expireAfterWrite(1, TimeUnit.HOURS)
+            .build();
+    }
+}
+```
+
+# 日志规范
+
+## 日志配置
+- 使用SLF4J + Log4j2
+- 异步日志提升性能
+- 按日期滚动归档
+- 不同环境不同级别
+
+### Log4j2配置
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <RollingFile name="RollingFile"
+                     fileName="logs/app.log"
+                     filePattern="logs/app-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="100 MB"/>
+            </Policies>
+        </RollingFile>
+    </Appenders>
+</Configuration>
+```
+
+## 日志记录
+- ERROR：系统错误，需要立即处理
+- WARN：警告信息，需要关注
+- INFO：业务流程，正常记录
+- DEBUG：调试信息，开发环境使用
+
+### 日志使用
+```java
+@Slf4j
+@Service
+public class MaterialServiceImpl implements MaterialService {
+    
+    public void saveInspectionProduct(MaterialSaveDTO dto) {
+        log.info("开始保存检品信息：{}", dto);
+        try {
+            // 业务处理
+            log.info("检品信息保存成功，ID：{}", savedId);
+        } catch (Exception e) {
+            log.error("检品信息保存失败：{}", e.getMessage(), e);
+            throw new BusinessException("检品保存失败");
+        }
+    }
+}
+```
+
+## 操作日志
+- 使用@OperationLog记录重要操作
+- 记录操作人、操作时间
+- 记录操作内容和结果
+- 支持操作日志查询
+
+```java
+@OperationLog(description = "新增检品")
+public void saveInspectionProduct(MaterialSaveDTO dto) {
+    // 业务处理
+}
+```
+
+# 监控规范
+
+## 应用监控
+- JVM监控
+- 线程监控
+- 内存监控
+- GC监控
+
+## 业务监控
+- 接口调用量
+- 接口响应时间
+- 业务异常统计
+- 业务指标监控
+
+## 链路追踪
+- 使用SkyWalking
+- 分布式链路追踪
+- 性能分析
+- 异常定位
+
+## 监控告警
+- 设置监控阈值
+- 配置告警规则
+- 多渠道告警通知
+- 告警级别区分
+
+## 监控大盘
+- 系统概览
+- 实时监控
+- 历史趋势
+- 异常分析
+
+# 安全审计
+
+## 操作审计
+- 记录关键操作
+- 操作可追溯
+- 支持审计查询
+- 审计日志保护
+
+## 安全审计
+- 异常登录记录
+- 敏感操作记录
+- 权限变更记录
+- 系统配置变更记录
+
+
+
+# 监控
+- Skywalking/APM 监控。
+

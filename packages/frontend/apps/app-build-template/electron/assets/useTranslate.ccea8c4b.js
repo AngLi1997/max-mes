@@ -1,0 +1,1 @@
+import{R as s,P as e,i as t}from"./is.456bb0e5.js";import{a7 as a}from"./index.vue_vue_type_style_index_0_scoped_1f546a60_lang.3b8a082e.js";const r=r=>{const n=r?s(r)+".":"";return{translate:(s,...r)=>{const o=a.messages(),_=e(o,n+s);return t(_)?_(...r):_}}};export{r as u};

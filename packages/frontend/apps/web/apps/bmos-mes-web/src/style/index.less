@@ -1,0 +1,65 @@
+.node-content-container {
+  display: flex;
+  column-gap: 8px;
+  align-items: center;
+  line-height: 1;
+}
+
+.node-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-inline: 10px;
+  padding-block: 8px;
+  transition: all linear 0.2s;
+  font-size: 14px;
+  cursor: pointer;
+  box-sizing: border-box;
+  margin-bottom: 8px;
+
+  &:hover {
+    border-color: #2871ff;
+    background-color: #f2f4f7;
+
+    .node-operation {
+      .icon-edit {
+        display: block;
+      }
+
+      .icon-delete {
+        display: block;
+      }
+    }
+  }
+}
+
+.innner-check {
+  color: #ff9a2f;
+  box-shadow: 0px 0px 0px 2px #ff9a2f33;
+  border-radius: 4px;
+  cursor: url('../assets/images/cursor.png') auto;
+}
+/* stylelint-disable rule-empty-line-before */
+
+/* stylelint-disable-next-line selector-class-pattern */
+
+// 临期样式
+.row-bg-warning {
+  background: #fff3e5;
+  .mes-table-cell-row-hover {
+    background: #fff3e5;
+  }
+  .mes-table-cell {
+    background: #fff3e5;
+  }
+}
+//过期样式
+.row-bg-error {
+  background: #ffe6e0;
+  .mes-table-cell-row-hover {
+    background: #ffe6e0;
+  }
+  .mes-table-cell {
+    background: #ffe6e0;
+  }
+}

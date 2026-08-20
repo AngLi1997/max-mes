@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.process.mapper.ProcessMapper">
+
+    <select id="selectPageList" resultType="com.bmos.mes.service.process.vo.ProcessPageVO">
+        select distinct
+            t1.id,
+            t1.name,
+            t1.product_id,
+            t1.active_version,
+            t1.product_category_id,
+            t3.name as productName,
+            t3.specification,
+            t3.merge_code as mergeCode,
+            bm_process_dashboard_config.process_version as dashboard_config_version
+        from bm_process t1
+        join bm_resource_permission t2 on t1.id = t2.resource_id
+        join bm_material t3 on t1.product_id = t3.id
+        left join bm_process_dashboard_config on t1.id = bm_process_dashboard_config.process_id and bm_process_dashboard_config.is_deleted = 0
+        where t1.is_deleted = 0
+        and t2.dept_id in
+        <foreach collection="deptIds" open="(" close=")" separator="," item="item">
+            #{item}
+        </foreach>
+        <if test="name != null and name != ''">
+            and t1.name like concat('%',#{name},'%')
+        </if>
+        <if test="productId != null and productId != ''">
+            and t1.product_id = #{productId}
+        </if>
+        <if test="categoryIds != null and categoryIds.size > 0">
+            and t1.product_category_id in
+            <foreach collection="categoryIds" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        order by t1.create_time desc
+    </select>
+    <select id="selectRelationList" resultType="com.bmos.mes.service.process.model.Process">
+        select distinct
+            t1.id,
+            t1.name,
+            t1.product_id,
+            t1.active_version
+        from bm_process t1
+        join bm_process_relation t2 on t1.id = t2.relation_process_id
+        where t1.is_deleted = false
+        and t2.process_id = #{processId}
+    </select>
+
+    <select id="getAuditBusinessKey" resultType="java.lang.String">
+        SELECT DISTINCT
+            t3.id
+        FROM
+            bm_process t1
+        JOIN bm_resource_permission t2 ON t1.id = t2.resource_id
+        JOIN bm_process_version AS t3 ON t1.id = t3.process_id
+        WHERE
+            t1.is_deleted = 0
+        AND t3.is_deleted = 0
+        AND t3.action_state = 'approval'
+        AND t2.dept_id IN
+        <foreach collection="deptIdList" open="(" close=")" separator="," item="item">
+            #{item}
+        </foreach>
+    </select>
+    <select id="getIdListByDeptIds" resultType="java.lang.Long">
+        SELECT DISTINCT
+        t1.id
+        FROM
+        bm_process t1
+        JOIN bm_resource_permission t2 ON t1.id = t2.resource_id
+        WHERE
+        t1.is_deleted = 0
+        AND t2.dept_id IN
+        <foreach collection="deptIdList" open="(" close=")" separator="," item="item">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="selectByProductIdsAndDeptIds" resultType="com.bmos.mes.service.process.model.Process">
+        select distinct
+            t1.id,
+            t1.name,
+            t1.product_id,
+            t1.active_version
+        from bm_process t1
+        join bm_resource_permission t2 on t1.id = t2.resource_id
+        where t1.is_deleted = 0
+        <if test="productIds != null and productIds.size() > 0">
+            and t1.product_id in
+            <foreach collection="productIds" open="(" close=")" separator="," item="item">
+                #{item}
+            </foreach>
+        </if>
+        and t2.dept_id in
+        <foreach collection="deptIds" open="(" close=")" separator="," item="item">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="selectProductListByProcessIdS" resultType="com.bmos.mes.service.plan.production.vo.BuildPlanBatchNextNoVO">
+        SELECT
+            t2.id as material_id,
+            t2.inner_packing_specification as innerPackingSpecification,
+            t2.packing_specification as packingSpecification,
+            t2.product_mark as productMark,
+            t2.merge_code as productMergeCode,
+            t2.`name` as productName,
+            t1.id as processId
+        FROM
+            bm_process AS t1
+            JOIN bm_material AS t2 ON t1.product_id = t2.id
+        WHERE
+            t1.is_deleted = 0
+            AND t2.is_deleted = 0
+            and t1.id in
+        <foreach collection="list" separator="," open="(" close=")" item="processId">
+            #{processId}
+        </foreach>
+    </select>
+</mapper>

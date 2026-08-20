@@ -1,0 +1,45 @@
+#form-box .selectTdClass {
+  background-color: #edf5fa !important;
+}
+#form-box table.noBorderTable td,
+#form-box table.noBorderTable th,
+#form-box table.noBorderTable caption {
+  border: 1px dashed #ddd !important;
+}
+#form-box table {
+  margin-bottom: 10px;
+  border-collapse: collapse;
+  display: table;
+}
+#form-box td,
+#form-box th {
+  padding: 5px 10px;
+  border: 1px solid #ddd;
+}
+#form-box caption {
+  border: 1px dashed #ddd;
+  border-bottom: 0;
+  padding: 3px;
+  text-align: center;
+}
+#form-box th {
+  border-top: 1px solid #bbb;
+  background-color: #f7f7f7;
+}
+#form-box table tr.firstRow th {
+  border-top-width: 2px;
+}
+#form-box .ue-table-interlace-color-single {
+  background-color: #fcfcfc;
+}
+#form-box .ue-table-interlace-color-double {
+  background-color: #f7faff;
+}
+#form-box td p {
+  margin: 0;
+  padding: 0;
+}
+#form-box {
+  width: 100%;
+  margin: auto;
+}

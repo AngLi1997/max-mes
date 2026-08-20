@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.trace.material.mapper.IMaterialTraceHistoryMapper">
+
+    <select id="queryTraceHistory" resultType="com.bmos.mes.service.trace.material.entity.MaterialTraceHistoryDO">
+        select bm_material_trace_history.*,
+               bm_procedure.name      as procedure_name,
+               bm_procedure_step.name as procedure_step_name,
+               bm_process.name as process_name
+        from bm_material_trace_history
+                 left join bm_procedure on bm_material_trace_history.procedure_id = bm_procedure.id
+                 left join bm_procedure_step on bm_material_trace_history.procedure_step_id = bm_procedure_step.id
+                 left join bm_process on bm_material_trace_history.process_id = bm_process.id
+        <where>
+            bm_material_trace_history.is_deleted = 0
+            <if test="(materialIds == null or materialIds.size() == 0) or (procedureStepIds == null or procedureStepIds.size() == 0) or (productPlanIds == null or productPlanIds.size() == 0)">
+                and 1 = -1
+            </if>
+            <if test="materialIds != null and materialIds.size() != 0">
+                and bm_material_trace_history.material_id in
+                <foreach collection="materialIds" item="materialId" open="(" separator="," close=")">
+                    #{materialId}
+                </foreach>
+            </if>
+            <if test="procedureStepIds != null and procedureStepIds.size() != 0">
+                and bm_material_trace_history.procedure_step_id in
+                <foreach collection="procedureStepIds" item="procedureStepId" open="(" separator="," close=")">
+                    #{procedureStepId}
+                </foreach>
+            </if>
+            <if test="productPlanIds != null and productPlanIds.size() != 0">
+                and (bm_material_trace_history.product_plan_id in
+                <foreach collection="productPlanIds" item="productPlanId" open="(" separator="," close=")">
+                    #{productPlanId}
+                </foreach>
+                or bm_material_trace_history.source_product_plan_id in
+                <foreach collection="productPlanIds" item="productPlanId" open="(" separator="," close=")">
+                    #{productPlanId}
+                </foreach>
+                )
+            </if>
+        </where>
+    </select>
+</mapper>

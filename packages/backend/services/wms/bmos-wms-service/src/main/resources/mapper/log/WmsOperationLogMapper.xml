@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.wms.service.log.mapper.WmsOperationLogMapper">
+
+    <select id="selectPageList" resultType="com.bmos.wms.service.log.vo.WmsLogPageVO">
+        SELECT
+        id,
+        operation_type,
+        operation_business,
+        operation_object,
+        user_name,
+        remark,
+        create_time AS operationTime,
+        user_id,
+        menu_id,
+        login_name
+        FROM
+        bw_operation_log
+        WHERE
+        is_deleted = 0
+        <if test="userName != null and userName != ''">
+            and (user_name like concat('%',#{userName},'%') or login_name like concat('%',#{userName},'%'))
+        </if>
+        <if test="startTime != null and endTime != null">
+            and create_time between concat(#{startTime}, ' 00:00:00') and concat(#{endTime}, ' 23:59:59')
+        </if>
+        <if test="menuId != null">
+            and menu_id like concat(#{menuId},'%')
+        </if>
+        <if test="operationType != null">
+            and operation_type = #{operationType}
+        </if>
+        order by create_time desc
+    </select>
+    <select id="selectExportData" resultType="com.bmos.wms.service.log.vo.OperationLogExcelVO">
+        SELECT
+        id,
+        operation_type,
+        operation_business,
+        operation_object,
+        user_name,
+        user_id,
+        remark,
+        create_time,
+        menu_id
+        FROM
+        bw_operation_log
+        WHERE
+        is_deleted = 0
+        <if test="operationType != null">
+            and operation_type = #{operationType}
+        </if>
+        <if test="menuId != null">
+            and menu_id like concat(#{menuId},'%')
+        </if>
+        <if test="userName != null and userName != ''">
+            and (user_name like concat('%',#{userName},'%') or login_name like concat('%',#{userName},'%'))
+        </if>
+        <if test="startTime != null and endTime != null">
+            and create_time between concat(#{startTime}, ' 00:00:00') and concat(#{endTime}, ' 23:59:59')
+        </if>
+        order by create_time desc
+    </select>
+    <select id="selectByIds" resultType="com.bmos.wms.service.log.vo.OperationLogExcelVO">
+        SELECT
+        id,
+        operation_type,
+        operation_business,
+        operation_object,
+        user_name,
+        user_id,
+        remark,
+        create_time,
+        menu_id
+        FROM
+        bw_operation_log
+        WHERE
+        is_deleted = 0
+        and id in
+        <foreach collection="list" open="(" separator="," close=")" item="id">
+            #{id}
+        </foreach>
+    </select>
+</mapper>

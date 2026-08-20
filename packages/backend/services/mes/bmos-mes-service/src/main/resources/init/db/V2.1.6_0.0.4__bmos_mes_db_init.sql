@@ -1,0 +1,1 @@
+ALTER TABLE `bm_execute_attachment` ADD COLUMN `remark` VARCHAR ( 255 ) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '备注信息';

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.inspect.scheme.mapper.InspectionSchemeVersionMapper">
+
+    <select id="listBySchemeId" resultType="com.bmos.lims2.server.inspect.scheme.dto.response.SchemeVersionOptionDTO">
+        SELECT
+            v.id AS id,
+            v.version_no AS versionNo,
+            v.status AS status
+        FROM lm_inspection_scheme_version v
+        WHERE v.scheme_id = #{schemeId}
+          AND v.is_deleted = 0
+        ORDER BY v.create_time DESC, v.id DESC
+    </select>
+    
+    <select id="checkVersionNoDuplicate" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM lm_inspection_scheme_version
+        WHERE scheme_id = #{schemeId}
+        AND version_no = #{versionNo}
+        AND is_deleted = 0
+        <if test="excludeId != null">
+            AND id != #{excludeId}
+        </if>
+    </select>
+
+    <select id="getActiveVersion" resultType="com.bmos.lims2.server.inspect.scheme.entity.InspectionSchemeVersion">
+        SELECT *
+        FROM lm_inspection_scheme_version
+        WHERE scheme_id = #{schemeId}
+        AND status = 'ACTIVE'
+        AND is_deleted = 0
+        LIMIT 1
+    </select>
+
+    <update id="deactivateAllVersions">
+        UPDATE lm_inspection_scheme_version
+        SET status = 'INACTIVE',
+            update_time = NOW(),
+            update_user_id = #{updateBy}
+        WHERE scheme_id = #{schemeId}
+        AND id != #{excludeId}
+        AND is_deleted = 0
+    </update>
+
+    <select id="listOperateRulesByVersionId"
+            resultType="com.bmos.lims2.server.inspect.scheme.dto.response.SchemeVersionOperateRuleDTO">
+        SELECT DISTINCT
+            r.id          AS operateId,
+            r.name        AS name,
+            r.code        AS code,
+            rv.id         AS versionId,
+            rv.version    AS versionNo
+        FROM lm_inspection_scheme_parameter isp
+        INNER JOIN lm_inspect_method_operate_bind bind ON bind.record_id = isp.record_id
+        INNER JOIN bm_operate_rule r ON r.id = bind.operate_id AND r.is_deleted = 0
+        LEFT JOIN bm_operate_rule_version rv ON rv.id = (
+            SELECT id
+            FROM bm_operate_rule_version
+            WHERE operate_id = r.id
+              AND is_deleted = 0
+            ORDER BY id DESC
+            LIMIT 1
+        )
+        WHERE isp.version_id = #{schemeVersionId}
+          AND isp.record_id IS NOT NULL
+          AND isp.is_deleted = 0
+        ORDER BY r.id
+    </select>
+
+</mapper> 

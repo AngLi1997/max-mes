@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.wms.service.cargo.mapper.ICargoMapper">
+    <select id="queryPage" resultType="com.bmos.wms.service.cargo.vo.CargoPageVO">
+        select bw_cargo.id,
+               bw_cargo.cargo_name,
+               bw_cargo.cargo_code,
+               bw_cargo.merge_code,
+               bw_cargo.specification,
+               bw_cargo_category.cargo_category_name,
+               bw_cargo.unit_id,
+               bw_cargo.enable
+        from bw_cargo
+                 left join bw_cargo_category
+                           on bw_cargo.cargo_category_id = bw_cargo_category.id and bw_cargo_category.is_deleted = false
+        where bw_cargo.is_deleted = false
+          and bw_cargo_category.is_deleted = false
+        <if test="pageQuery.cargoName != null and pageQuery.cargoName != ''">
+            and bw_cargo.cargo_name like concat('%', #{pageQuery.cargoName}, '%')
+        </if>
+        <if test="pageQuery.mergeCode != null and pageQuery.mergeCode != ''">
+            and bw_cargo.merge_code like concat('%', #{pageQuery.mergeCode}, '%')
+        </if>
+        <if test="pageQuery.enable != null">
+            and bw_cargo.enable = #{pageQuery.enable}
+        </if>
+        <if test="cargoCategoryIds != null and cargoCategoryIds.size() == 0">
+            and 1 = 2
+        </if>
+        <if test="cargoCategoryIds != null and cargoCategoryIds.size() > 0">
+            and bw_cargo.cargo_category_id in
+            <foreach collection="cargoCategoryIds" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+        order by bw_cargo.merge_code
+    </select>
+
+    <select id="selectSendOrderItemWithCargoIds" resultType="com.bmos.wms.service.sendout.vo.SendOrderItemVO">
+        select
+               bw_cargo.id as business_id,
+               bw_cargo.cargo_name,
+               bw_cargo.cargo_code,
+               bw_cargo.merge_code,
+               bw_cargo.specification as cargo_specification
+        from bw_cargo
+        where bw_cargo.is_deleted = 0
+        <if test="cargoIds != null and cargoIds.size() > 0">
+            and bw_cargo.id in
+            <foreach collection="cargoIds" open="(" close=")" separator="," item="item">
+                #{item}
+            </foreach>
+        </if>
+        <if test="cargoIds != null and cargoIds.size() == 0">
+            and 1 = -1
+        </if>
+    </select>
+</mapper>

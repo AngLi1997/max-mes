@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.platform.service.tag.mapper.ITagInstanceMapper">
+
+    <select id="queryPage" resultType="com.bmos.platform.service.tag.vo.TagInstancePageVO">
+        select bp_tag_instance.id,
+               bp_tag_instance.tag_name,
+               bp_tag_type.tag_type_name,
+               bp_tag_scene.tag_scene_name,
+               bp_tag_instance.is_enable as enable
+        from bp_tag_instance
+                 left join bp_tag_type on bp_tag_instance.tag_type_id = bp_tag_type.id and bp_tag_type.is_deleted = 0
+                 left join bp_tag_scene on bp_tag_instance.tag_scene_id = bp_tag_scene.id and bp_tag_scene.is_deleted = 0
+        <where>
+            bp_tag_instance.is_deleted = 0
+            <if test="pageQuery.tagTypeId != null">
+                and bp_tag_instance.tag_type_id = #{pageQuery.tagTypeId}
+            </if>
+            <if test="pageQuery.tagName != null and pageQuery.tagName != ''">
+                and bp_tag_instance.tag_name like concat('%', #{pageQuery.tagName}, '%')
+            </if>
+            <if test="pageQuery.tagSceneName != null and pageQuery.tagSceneName != ''">
+                and bp_tag_scene.tag_scene_name like concat('%', #{pageQuery.tagSceneName}, '%')
+            </if>
+            order by bp_tag_instance.create_time
+        </where>
+    </select>
+</mapper>

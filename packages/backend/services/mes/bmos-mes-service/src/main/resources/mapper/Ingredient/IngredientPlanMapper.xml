@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.ingredient.plan.mapper.IngredientPlanMapper">
+    <select id="selectMaxSerialNo" resultType="java.lang.Integer">
+        select MAX(serial_no)
+        from bm_ingredient_plan
+        where product_plan_id = #{productPlanId}
+    </select>
+
+    <select id="queryPendingIngredientPlanList"
+            resultType="com.bmos.mes.service.ingredient.weigh.vo.IngredientPlanItemVO">
+        select bm_ingredient_plan.id,
+               bm_ingredient_plan.name,
+               (select count(1)
+                from bm_ingredient_plan_material_batch
+                where ingredient_plan_id = bm_ingredient_plan.id) plan_batch_count,
+               (select count(1)
+                from bm_ingredient_weigh_batch_process
+                where ingredient_plan_id = bm_ingredient_plan.id) weigh_batch_count
+        from bm_ingredient_plan
+        where bm_ingredient_plan.completed = true
+          and bm_ingredient_plan.is_deleted = 0
+          and bm_ingredient_plan.product_plan_id = #{productPlanId}
+          and bm_ingredient_plan.batch_no = #{batchNo}
+        order by bm_ingredient_plan.name;
+    </select>
+
+    <select id="queryPendingInputPlanList" resultType="com.bmos.mes.service.ingredient.weigh.vo.IngredientPlanItemVO">
+        select distinct bm_ingredient_plan.id,
+                        bm_ingredient_plan.name
+        from bm_ingredient_plan
+                 left join bm_ingredient_weigh_process
+                           on bm_ingredient_plan.id = bm_ingredient_weigh_process.ingredient_plan_id and
+                              bm_ingredient_weigh_process.is_deleted = 0
+                 left join bm_ingredient_input_record
+                           on bm_ingredient_input_record.ingredient_plan_id =
+                              bm_ingredient_weigh_process.ingredient_plan_id and
+                              bm_ingredient_input_record.is_deleted = 0
+        where bm_ingredient_plan.is_deleted = 0
+          and bm_ingredient_plan.completed = true
+          and bm_ingredient_plan.product_plan_id = #{productPlanId}
+          and bm_ingredient_input_record.id is null
+        order by bm_ingredient_plan.name
+    </select>
+</mapper>

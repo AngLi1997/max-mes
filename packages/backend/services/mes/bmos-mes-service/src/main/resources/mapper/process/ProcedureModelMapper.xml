@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.process.mapper.ProcedureModelMapper">
+
+    <update id="deleteByIdNotIn">
+        update bm_procedure_model
+        set is_deleted = 1,
+            del_id_flag = id
+        where process_version_id = #{processVersionId}
+        and id not in
+        <foreach collection="ids" open="(" close=")" separator="," item="item">
+            #{item}
+        </foreach>
+    </update>
+    <update id="deleteByProcessVersion">
+        update bm_procedure_model
+        set is_deleted = 1,
+        del_id_flag = id
+        where process_version_id = #{processVersionId}
+    </update>
+
+
+    <select id="getListByDeleteIds" resultType="com.bmos.mes.service.process.vo.Task.NodeVO">
+        SELECT
+            id,
+            `name`,
+            is_deleted as isDeleted
+        FROM
+            bm_procedure_model
+        where id in
+        <foreach collection="modelIdS" separator="," open="(" close=")" item="modelId">
+            #{modelId}
+        </foreach>
+    </select>
+</mapper>

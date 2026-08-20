@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.ingredient.weigh.mapper.IIngredientWeighRecordMapper">
+    <select id="queryWeighedStorageMaterialList"
+            resultType="com.bmos.mes.service.ingredient.weigh.vo.IngredientWeighStorageMaterialVO">
+        select distinct bm_storage_material.id,
+                        bm_storage_material.no,
+                        bm_storage_material_batch.material_batch_no,
+                        bm_storage_material.id                                          as material_batch_id,
+                        bm_ingredient_plan_material_batch.ingredient_quantity           as quantity,
+                        bm_ingredient_plan_material_batch.unit_id,
+                        bm_storage_material_batch.hydration,
+                        bm_storage_material_batch.no_hydration_content,
+                        bm_storage_material_batch.expired_date,
+                        bm_storage_material_batch.factory_batch_no,
+                        bm_storage_material_batch.supplier,
+                        bm_material.merge_code                                          as material_code,
+                        bm_material.name                                                as material_name,
+                        bm_ingredient_weigh_record.tare_weight,
+                        bm_ingredient_weigh_record.gross_weight,
+                        bm_ingredient_weigh_record.net_weight,
+                        bm_ingredient_weigh_record.sign_status,
+                        bm_ingredient_weigh_record.container_id,
+                        bm_ingredient_weigh_record.container_name,
+                        bm_ingredient_weigh_record.weigher_id,
+                        bm_ingredient_weigh_record.re_checker_id,
+                        bm_ingredient_weigh_record.weigh_time as weigh_date,
+                        concat(bm_cargo_position.code, '-', bm_cargo_position.position) as material_position_name,
+                        bm_material_category.category_type
+        from bm_ingredient_weigh_record
+                 left join bm_storage_material_batch
+                           on bm_ingredient_weigh_record.storage_material_batch_id = bm_storage_material_batch.id and
+                              bm_storage_material_batch.is_deleted = 0
+                 left join bm_ingredient_weigh_batch_process
+                           on bm_ingredient_weigh_batch_process.storage_material_batch_id = bm_ingredient_weigh_record.storage_material_batch_id
+                           and bm_ingredient_weigh_batch_process.ingredient_plan_id = bm_ingredient_weigh_record.ingredient_plan_id
+                           and bm_ingredient_weigh_batch_process.is_deleted = 0
+                 left join bm_storage_material
+                           on bm_ingredient_weigh_record.storage_material_id = bm_storage_material.id and
+                              bm_storage_material.is_deleted = 0
+                 left join bm_material
+                           on bm_storage_material.material_id = bm_material.id and bm_material.is_deleted = 0
+                 left join bm_material_category on bm_material_category.id = bm_material.material_category_id and
+                                                   bm_material_category.is_deleted = 0
+                 left join bm_ingredient_plan
+                           on bm_ingredient_weigh_record.ingredient_plan_id = bm_ingredient_plan.id and
+                              bm_ingredient_plan.is_deleted = 0
+                 left join bm_ingredient_plan_material_batch on bm_ingredient_plan_material_batch.ingredient_plan_id =
+                                                                bm_ingredient_weigh_record.ingredient_plan_id
+            and bm_ingredient_weigh_record.storage_material_batch_id =
+                bm_ingredient_plan_material_batch.material_batch_id
+                 left join bm_cargo_position
+                           on bm_ingredient_weigh_record.material_position_id = bm_cargo_position.id and
+                              bm_cargo_position.is_deleted = 0
+                               and bm_ingredient_plan_material_batch.material_batch_id =
+                                   bm_ingredient_weigh_record.storage_material_batch_id
+                               and bm_ingredient_weigh_record.is_deleted = 0
+        <where>
+            bm_ingredient_weigh_record.is_deleted = 0
+            <if test="ingredientPlanId != null">
+                and bm_ingredient_weigh_record.ingredient_plan_id = #{ingredientPlanId}
+            </if>
+            <if test="weighType != null">
+                and bm_ingredient_weigh_record.weigh_type = #{weighType.value}
+            </if>
+            <if test="componentId != null">
+                and bm_ingredient_weigh_batch_process.component_id = #{componentId}
+            </if>
+            <if test="reuse and procedureStepModelId != null">
+                and bm_ingredient_weigh_batch_process.reuse = #{reuse}
+            </if>
+            <if test="!reuse and procedureStepModelId != null">
+                and bm_ingredient_weigh_batch_process.procedure_step_model_id = #{procedureStepModelId}
+            </if>
+            <if test="copyVersion != null">
+                and bm_ingredient_weigh_batch_process.copy_version = #{copyVersion}
+            </if>
+        </where>
+    </select>
+</mapper>

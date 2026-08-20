@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.inspect.scheme.mapper.InspectionSchemeItemMapper">
+    
+    <select id="listByDetailId" resultType="com.bmos.lims2.server.inspect.scheme.entity.InspectionSchemeItem">
+        SELECT *
+        FROM lm_inspection_scheme_item
+        WHERE version_id = #{versionId}
+        AND is_deleted = 0
+        ORDER BY sort ASC, id ASC
+    </select>
+
+    <select id="listWithAnalyzeItems" resultMap="itemWithAnalyzeItemsMap">
+        SELECT 
+            i.*,
+            item.name as inspect_item_name,
+            item.code as inspect_item_code,
+            a.id as parameter_config_id,
+            a.parameter_id,
+            a.inspect_item_id,
+            a.item_config_id,
+            p.name as parameter_name,
+            p.code as parameter_code,
+            a.record_id,
+            a.record_version_id,
+            a.record_item_id,
+            r.name as record_name,
+            r.code as record_code,
+            rv.version as record_version,
+            a.execute_method,
+            a.final_expression,
+            a.standard_rule,
+            a.is_reportable,
+            a.is_executable
+        FROM lm_inspection_scheme_item i
+        LEFT JOIN lm_inspect_item item ON i.inspect_item_id = item.id
+        LEFT JOIN lm_inspection_scheme_parameter a ON i.id = a.item_config_id
+        LEFT JOIN bm_batch_record r ON a.record_id = r.id AND r.is_deleted = 0
+        LEFT JOIN bm_batch_record_version rv ON a.record_version_id = rv.id AND r.is_deleted = 0
+        LEFT JOIN lm_inspect_parameter p ON a.parameter_id = p.id
+        WHERE i.version_id = #{versionId}
+        AND i.is_deleted = 0
+        AND (item.id IS NULL OR item.is_deleted = 0)
+        AND (a.id IS NULL OR a.is_deleted = 0)
+        AND (p.id IS NULL OR p.is_deleted = 0)
+        ORDER BY i.sort ASC, i.id ASC, a.id ASC
+    </select>
+
+    <resultMap id="itemWithAnalyzeItemsMap" type="com.bmos.lims2.server.inspect.scheme.dto.InspectionSchemeItemDTO">
+        <id property="id" column="id"/>
+        <result property="versionId" column="version_id"/>
+        <result property="schemeId" column="scheme_id"/>
+        <result property="packageId" column="package_id"/>
+        <result property="inspectItemId" column="inspect_item_id"/>
+        <result property="inspectItemName" column="inspect_item_name"/>
+        <result property="inspectItemCode" column="inspect_item_code"/>
+        <result property="isRequired" column="is_required"/>
+        <result property="duration" column="duration"/>
+        <result property="timeUnit" column="time_unit"/>
+        <result property="sort" column="sort"/>
+        <collection property="parameters" ofType="com.bmos.lims2.server.inspect.scheme.dto.InspectionSchemeParameterDTO">
+            <id property="id" column="parameter_id"/>
+            <result property="id" column="parameter_config_id"/>
+            <result property="inspectItemId" column="inspect_item_id"/>
+            <result property="schemeId" column="scheme_id"/>
+            <result property="versionId" column="version_id"/>
+            <result property="packageId" column="package_id"/>
+            <result property="parameterId" column="parameter_id"/>
+            <result property="itemConfigId" column="item_config_id"/>
+            <result property="recordId" column="record_id"/>
+            <result property="recordName" column="record_name"/>
+            <result property="recordCode" column="record_code"/>
+            <result property="recordVersionId" column="record_version_id"/>
+            <result property="recordVersion" column="record_version"/>
+            <result property="recordItemId" column="record_item_id"/>
+            <result property="parameterName" column="parameter_name"/>
+            <result property="parameterCode" column="parameter_code"/>
+            <result property="standardRule" column="standard_rule"/>
+            <result property="isReportable" column="is_reportable"/>
+            <result property="isExecutable" column="is_executable"/>
+            <result property="executeMethod" column="execute_method"/>
+            <result property="finalExpression" column="final_expression"/>
+        </collection>
+    </resultMap>
+
+</mapper>

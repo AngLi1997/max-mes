@@ -1,0 +1,966 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mappings xmlns="http://dozer.sourceforge.net" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://dozer.sourceforge.net
+          http://dozer.sourceforge.net/schema/beanmapping.xsd">
+    <mapping date-format="yyyy-MM-dd" map-id="HlInspectOrderSendBack">
+        <class-a>com.bmos.api.server.internal.lims.dto.InspectOrderSendBackDTO</class-a>
+        <class-b>com.bmos.mes.inspect.dto.InspectRejectDTO</class-b>
+        <field>
+            <a>mesSerialNo</a>
+            <b>inspectNo</b>
+        </field>
+        <field>
+            <a>backReason</a>
+            <b>reason</b>
+        </field>
+    </mapping>
+
+    <mapping date-format="yyyy-MM-dd" map-id="HlInspectResultSendBack">
+        <class-a>com.bmos.api.server.internal.lims.dto.InspectResultSendBackDTO</class-a>
+        <class-b>com.bmos.mes.inspect.dto.InspectResultCallBackDTO</class-b>
+        <field>
+            <a>mesSerialNo</a>
+            <b>inspectNo</b>
+        </field>
+        <field>
+            <a>serialResult</a>
+            <b>result</b>
+        </field>
+        <field custom-converter="com.bmos.api.server.converter.HlInspectResultSendBackIsCloseConverter">
+            <a>isClose</a>
+            <b>closed</b>
+        </field>
+    </mapping>
+    <mapping date-format="yyyy-MM-dd" map-id="HlInspectResultSendBackItem">
+        <class-a>com.bmos.api.server.internal.lims.dto.InspectResultItemDTO</class-a>
+        <class-b>com.bmos.mes.inspect.dto.InspectResultItemDTO</class-b>
+        <field custom-converter="com.bmos.api.server.converter.HlInspectResultSendBackTestCodeConverter">
+            <a>testCode</a>
+            <b>alreadyConvertProgramNo</b>
+        </field>
+        <field>
+            <a>testCode</a>
+            <b>inspectProgramNo</b>
+        </field>
+        <field>
+            <a>testNo</a>
+            <b>inspectProgramName</b>
+        </field>
+        <field>
+            <a>testResult</a>
+            <b>inspectResult</b>
+        </field>
+        <field>
+            <a>testConclusion</a>
+            <b>inspectConclusion</b>
+        </field>
+    </mapping>
+
+    <mapping date-format="yyyy-MM-dd" map-id="HlInspectOrderSend">
+        <class-a>com.alibaba.fastjson.JSONObject</class-a>
+        <class-b>com.bmos.api.server.outer.lims.dto.InspectRequestOrderDTO</class-b>
+        <field>
+            <a>pleaseCheckNo</a>
+            <b>REQUESTID</b>
+        </field>
+        <field>
+            <a>productLineName</a>
+            <b>REQUEST_DEPT</b>
+        </field>
+        <field>
+            <a>sampleQuantity</a>
+            <b>ACTUALVOL</b>
+        </field>
+        <field>
+            <a>materialCode</a>
+            <b>MATCODE</b>
+        </field>
+        <field>
+            <a>sampleQuantityUnitName</a>
+            <b>ACTUALVOL_UNITS</b>
+        </field>
+        <field>
+            <a>inspector</a>
+            <b>REQUESTER</b>
+        </field>
+        <field>
+            <a>productBatchNo</a>
+            <b>BATCHNO</b>
+        </field>
+        <field>
+            <a>productBatchQuantity</a>
+            <b>ESTIMATEDVOL</b>
+        </field>
+        <field>
+            <a>materialName</a>
+            <b>MATNAME</b>
+        </field>
+        <field>
+            <a>materialBatchNo</a>
+            <b>MATBATCHNO</b>
+        </field>
+        <field>
+            <a>productBatchQuantityUnit</a>
+            <b>ESTIMATEDVOL_UNITS</b>
+        </field>
+        <field>
+            <a>instructionNo</a>
+            <b>ORDER_NUMBER</b>
+        </field>
+        <field>
+            <a>remark</a>
+            <b>COMMENTS</b>
+        </field>
+        <!-- 这里对应请验单自定义字段转换为疫苗LIMS的字段 需要根据LIMS自定义请验单做修改-->
+        <field>
+            <a>1212</a>
+            <b>TESTNO</b>
+        </field>
+        <field>
+            <a>c1</a>
+            <b>PROCESS</b>
+        </field>
+        <field>
+            <a>c2</a>
+            <b>REQUEST_REASON</b>
+        </field>
+        <field>
+            <a>c3</a>
+            <b>PRODUCTION_DATE</b>
+        </field>
+        <field>
+            <a>c4</a>
+            <b>RETENTIONSAMPLEVOL</b>
+        </field>
+        <field>
+            <a>c5</a>
+            <b>RETENTIONSAMPLE_UNITS</b>
+        </field>
+        <field>
+            <a>c6</a>
+            <b>CREATE_DEPT</b>
+        </field>
+    </mapping>
+    <mapping date-format="yyyy-MM-dd" map-id="hlSapMaterialSync">
+        <class-a>com.bmos.api.server.internal.sap.dto.MaterialInfoDTO</class-a>
+        <class-b>com.bmos.platform.facade.material.dto.SapMaterialSyncDTO</class-b>
+        <field>
+            <a>MATNR</a>
+            <b>materialCode</b>
+        </field>
+        <field custom-converter="com.bmos.api.server.converter.HlMaterialCategoryCodeConverter">
+            <a>MTART</a>
+            <b>materialCategoryCode</b>
+        </field>
+        <field>
+            <a>MAKTX</a>
+            <b>name</b>
+        </field>
+        <field>
+            <a>ZM_TYM</a>
+            <b>commonName</b>
+        </field>
+        <field>
+            <a>ZM_HH</a>
+            <b>itemNumber</b>
+        </field>
+        <field>
+            <a>ZM_GGXH</a>
+            <b>specification</b>
+        </field>
+        <field>
+            <a>ZB_BZGG</a>
+            <b>packingSpecification</b>
+        </field>
+        <field>
+            <a>ZM_JX</a>
+            <b>dosageForm</b>
+        </field>
+        <field>
+            <a>MEINS</a>
+            <b>unitCode</b>
+        </field>
+        <field>
+            <a>MATKL</a>
+            <b>materialGroup</b>
+        </field>
+        <field>
+            <a>MSTAE</a>
+            <b>materialFactoryStatus</b>
+        </field>
+        <field>
+            <a>ERSDA</a>
+            <b>sapCreateDate</b>
+        </field>
+        <field>
+            <a>ERNAM</a>
+            <b>sapCreateBy</b>
+        </field>
+        <!-- 这里对应请验单自定义字段转换为疫苗LIMS的字段 需要根据LIMS自定义请验单做修改-->
+        <field>
+            <a>CREATED_AT_TIME</a>
+            <b>sapCreateTime</b>
+        </field>
+        <field>
+            <a>LAEDA</a>
+            <b>sapUpdateTime</b>
+        </field>
+        <field>
+            <a>AENAM</a>
+            <b>sapUpdateBy</b>
+        </field>
+        <field>
+            <a>LAST_CHANGED_TIME</a>
+            <b>sapUpdateTime</b>
+        </field>
+    </mapping>
+    <mapping date-format="yyyy-MM-dd" map-id="hlSapMaterialUnitInfo">
+        <class-a>com.bmos.api.server.internal.sap.dto.MaterialUnitInfoDTO</class-a>
+        <class-b>com.bmos.platform.facade.material.dto.MaterialSapUnitDefinitionDTO</class-b>
+        <field>
+            <a>UMREN</a>
+            <b>sapDenominator</b>
+        </field>
+        <field>
+            <a>UMREZ</a>
+            <b>sapNumerator</b>
+        </field>
+        <field>
+            <a>MEINH</a>
+            <b>unitName</b>
+        </field>
+    </mapping>
+    <mapping date-format="yyyy-MM-dd" map-id="hlSapMaterialProvider">
+        <class-a>com.bmos.api.server.internal.sap.dto.MaterialFactoryDTO</class-a>
+        <class-b>com.bmos.platform.facade.material.dto.SapMaterialProviderDTO</class-b>
+        <field>
+            <a>WERKS</a>
+            <b>factory</b>
+        </field>
+        <field>
+            <a>AUSME</a>
+            <b>unit</b>
+        </field>
+        <field>
+            <a>XCHPF</a>
+            <b>batchManage</b>
+        </field>
+        <field>
+            <a>EKGRP</a>
+            <b>purchasingGroup</b>
+        </field>
+        <field>
+            <a>BSTME</a>
+            <b>purchasingUnit</b>
+        </field>
+        <field>
+            <a>MMSTA</a>
+            <b>specificMaterialStatus</b>
+        </field>
+        <field>
+            <a>BSTRF</a>
+            <b>roundingValue</b>
+        </field>
+    </mapping>
+    <mapping date-format="yyyy-MM-dd" map-id="hlSapMaterialSaleInfo">
+        <class-a>com.bmos.api.server.internal.sap.dto.MaterialSaleInfoDTO</class-a>
+        <class-b>com.bmos.platform.facade.material.dto.MaterialSalesInformationDTO</class-b>
+        <field>
+            <a>VKORG</a>
+            <b>salesOrganization</b>
+        </field>
+        <field>
+            <a>VTWEG</a>
+            <b>distributionChannel</b>
+        </field>
+        <field>
+            <a>VRKME</a>
+            <b>salesUnit</b>
+        </field>
+    </mapping>
+
+        <!--  工单同步映射  -->
+    <mapping date-format="yyyy-MM-dd" map-id="hlSapWorkOrderSync">
+        <class-a>com.bmos.api.server.internal.sap.dto.WorkOrderDTO</class-a>
+        <class-b>com.bmos.mes.sap.dto.SapWorkOrderSyncDTO</class-b>
+        <field>
+            <a>AUFNR</a>
+            <b>productionOrderNo</b>
+        </field>
+        <field>
+            <a>AUART</a>
+            <b>orderType</b>
+        </field>
+        <field>
+            <a>WERKS</a>
+            <b>factory</b>
+        </field>
+        <field custom-converter="com.bmos.api.server.converter.HlProductionLineConverter">
+            <a>ARBPL</a>
+            <b>productionLineCode</b>
+        </field>
+        <field>
+            <a>PLNBEZ</a>
+            <b>productCode</b>
+        </field>
+        <field>
+            <a>MAKTX</a>
+            <b>productName</b>
+        </field>
+        <field>
+            <a>MEINS</a>
+            <b>unit</b>
+        </field>
+        <field>
+            <a>GAMNG</a>
+            <b>quantity</b>
+        </field>
+        <field>
+            <a>GSTRP</a>
+            <b>startDate</b>
+        </field>
+        <field>
+            <a>GLTRP</a>
+            <b>endDate</b>
+        </field>
+        <field>
+            <a>CHARG</a>
+            <b>batch</b>
+        </field>
+        <field>
+            <a>VERID</a>
+            <b>productionVersion</b>
+        </field>
+        <field>
+            <a>ZB_PBATCH</a>
+            <b>productBatchNo</b>
+        </field>
+        <field>
+            <a>TEXT1</a>
+            <b>versionDesc</b>
+        </field>
+        <field custom-converter="com.bmos.api.server.converter.HlProcessNameConverter">
+            <a>TEXT1</a>
+            <b>processNameList</b>
+        </field> 
+        <field>
+            <a>ERNAM</a>
+            <b>sapCreateBy</b>
+        </field>
+        <field>
+            <a>ERDAT</a>
+            <b>sapCreateDate</b>
+        </field>
+        <field>
+            <a>AENAM</a>
+            <b>sapUpdateBy</b>
+        </field>
+        <field>
+            <a>AEDAT</a>
+            <b>sapUpdateDate</b>
+        </field>
+        <field>
+            <a>RSNUM</a>
+            <b>reservedNo</b>
+        </field>
+    </mapping>
+
+    <!-- 工单物料映射-->
+    <mapping date-format="yyyy-MM-dd" map-id="hlSapWorkOrderMaterial">
+        <class-a>com.bmos.api.server.internal.sap.dto.WorkOrderMaterialDTO</class-a>
+        <class-b>com.bmos.mes.sap.dto.SapWorkOrderMaterialDTO</class-b>
+        <field>
+            <a>AUFNR</a>
+            <b>productionOrderNO</b>
+        </field>
+        <field>
+            <a>POSNR</a>
+            <b>orderPosnr</b>
+        </field>
+        <field>
+            <a>RSPOS</a>
+            <b>orderRspos</b>
+        </field>
+        <field>
+            <a>BWART</a>
+            <b>moveType</b>
+        </field>
+        <field>
+            <a>MATNR</a>
+            <b>materialCode</b>
+        </field>
+        <field>
+            <a>MAKTX</a>
+            <b>materialName</b>
+        </field>
+        <field>
+            <a>BDMNG</a>
+            <b>quantity</b>
+        </field>
+        <field>
+            <a>MEINS</a>
+            <b>unit</b>
+        </field>
+        <field>
+            <a>CHARG</a>
+            <b>batchNo</b>
+        </field>
+    </mapping>
+
+    
+
+   
+    <!-- 产出工时上报映射  -->
+    <mapping date-format="yyyy-MM-dd" map-id="ReportWorkHorsDTO">
+        <class-a>com.alibaba.fastjson.JSONObject</class-a>
+        <class-b>com.bmos.api.server.outer.sap.dto.ReportWorkHorsDTO</class-b>
+        <field>
+            <a>sapWorkOrderNo</a>
+            <b>AUFNR</b>
+        </field>
+        <field>
+            <a>factory</a>
+            <b>WERKS</b>
+        </field>
+        <field>
+            <a>materialCode</a>
+            <b>MATNR</b>
+        </field>
+        <field>
+            <a>procedure</a>
+            <b>VORNR</b>
+        </field>
+        <field>
+            <a>productionBatchNo</a>
+            <b>ZB_PBATCH</b>
+        </field>
+        <field>
+            <a>quantity</a>
+            <b>LMNGA</b>
+        </field>
+        <field>
+            <a>unitCode</a>
+            <b>MEINH</b>
+        </field>
+        <field>
+            <a>batch</a>
+            <b>CHARG</b>
+        </field>
+        <field>
+            <a>storageLocation</a>
+            <b>LGORT</b>
+        </field>
+        <field>
+            <a>paymentDate</a>
+            <b>BUDAT</b>
+        </field>
+        <field>
+            <a>directWorkHours</a>
+            <b>ISM01</b>
+        </field>
+        <field>
+            <a>indirectWorkingHours</a>
+            <b>ISM02</b>
+        </field>
+        <field>
+            <a>auxiliaryMaterials</a>
+            <b>ISM03</b>
+        </field>
+        <field>
+            <a>depreciation</a>
+            <b>ISM04</b>
+        </field>
+        <field>
+            <a>power</a>
+            <b>ISM05</b>
+        </field>
+        <field>
+            <a>other</a>
+            <b>ISM06</b>
+        </field>
+        <field>
+            <a>wj</a>
+            <b>ZZQTY1</b>
+        </field>
+        <field>
+            <a>unqualified</a>
+            <b>ZZQTY2</b>
+        </field>
+        <field>
+            <a>otherUses</a>
+            <b>ZZQTY3</b>
+        </field>
+        <field>
+            <a>otherUses</a>
+            <b>ZZQTY3</b>
+        </field>
+        <field>
+            <a>waste</a>
+            <b>ZZQTY4</b>
+        </field>
+        <field>
+            <a>Sampling</a>
+            <b>ZZQTY5</b>
+        </field>
+        <field>
+            <a>retentionSample</a>
+            <b>ZZQTY6</b>
+        </field>
+        <field>
+            <a>splq</a>
+            <b>ZZQTY7</b>
+        </field>
+        <field>
+            <a>liplq</a>
+            <b>ZZQTY8</b>
+        </field>
+        <field>
+            <a>productionDate</a>
+            <b>HSDAT</b>
+        </field>
+        <field>
+            <a>supplier</a>
+            <b>LTXA1</b>
+        </field>
+    </mapping>
+
+
+
+ <!-- 成品入库映射  -->
+    <mapping date-format="yyyy-MM-dd" map-id="ProductionInWarehouse">
+        <class-a>com.alibaba.fastjson.JSONObject</class-a>
+        <class-b>com.bmos.api.server.outer.sap.dto.ProductInWareHouseDTO</class-b>
+        <field>
+            <a>inWarehouseOrder</a>
+            <b>ZWWXTID</b>
+        </field>
+        <field>
+            <a>sapWorkOrderNo</a>
+            <b>AUFNR</b>
+        </field>
+        <field>
+            <a>factory</a>
+            <b>WERKS</b>
+        </field>
+        <field>
+            <a>inWarehouseDate</a>
+            <b>BUDAT</b>
+        </field>
+        <field>
+            <a>operator</a>
+            <b>WEMPF</b>
+        </field>
+        <field>
+            <a>reviewer</a>
+            <b>ABLAD</b>
+        </field>
+        <field>
+            <a>storageLocation</a>
+            <b>LGORT</b>
+        </field>
+        <field>
+            <a>materialCode</a>
+            <b>MATNR</b>
+        </field>
+        <field>
+            <a>specification</a>
+            <b>ZMM_GGXH</b>
+        </field>
+        <field>
+            <a>quantity</a>
+            <b>ERFMG</b>
+        </field>
+        <field>
+            <a>batch</a>
+            <b>CHARG</b>
+        </field>
+        <field>
+            <a>productBatchNo</a>
+            <b>ZB_PBATCH</b>
+        </field>
+        <field>
+            <a>expireDate</a>
+            <b>VADAT</b>
+        </field>
+        <field>
+            <a>productDate</a>
+            <b>HSDAT</b>
+        </field>
+    </mapping>
+
+        <!-- 设备状态映射 -->
+    <mapping date-format="yyyy-MM-dd" map-id="hlEquipmentStatusSync">
+        <class-a>com.bmos.api.server.internal.sap.dto.EquipmentStatusDTO</class-a>
+        <class-b>com.bmos.platform.facade.equipment.dto.SapEquipmentStatusSyncDTO</class-b>
+        <field>
+            <a>EQUNR</a>
+            <b>equipmentCode</b>
+        </field>
+        <field custom-converter="com.bmos.api.server.converter.HlEquipmentStatusConvert">
+            <a>ZV_STAT</a>
+            <b>sapValidateStatus</b>
+        </field>
+        <field custom-converter="com.bmos.api.server.converter.HlEquipmentStatusExpireDateConvert">
+            <a>ZV_DAT</a>
+            <b>validateExpireDate</b>
+        </field>
+    </mapping>
+
+        <!-- 检验结果查询参数映射 -->
+    <mapping date-format="yyyy-MM-dd" map-id="MaterialInspectQuery">
+        <class-a>com.alibaba.fastjson.JSONObject</class-a>
+        <class-b>com.bmos.api.server.outer.sap.dto.QueryMaterialInspectDTO</class-b>
+        <field>
+            <a>materialCode</a>
+            <b>MATNR</b>
+        </field>
+        <field>
+            <a>sapBatchNo</a>
+            <b>CHARG</b>
+        </field>
+    </mapping>
+
+<!-- 检验结果映射 -->
+    <mapping date-format="yyyy-MM-dd" map-id="MaterialInspectResult">
+        <class-a>com.bmos.api.server.outer.sap.dto.MaterialInspectResponseDTO</class-a>
+        <class-b>com.bmos.api.feign.sap.dto.MaterialInspectResultDTO</class-b>
+        <field>
+            <a>MKMNR</a>
+            <b>inspectProgramNo</b>
+        </field>
+        <field>
+            <a>KURZTEXT</a>
+            <b>inspectProgramName</b>
+        </field>
+        <field>
+            <a>ZINSP</a>
+            <b>inspectResult</b>
+        </field>
+        <field>
+            <a>ZCONC</a>
+            <b>inspectConclusion</b>
+        </field>
+    </mapping>
+
+    <!--  ewm出库单映射  -->
+    <mapping date-format="yyyy-MM-dd" map-id="MaterialOutboundOrder">
+        <class-a>com.bmos.api.server.internal.ewm.dto.MaterialOutboundOrderDTO</class-a>
+        <class-b>com.bmos.mes.ewm.dto.EWMReceiveTaskDTO</class-b>
+        <field custom-converter="com.bmos.api.server.converter.StringTrimConverter">
+            <a>VBELN</a>
+            <b>deliveryNo</b>
+        </field>
+        <field>
+            <a>LGNUM</a>
+            <b>fromLocation</b>
+        </field>
+        <field>
+            <a>LGORT</a>
+            <b>toLocation</b>
+        </field>
+        <field>
+            <a>WERKS</a>
+            <b>factory</b>
+        </field>
+        <field>
+            <a>ZAUFNR</a>
+            <b>sapWorkNo</b>
+        </field>
+    </mapping>
+
+    <!--  ewm出库单批次映射  -->
+    <mapping date-format="yyyyMMdd" map-id="MaterialOutboundOrderBatch">
+        <class-a>com.bmos.api.server.internal.ewm.dto.MaterialBatchDTO</class-a>
+        <class-b>com.bmos.mes.ewm.dto.EWMReceiveBatchDTO</class-b>
+        <field>
+            <a>ZITME</a>
+            <b>rowNo</b>
+        </field>
+        <field custom-converter="com.bmos.api.server.converter.StringTrimConverter">
+            <a>MATNR</a>
+            <b>materialMergeCode</b>
+        </field>
+        <field>
+            <a>MAKTX</a>
+            <b>materialDescription</b>
+        </field>
+        <field custom-converter="com.bmos.api.server.converter.StringTrimConverter">
+            <a>CHARG</a>
+            <b>materialBatchNo</b>
+        </field>
+        <field custom-converter="com.bmos.api.server.converter.StringTrimConverter">
+            <a>ERFME</a>
+            <b>unitName</b>
+        </field>
+        <field custom-converter="com.bmos.api.server.converter.StringTrimConverter">
+            <a>WEMNG</a>
+            <b>quantity</b>
+        </field>
+        <field>
+            <a>CAT_TXT</a>
+            <b>ewmBatchQualityStatus</b>
+        </field>
+        <field>
+            <a>ZHA</a>
+            <b>content</b>
+        </field>
+        <field custom-converter="com.bmos.api.server.converter.LocalDateConverter">
+            <a>ZVFDAT</a>
+            <b>expirationDate</b>
+        </field>
+        <field custom-converter="com.bmos.api.server.converter.LocalDateConverter">
+            <a>ZRESTEST_DATE</a>
+            <b>recheckDate</b>
+        </field>
+        <field custom-converter="com.bmos.api.server.converter.LocalDateConverter">
+            <a>ZHSDAT</a>
+            <b>productionDate</b>
+        </field>
+        <field>
+            <a>ZB_GYSPC</a>
+            <b>supplierBatchNo</b>
+        </field>
+        <field>
+            <a>ZB_SCS</a>
+            <b>manufacturer</b>
+        </field>
+    </mapping>
+
+    <!--  ewm出库单最小包装映射  -->
+    <mapping date-format="yyyy-MM-dd" map-id="MaterialOutboundOrderPackage">
+        <class-a>com.bmos.api.server.internal.ewm.dto.MaterialPackageDTO</class-a>
+        <class-b>com.bmos.mes.ewm.dto.EWMReceiveMaterialDTO</class-b>
+        <field custom-converter="com.bmos.api.server.converter.StringTrimConverter">
+            <a>ZEWMCODE</a>
+            <b>ewmCode</b>
+        </field>
+        <field custom-converter="com.bmos.api.server.converter.StringTrimConverter">
+            <a>ZBZGG</a>
+            <b>quantity</b>
+        </field>
+        <field custom-converter="com.bmos.api.server.converter.StringTrimConverter">
+            <a>ZRELEASENO</a>
+            <b>releaseOrderNo</b>
+        </field>
+    </mapping>
+
+    <!--  批次放行映射  -->
+    <mapping map-id="hlSapBatchRelease">
+        <class-a>com.bmos.api.server.internal.sap.dto.BatchReleaseDTO</class-a>
+        <class-b>com.bmos.mes.sap.dto.SapBatchReleaseDTO</class-b>
+        <field>
+            <a>PRUEFLOS</a>
+            <b>inspectionNo</b>
+        </field>
+        <!-- 批次号 -->
+        <field>
+            <a>CHARG</a>
+            <b>batchNo</b>
+        </field>
+        <!-- 物料编码 -->
+        <field>
+            <a>MATNR</a>
+            <b>materialCode</b>
+        </field>
+        <!-- 系统状态 -->
+        <field>
+            <a>STATUSTEXT</a>
+            <b>systemStatus</b>
+        </field>
+        <!-- 代码评估 -->
+        <field>
+            <a>VBEWERTUNG</a>
+            <b>codeAssessment</b>
+        </field>
+        <!-- 使用决策代码 -->
+        <field>
+            <a>VCODE</a>
+            <b>decisionCode</b>
+        </field>
+        <!-- 放行-非限制使用 -->
+        <field>
+            <a>LMENGE01</a>
+            <b>nonRestricted</b>
+        </field>
+        <!-- 放行-样品消耗 -->
+        <field>
+            <a>LMENGE02</a>
+            <b>sampleConsumption</b>
+        </field>
+        <!-- 放行-废品 -->
+        <field>
+            <a>LMENGE03</a>
+            <b>scrap</b>
+        </field>
+        <!-- 放行-冻结 -->
+        <field>
+            <a>LMENGE04</a>
+            <b>frozen</b>
+        </field>
+        <!-- 放行-新物料 -->
+        <field>
+            <a>LMENGE05</a>
+            <b>newMaterial</b>
+        </field>
+        <!-- 放行-预留 -->
+        <field>
+            <a>LMENGE06</a>
+            <b>reserved</b>
+        </field>
+        <!-- 放行-退货 -->
+        <field>
+            <a>LMENGE07</a>
+            <b>returned</b>
+        </field>
+        <!-- 放行单位 -->
+        <field>
+            <a>MENGENEINH</a>
+            <b>unit</b>
+        </field>
+        <!-- 放行人 -->
+        <field>
+            <a>CREATEDBY</a>
+            <b>createdBy</b>
+        </field>
+        <!-- 放行日期 -->
+        <field >
+            <a>CPUDT</a>
+            <b>releaseDate</b>
+        </field>
+        <!-- 放行时间 -->
+        <field>
+            <a>CPUTM</a>
+            <b>releaseTime</b>
+        </field>
+    </mapping>
+
+    <!--  物料消耗映射  -->
+    <mapping map-id="ConsumeMaterialOrderDTO">
+        <class-a>com.alibaba.fastjson.JSONObject</class-a>
+        <class-b>com.bmos.api.server.outer.sap.dto.ConsumeMaterialOrderDTO</class-b>
+        <field>
+            <a>productionOrderNo</a>
+            <b>AUFNR</b>
+        </field>
+        <field>
+            <a>date</a>
+            <b>BUDAT</b>
+        </field>
+        <field>
+            <a>voucherText</a>
+            <b>BKTXT</b>
+        </field>
+
+    </mapping>
+    <mapping map-id="ConsumeMaterialDTO">
+        <class-a>com.alibaba.fastjson.JSONObject</class-a>
+        <class-b>com.bmos.api.server.outer.sap.dto.ConsumeMaterialDTO</class-b>
+        <field>
+            <a>orderRspos</a>
+            <b>RSPOS</b>
+        </field>
+        <field>
+            <a>materialCode</a>
+            <b>MATNR</b>
+        </field>
+        <field>
+            <a>factory</a>
+            <b>WERKS</b>
+        </field>
+        <field>
+            <a>sapBatchNo</a>
+            <b>CHARG</b>
+        </field>
+        <field>
+            <a>quantity</a>
+            <b>MENGE</b>
+        </field>
+        <field>
+            <a>unit</a>
+            <b>ERFME</b>
+        </field>
+        <field>
+            <a>secondaryWarehouse</a>
+            <b>LGORT</b>
+        </field>
+        <field>
+            <a>KZEAR</a>
+            <b>KZEAR</b>
+        </field>
+    </mapping>
+
+    <!--  转储移库映射  -->
+    <mapping map-id="MaterialInventoryMoveDTO">
+        <class-a>com.alibaba.fastjson.JSONObject</class-a>
+        <class-b>com.bmos.api.server.outer.sap.dto.MaterialInventoryMoveDTO</class-b>
+        <field>
+            <a>date</a>
+            <b>BUDAT</b>
+        </field>
+        <field>
+            <a>type</a>
+            <b>ZDJLX</b>
+        </field>
+        <field>
+            <a>businessDocumentNo</a>
+            <b>BKTXT</b>
+        </field>
+    </mapping>
+
+    <mapping map-id="MaterialInventoryItem">
+        <class-a>com.alibaba.fastjson.JSONObject</class-a>
+        <class-b>com.bmos.api.server.outer.sap.dto.MaterialInventoryItem</class-b>
+        <field>
+            <a>materialCode</a>
+            <b>MATNR</b>
+        </field>
+        <field>
+            <a>factory</a>
+            <b>WERKS</b>
+        </field>
+        <field>
+            <a>quantity</a>
+            <b>MENGE</b>
+        </field>
+        <field>
+            <a>unit</a>
+            <b>ERFME</b>
+        </field>
+        <field>
+            <a>batchNo</a>
+            <b>CHARG</b>
+        </field>
+        <field>
+            <a>secondaryWarehouse</a>
+            <b>LGORT</b>
+        </field>
+        <field>
+            <a>receiveSecondaryWarehouse</a>
+            <b>UMLGO</b>
+        </field>
+        <field>
+            <a>costCenter</a>
+            <b>KOSTL</b>
+        </field>
+        <field>
+            <a>productionDate</a>
+            <b>HSDAT</b>
+        </field>
+        <field>
+            <a>transferRemark</a>
+            <b>GRUND</b>
+        </field>
+        <field>
+            <a>backReason</a>
+            <b>ZREASON</b>
+        </field>
+        <field>
+            <a>operatorName</a>
+            <b>ZTLBM</b>
+        </field>
+        <field>
+            <a>checkerName</a>
+            <b>ZHDRY</b>
+        </field>
+    </mapping>
+</mappings>

@@ -1,0 +1,39 @@
+{
+  "name": "demo",
+  "version": "0.0.0",
+  "description": "demo",
+  "keywords": [
+    "demo"
+  ],
+  "license": "MIT",
+  "author": "Ansel",
+  "main": "",
+  "module": "",
+  "types": "",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "workspaces": [
+    "../../packages"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite dev",
+    "open": "npx @bmos/open open",
+    "test": "npx @bmos/open"
+  },
+  "dependencies": {
+    "@ant-design/icons-vue": "^7.0.0",
+    "@bmos/components": "workspace:^",
+    "@bmos/i18n": "workspace:^",
+    "@bmos/utils": "workspace:^",
+    "ant-design-vue": "^4.2.5"
+  },
+  "devDependencies": {
+    "@bmos/open": "workspace:^",
+    "@vitejs/plugin-vue-jsx": "^4.0.0",
+    "dayjs": "^1.11.10",
+    "less": "^4.2.0"
+  }
+}

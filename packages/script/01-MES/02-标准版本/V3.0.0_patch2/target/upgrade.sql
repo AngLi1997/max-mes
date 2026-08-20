@@ -1,0 +1,11 @@
+UPDATE bmos_mes.bm_flow_audit_category SET name = '生产配置-Конфигурация производства' WHERE id = 12002001;
+UPDATE bmos_mes.bm_flow_audit_category SET name = '生产指令单-Карта производственных инструкций' WHERE id = 12003001;
+UPDATE bmos_mes.bm_flow_audit_category SET name = '批签发-Выпуск партии' WHERE id = 12004001;
+UPDATE bmos_mes.bm_flow_audit_category SET name = '批记录-Запись о партии' WHERE id = 12005001;
+UPDATE bmos_mes.bm_flow_audit_category SET name = '记录审批-Утверждение записи' WHERE id = 12002000101;
+UPDATE bmos_mes.bm_flow_audit_category SET name = '工艺审批-Утверждение процесса' WHERE id = 12002000201;
+UPDATE bmos_mes.bm_flow_audit_category SET name = '生产BOM审批-Утверждение спецификации материалов' WHERE id = 12002000301;
+UPDATE bmos_mes.bm_flow_audit_category SET name = '操作规程审批-Утверждение операционного процесса' WHERE id = 12002000401;
+UPDATE bmos_mes.bm_flow_audit_category SET name = '指令单审批-Утверждение инструкции' WHERE id = 12003000101;
+UPDATE bmos_mes.bm_flow_audit_category SET name = '批签发审核-Проверка выпуска партии' WHERE id = 12004000101;
+UPDATE bmos_mes.bm_flow_audit_category SET name = '批记录审核-Проверка записи о партии' WHERE id = 12005000101;

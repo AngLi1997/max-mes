@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.stability.review.mapper.StabilityResultReviewMapper">
+
+    <!--
+        查询 SAMPLE_AUDIT_PENDING 状态的稳定性检验单候选列表。
+        由工作流分页驱动，这里仅做业务筛选，不分页。
+    -->
+    <select id="selectCandidatesForReview" resultType="com.bmos.lims2.server.stability.review.dto.StabilityResultReviewDTO">
+        SELECT DISTINCT
+            io.id AS inspectionOrderId,
+            sip.code AS planCode,
+            io.batch_no AS batchNo,
+            io.order_no AS orderNo,
+            sip.material_name AS materialName,
+            sip.material_code AS materialCode,
+            sip.material_spec AS materialSpec,
+            io.create_time AS requestTime,
+            io.order_status AS orderStatus,
+            io.sample_audit_process_instance_id AS processInstanceId
+        FROM lm_inspection_order io
+        INNER JOIN lm_stability_plan_timepoint_task tpTask
+            ON tpTask.inspection_order_id = io.id AND tpTask.is_deleted = 0
+        INNER JOIN lm_stability_inspect_plan sip
+            ON tpTask.plan_id = sip.id AND sip.is_deleted = 0
+        WHERE io.is_deleted = 0
+          AND io.order_status = 'SAMPLE_AUDIT_PENDING'
+          AND io.sample_audit_process_instance_id IS NOT NULL
+        <if test="query.planCode != null and query.planCode != ''">
+            AND sip.code LIKE CONCAT('%', #{query.planCode}, '%')
+        </if>
+        <if test="query.orderNo != null and query.orderNo != ''">
+            AND io.order_no LIKE CONCAT('%', #{query.orderNo}, '%')
+        </if>
+        <if test="query.batchNo != null and query.batchNo != ''">
+            AND io.batch_no LIKE CONCAT('%', #{query.batchNo}, '%')
+        </if>
+        <if test="query.materialId != null">
+            AND sip.material_id = #{query.materialId}
+        </if>
+        <if test="query.materialIds != null and query.materialIds.size() > 0">
+            AND sip.material_id IN
+            <foreach collection="query.materialIds" item="id" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        </if>
+        <if test="query.requestTimeStart != null">
+            AND io.create_time >= #{query.requestTimeStart}
+        </if>
+        <if test="query.requestTimeEnd != null">
+            AND io.create_time &lt;= #{query.requestTimeEnd}
+        </if>
+        ORDER BY io.create_time DESC, io.order_no ASC
+    </select>
+
+    <!--
+        查询稳定性审核详情页头部"请验信息"面板所需全部字段。
+    -->
+    <select id="selectStabilityAuditHeader"
+            resultType="com.bmos.lims2.server.stability.review.dto.StabilityAuditHeaderDTO">
+        SELECT
+            io.id               AS inspectionOrderId,
+            sip.code            AS planCode,
+            io.batch_no         AS batchNo,
+            io.order_no         AS orderNo,
+            sip.material_name   AS materialName,
+            sip.material_code   AS materialCode,
+            sip.material_spec   AS materialSpec,
+            ss.name             AS schemeName,
+            ss.code             AS schemeCode,
+            ssv.version_no      AS schemeVersion,
+            io.create_by        AS requestUserId,
+            io.create_time      AS requestTime,
+            io.remark
+        FROM lm_inspection_order io
+        INNER JOIN lm_stability_plan_timepoint_task tpTask
+            ON tpTask.inspection_order_id = io.id AND tpTask.is_deleted = 0
+        INNER JOIN lm_stability_inspect_plan sip
+            ON tpTask.plan_id = sip.id AND sip.is_deleted = 0
+        INNER JOIN lm_stability_scheme_version ssv
+            ON io.scheme_version_id = ssv.id AND ssv.is_deleted = 0
+        INNER JOIN lm_stability_scheme ss
+            ON ssv.scheme_id = ss.id AND ss.is_deleted = 0
+        WHERE io.id = #{orderId}
+          AND io.is_deleted = 0
+        LIMIT 1
+    </select>
+
+</mapper>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.audit.mapper.FlowAuditVersionMapper">
+
+    <select id="selectVersionList" resultType="com.bmos.lims2.server.audit.vo.FlowAuditVO">
+        SELECT
+            t1.id AS versionId,
+            t1.version as version,
+            t1.state as state,
+            t1.remark as remark,
+            t1.deployment_id as deploymentId,
+            t2.name as name,
+            t1.history_version as historyVersion
+        FROM
+            lm_flow_audit_version as t1
+          join lm_flow_audit AS t2 ON t2.id = t1.flow_audit_id
+        WHERE
+            t1.is_deleted = 0
+        and t2.is_deleted = 0
+        and flow_audit_id =#{id}
+        order by t1.version desc
+    </select>
+
+    <select id="selectMaxVersionByAuditId" resultType="java.lang.Integer">
+        select
+            version
+        from
+            lm_flow_audit_version
+        where
+            is_deleted = 0
+        and flow_audit_id =#{flowAuditId}
+        order by version desc
+        limit 1
+    </select>
+
+</mapper>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title></title>
+    <script type="text/javascript" src="../internal.js?20220503"></script>
+    <style type="text/css">
+        .wh_input {
+            width: 120px;
+        }
+
+        .section {
+            margin-top: 20px;
+        }
+
+        .wh_input_box {
+            padding: 0 10px;
+        }
+
+        #set_family_select {
+            width: 127px;
+            padding: 2px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wh_input_box">
+        <div class="section">
+            <span id="widthID"></span>
+            <input class="wh_input" id="set_width_input" onchange="widthInput()" type="number" id="J_tone" />
+        </div>
+        <div class="section">
+            <span id="heightID"></span>
+            <input class="wh_input" id="set_height_input" onchange="heightInput()" type="number" id="J_tone" />
+        </div>
+        <div class="section" id="set_size_box">
+            <span id="sizeID"></span>
+            <input class="wh_input" id="set_size_input" onchange="sizeInput()" type="number" id="J_tone" />
+        </div>
+        <div class="section" id="set_family_box">
+            <span id="familyID"></span>
+            <select name="family" id="set_family_select">
+                <option value="SimSun" id="option_SimSun"></option>
+                <option value="SimHei" id="option_SimHei"></option>
+                <option value="YaHei" id="option_YaHei"></option>
+                <option value="FangSong" id="option_FangSong"></option>
+            </select>
+        </div>
+    </div>
+    <script type="text/javascript">
+        if (!!editor.document.clickNodeList && editor.document.clickNodeList.length > 1) {
+            // 当前选中了多个节点
+            $G('set_width_input').value = ''
+            $G('set_height_input').value = ''
+            $G('set_size_input').value = ''
+            $G('set_family_select').value = ''
+        } else {
+            $G('set_width_input').value = editor.clickwh.clientWidth - 4
+            $G('set_height_input').value = editor.clickwh.clientHeight - 4
+            $G('set_size_input').value = editor.clickwh.style.fontSize.split('px')[0]
+            $G('set_family_select').value = editor.clickwh.style.fontFamily
+        }
+        if(editor.clickwh && editor.clickwh.tagName == 'IMG'){
+            $G('set_size_box').style.display = 'none'
+            $G('set_family_box').style.display = 'none'
+        }
+        // 国际化
+        $G('widthID').textContent = editor.getLang("insertframe.static.lang_input_width")
+        $G('heightID').textContent = editor.getLang("insertframe.static.lang_input_height")
+        $G('familyID').textContent = editor.getLang("insertframe.static.lang_input_family")
+        $G('sizeID').textContent = editor.getLang("insertframe.static.lang_input_size")
+        $G('option_SimSun').textContent = editor.getLang("spechars.SimSun")
+        $G('option_SimHei').textContent = editor.getLang("spechars.SimHei")
+        $G('option_YaHei').textContent = editor.getLang("spechars.YaHei")
+        $G('option_FangSong').textContent = editor.getLang("spechars.FangSong")
+        // 宽度变化
+        // const widthInput = () => {
+        //     if ($G('set_width_input').value * 1 < 80) {
+        //         $G('set_width_input').value = 80
+        //     }
+        // }
+        // // 高度变化
+        // const heightInput = () => {
+        //     if ($G('set_height_input').value * 1 < 16) {
+        //         $G('set_height_input').value = 16
+        //     }
+        // }
+        // 字号变化
+        const sizeInput = () => {
+            if ($G('set_size_input').value * 1 < 5) {
+                $G('set_size_input').value = 5
+            }
+            if ($G('set_size_input').value * 1 > 72) {
+                $G('set_size_input').value = 72
+            }
+        }
+        dialog.onok = function () {
+            if (!!editor.document.clickNodeList && editor.document.clickNodeList.length > 1) {
+                // 当前选中了多个节点
+                editor.document.clickNodeList.map((item) => {
+                    let dom = editor.document.getElementById(item)
+                    if ($G('set_width_input').value != '') {
+                        dom.style.width = $G('set_width_input').value + 'px'
+                    }
+                    if ($G('set_height_input').value != '') {
+                        dom.style.height = $G('set_height_input').value + 'px'
+                    }
+                    if ($G('set_size_input').value != '') {
+                        dom.style.fontSize = $G('set_size_input').value + 'px'
+                    }
+                    if ($G('set_family_select').value != '') {
+                        dom.style.fontFamily = $G('set_family_select').value
+                    }
+                })
+            } else {
+                editor.clickwh.style.width = $G('set_width_input').value + 'px'
+                editor.clickwh.style.height = $G('set_height_input').value + 'px'
+                editor.clickwh.style.fontSize = $G('set_size_input').value + 'px'
+                editor.clickwh.style.fontFamily = $G('set_family_select').value
+            }
+        };
+    </script>
+</body>
+
+</html>

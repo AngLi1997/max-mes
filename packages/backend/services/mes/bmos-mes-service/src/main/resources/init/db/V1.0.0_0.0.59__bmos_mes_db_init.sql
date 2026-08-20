@@ -1,0 +1,1 @@
+alter table bm_procedure_task_instance alter column flow_state drop default;

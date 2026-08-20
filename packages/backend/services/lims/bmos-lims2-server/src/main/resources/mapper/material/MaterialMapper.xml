@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.material.mapper.MaterialMapper">
+
+    <sql id="BASE_COLUM">
+        lm_inspect_material.id,
+        lm_inspect_material.category_id,
+        lm_inspect_material.principal_material_id,
+        lm_inspect_material.name,
+        lm_inspect_material.code,
+        lm_inspect_material.specification,
+        lm_inspect_material.is_sub_material,
+        lm_inspect_material.status,
+        lm_inspect_material.merge_code,
+        lm_inspect_material.package_count,
+        lm_inspect_material.unit_id,
+        lm_inspect_material.extend_unit_id,
+        lm_inspect_material.description,
+        lm_inspect_material.platform_material_id,
+        lm_inspect_material.expand_info,
+        lm_inspect_material.remark,
+        lm_inspect_material.create_by,
+        lm_inspect_material.update_by,
+        lm_inspect_material.create_time,
+        lm_inspect_material.update_time,
+        lm_inspect_material.is_deleted
+
+    </sql>
+
+    <select id="selectByParam" resultType="com.bmos.lims2.server.material.entity.Material">
+        SELECT
+            <include refid="BASE_COLUM" />
+        FROM
+        lm_inspect_material left join lm_inspect_material_category c ON lm_inspect_material.category_id = c.id
+        <if test="param.hasEnabledDocument != null and param.hasEnabledDocument">
+            INNER JOIN lm_document_material dm ON lm_inspect_material.id = dm.product_id
+            INNER JOIN lm_document_config dc ON dm.config_id = dc.id AND dc.status = 1 AND dc.is_deleted = 0
+        </if>
+        <where>
+            <if test="param.categoryType != null">
+                AND c.category_type = #{param.categoryType}
+            </if>
+            <if test="param.categoryIdList != null and param.categoryIdList.size > 0">
+                AND lm_inspect_material.category_id in
+                <foreach collection="param.categoryIdList" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="param.packageFlag != null">
+                <if test="param.packageFlag">
+                    AND lm_inspect_material.package_count > 0
+                </if>
+                <if test="!param.packageFlag">
+                    AND lm_inspect_material.package_count = 0
+                </if>
+            </if>
+            <if test="param.name != null and param.name != ''">
+                AND lm_inspect_material.name LIKE CONCAT('%', #{param.name},'%')
+            </if>
+            <if test="param.mergeCode != null and param.mergeCode != ''">
+                AND lm_inspect_material.merge_code LIKE CONCAT('%', #{param.mergeCode}, '%')
+            </if>
+            <if test="param.keyword != null and param.keyword != ''">
+                AND (lm_inspect_material.merge_code like CONCAT('%', #{param.keyword}, '%') OR lm_inspect_material.name like CONCAT('%', #{param.keyword}, '%'))
+            </if>
+            <if test="param.specification != null and param.specification != ''">
+                AND lm_inspect_material.specification LIKE CONCAT('%', #{param.specification}, '%')
+            </if>
+            <if test="param.status != null">
+                AND lm_inspect_material.status = #{param.status}
+            </if>
+            <if test="param.platformMaterialIdList != null and param.platformMaterialIdList.size > 0">
+                AND lm_inspect_material.platform_material_id in
+                <foreach collection="param.platformMaterialIdList" open="(" separator="," close=")" item="item">
+                    #{item}
+                </foreach>
+            </if>
+            AND lm_inspect_material.is_deleted = 0
+        </where>
+        <if test="param.sortOrder != null and param.sortOrder != ''">
+            ORDER BY ${param.sortOrder}
+        </if>
+    </select>
+
+    <select id="selectPageWithCategory" resultType="com.bmos.lims2.server.material.dto.MaterialDTO">
+        SELECT
+            p.*,
+            (CASE WHEN p.package_count > 0 THEN TRUE ELSE FALSE END) AS packageFlag,
+            c.name AS categoryName
+        FROM lm_inspect_material p
+        LEFT JOIN lm_inspect_material_category c ON p.category_id = c.id
+        <where>
+            <if test="param.categoryType != null">
+                AND p.category_type = #{param.categoryType}
+            </if>
+            <if test="param.categoryIdList != null and param.categoryIdList.size > 0">
+                AND p.category_id in
+                <foreach collection="param.categoryIdList" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="param.packageFlag != null">
+                <if test="param.packageFlag">
+                    AND p.package_count > 0
+                </if>
+                <if test="!param.packageFlag">
+                    AND p.package_count = 0
+                </if>
+            </if>
+            <if test="param.name != null and param.name != ''">
+                AND p.name LIKE CONCAT('%', #{param.name},'%')
+            </if>
+            <if test="param.mergeCode != null and param.mergeCode != ''">
+                AND p.merge_code LIKE CONCAT('%', #{param.mergeCode}, '%')
+            </if>
+            <if test="param.keyword != null and param.keyword != ''">
+                AND (p.merge_code like CONCAT('%', #{param.keyword}, '%') OR p.name like CONCAT('%', #{param.keyword}, '%'))
+            </if>
+            <if test="param.specification != null and param.specification != ''">
+                AND p.specification LIKE CONCAT('%', #{param.specification}, '%')
+            </if>
+            <if test="param.platformMaterialIdList != null and param.platformMaterialIdList.size > 0">
+                AND p.platform_material_id in
+                <foreach collection="param.platformMaterialIdList" open="(" separator="," close=")" item="item">
+                    #{item}
+                </foreach>
+            </if>
+            AND p.is_deleted = 0
+        </where>
+        <if test="param.sortOrder != null and param.sortOrder != ''">
+            ORDER BY ${param.sortOrder}
+        </if>
+    </select>
+    <select id="selectPrincipalList" resultType="com.bmos.lims2.server.material.dto.MaterialDTO">
+        select
+        id,
+        code,
+        name,
+        merge_code
+        from lm_inspect_material
+        where is_deleted = 0
+        and is_sub_material = false
+        <if test="filter != null and filter">
+            and status = 1
+        </if>
+        <if test="materialCategoryId != null">
+            and category_id = #{materialCategoryId}
+        </if>
+        order by merge_code asc
+    </select>
+</mapper>

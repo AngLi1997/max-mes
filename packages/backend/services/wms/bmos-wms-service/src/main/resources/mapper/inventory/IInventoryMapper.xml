@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.wms.service.inventory.mapper.IInventoryMapper">
+    <sql id="commonQuery">
+        select distinct bw_inventory.id,
+                        bw_cargo.id                        as cargo_id,
+                        bw_cargo.cargo_name,
+                        bw_cargo.cargo_code,
+                        bw_cargo.merge_code,
+                        bw_cargo.specification,
+                        cast(bw_inventory.no as signed)    as inventory_no,
+                        bw_inventory_batch.batch_no,
+                        bw_inventory.unit_id,
+                        bw_inventory.init_quantity,
+                        bw_inventory.consume_quantity,
+                        bw_inventory.available_quantity,
+                        bw_inventory.reserve_quantity,
+                        bw_inventory_batch.expired_date,
+                        bw_inventory.position_id,
+                        concat((select group_concat(bw_storage.name separator '-')
+                                from bw_storage
+                                where find_in_set(bw_storage.id, bw_cargo_position.id_path)), '-',
+                               bw_cargo_position.position) as position
+        from bw_inventory
+                 left join bw_inventory_batch
+                           on bw_inventory_batch.id = bw_inventory.inventory_batch_id
+                 left join bw_cargo on bw_cargo.id = bw_inventory.cargo_id
+                 left join bw_cargo_position on bw_inventory.position_id = bw_cargo_position.id
+                 left join bw_resource_permission on bw_cargo_position.id = bw_resource_permission.resource_id
+    </sql>
+
+    <select id="queryPageWithPositionIds" resultType="com.bmos.wms.service.inventory.vo.InventoryVO">
+        <include refid="commonQuery"/>
+        <where>
+            bw_inventory_batch.is_deleted = 0
+              and bw_cargo.is_deleted = 0
+              and bw_inventory.is_deleted = 0
+              and bw_inventory.available_quantity != 0
+              and bw_cargo_position.is_deleted = 0
+              and bw_cargo_position.enable = 1
+            <if test="query.inventoryBatchId != null">
+                and bw_inventory.inventory_batch_id = #{query.inventoryBatchId}
+            </if>
+            <if test="query.inventoryNo != null and query.inventoryNo != ''">
+                and bw_inventory.no like concat('%', #{query.inventoryNo}, '%')
+            </if>
+            <if test="positionIds != null and positionIds.size() == 0">
+                and 1 = 2
+            </if>
+            <if test="positionIds != null and positionIds.size() > 0">
+                and bw_inventory.position_id in
+                <foreach collection="positionIds" open="(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+            order by bw_inventory.id desc
+        </where>
+    </select>
+
+    <select id="queryPageWithCargoIds" resultType="com.bmos.wms.service.inventory.vo.CargoInventoryVO">
+        select distinct bw_cargo.id as id,
+                        bw_cargo.cargo_name,
+                        bw_cargo.merge_code,
+                        bw_cargo.specification,
+                        bw_inventory_batch.unit_id
+        FROM bw_cargo
+                 LEFT JOIN bw_inventory_batch ON bw_inventory_batch.cargo_id = bw_cargo.id
+        <where>
+            bw_inventory_batch.is_deleted = 0
+              and bw_cargo.is_deleted = 0
+              and bw_inventory_batch.is_deleted = 0
+            <if test="query.cargoName != null and query.cargoName != ''">
+                and bw_cargo.cargo_name like concat('%', #{query.cargoName}, '%')
+            </if>
+            <if test="query.mergeCode != null and query.mergeCode != ''">
+                and bw_cargo.merge_code like concat('%', #{query.mergeCode}, '%')
+            </if>
+            <if test="cargoIds != null and cargoIds.size() == 0">
+                and 1 = 2
+            </if>
+            <if test="cargoIds != null and cargoIds.size() > 0">
+                and bw_cargo.id in
+                <foreach collection="cargoIds" open="(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        order by merge_code
+    </select>
+
+    <select id="queryListByBatchIdAndPositionId" resultType="com.bmos.wms.service.inventory.vo.InventoryVO">
+        <include refid="commonQuery"/>
+        <where>
+            bw_inventory_batch.is_deleted = 0
+              and bw_cargo.is_deleted = 0
+              and bw_inventory.is_deleted = 0
+              and bw_inventory.available_quantity != 0
+              and bw_cargo_position.is_deleted = 0
+              and bw_cargo_position.enable = 1
+            <if test="inventoryBatchId != null">
+                and bw_inventory.inventory_batch_id = #{inventoryBatchId}
+            </if>
+            <if test="positionId != null">
+                and bw_inventory.position_id = #{positionId}
+            </if>
+            order by bw_inventory.id desc
+        </where>
+    </select>
+    <select id="queryAvailableQuantityList"
+            resultType="com.bmos.wms.service.inventory.vo.InventoryAvailableQuantityListVO">
+        SELECT
+        bw_cargo.id,
+        bw_cargo.cargo_name AS material_name,
+        bw_cargo.merge_code,
+        bw_cargo.supplier,
+        bw_cargo.producer,
+        bw_inventory.unit_id,
+        bw_cargo.specification,
+        ifnull(SUM( bw_inventory.available_quantity ), 0) - ifnull(reserve.reserve_quantity, 0 ) AS inventory_quantity
+        FROM
+        bw_cargo
+        LEFT JOIN bw_inventory_batch ON bw_cargo.id = bw_inventory_batch.cargo_id  and bw_inventory_batch.available = 1
+        LEFT JOIN bw_inventory ON bw_inventory.inventory_batch_id = bw_inventory_batch.id
+        LEFT JOIN (select bw_cargo.id as cargo_id, SUM(reserve_quantity) reserve_quantity from bw_cargo LEFT JOIN bw_inventory_reserve
+        on bw_cargo.id = bw_inventory_reserve.cargo_id
+        GROUP BY cargo_id
+        ) as reserve on reserve.cargo_id = bw_cargo.id
+        <where>
+            <if test="materialPlatformIdList != null and materialPlatformIdList.size() > 0">
+            AND bw_cargo.platform_material_id in
+                <foreach collection="materialPlatformIdList" open="(" separator="," close=")" item="pId">
+                    #{pId}
+                </foreach>
+            </if>
+        </where>
+        GROUP BY bw_cargo.id
+    </select>
+
+    <select id="listByCargoIdAndBatchId" resultType="com.bmos.wms.service.inventory.vo.CargoInventoryItemVO">
+        select bw_inventory.id,
+               bw_cargo.cargo_name,
+               bw_inventory.inventory_batch_id,
+               bw_inventory_batch.batch_no                                     as inventory_batch_no,
+               bw_inventory.no                                                 as inventory_no,
+               bw_inventory.available_quantity + bw_inventory.reserve_quantity as quantity,
+               bw_inventory.unit_id,
+               bw_inventory.position_id,
+               concat((select group_concat(bw_storage.name separator '-')
+                       from bw_storage
+                       where find_in_set(bw_storage.id, bw_cargo_position.id_path)), '-',
+                      bw_cargo_position.position)                              as position,
+               bw_inventory_batch.expired_date
+        from bw_inventory
+                 left join bw_inventory_batch on bw_inventory.inventory_batch_id = bw_inventory_batch.id
+                 left join bw_cargo_position on bw_inventory.position_id = bw_cargo_position.id
+                 left join bw_cargo on bw_inventory.cargo_id = bw_cargo.id
+        where bw_inventory.is_deleted = 0
+          and bw_inventory_batch.is_deleted = 0
+          and bw_inventory_batch.available = 1
+          and bw_cargo_position.is_deleted = 0
+          and bw_cargo.is_deleted = 0
+          and bw_cargo_position.enable = 1
+          and (bw_inventory.available_quantity + bw_inventory.reserve_quantity) > 0
+        <if test="cargoId != null">
+            and bw_inventory.cargo_id = #{cargoId}
+        </if>
+        <if test="inventoryBatchId != null">
+            and bw_inventory.inventory_batch_id = #{inventoryBatchId}
+        </if>
+        order by cast(bw_inventory.no as signed)
+    </select>
+
+    <select id="queryRealQuantityListByCargoId" resultType="com.bmos.wms.service.inventory.vo.CargoInventoryRealQuantity">
+        select a.cargo_id,
+               a.available_quantity,
+               ifnull(b.reserve_quantity, 0) as reserve_quantity
+        from (select sum(available_quantity) as available_quantity, cargo_id from bw_inventory group by cargo_id) a
+                 left join (select sum(reserve_quantity) as reserve_quantity, cargo_id from bw_inventory_reserve group by cargo_id) b
+                           on a.cargo_id = b.cargo_id
+    </select>
+
+    <select id="queryRealQuantityListByInventoryBatchId" resultType="com.bmos.wms.service.inventory.vo.CargoInventoryRealQuantity">
+        select a.inventory_batch_id,
+               a.available_quantity,
+               ifnull(b.reserve_quantity, 0) as reserve_quantity
+        from (select sum(available_quantity) as available_quantity, inventory_batch_id from bw_inventory group by inventory_batch_id) a
+                 left join (select sum(reserve_quantity) as reserve_quantity, inventory_batch_id from bw_inventory_reserve group by inventory_batch_id) b
+                           on a.inventory_batch_id = b.inventory_batch_id
+    </select>
+
+    <select id="queryAvailableQuantityByBatchId" resultType="java.math.BigDecimal">
+        select ifnull(sum(available_quantity), 0) as available_quantity
+        from bw_inventory where inventory_batch_id = #{inventoryBatchId}
+    </select>
+</mapper>

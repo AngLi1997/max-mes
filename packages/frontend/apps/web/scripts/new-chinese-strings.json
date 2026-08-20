@@ -1,0 +1,15 @@
+{
+  "态势总览": "态势总览",
+  "工艺透视": "工艺透视",
+  "分层智控": "分层智控",
+  "工序标牌编码": "工序标牌编码",
+  "白俄大屏": "白俄大屏",
+  "工艺大屏显示": "工艺大屏显示",
+  "已${item.name}": "已${item.name}",
+  "未${item.name}": "未${item.name}",
+  "${item.name}属性必填": "${item.name}属性必填",
+  "是否保存${modelName[isState.value]}？": "是否保存${modelName[isState.value]}？",
+  "是否删除该${MaterialType[props.categoryType]}": "是否删除该${MaterialType[props.categoryType]}",
+  "是否停用该${MaterialType[props.categoryType]}": "是否停用该${MaterialType[props.categoryType]}",
+  "是否启用该${MaterialType[props.categoryType]}": "是否启用该${MaterialType[props.categoryType]}"
+}

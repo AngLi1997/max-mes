@@ -1,0 +1,25 @@
+export type Formula = String;
+
+export interface formulaNode {
+  id: string;
+  node_type: string;
+}
+
+export interface configType {
+  readonly?: boolean;
+}
+
+export interface RecordPropsType {
+  formulaId?: string;
+  config?: configType;
+  activeKeys?: Array<KEY>;
+  multiple?: boolean;
+}
+
+export type emits = [
+  'error',
+  'rendered',
+  'node-click',
+  'update:activeKeys',
+  'node-dbclick',
+];

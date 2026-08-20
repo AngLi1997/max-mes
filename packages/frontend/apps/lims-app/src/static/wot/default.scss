@@ -1,0 +1,738 @@
+// Wot Design UI 默认样式
+@import '@/static/wot/common.scss';
+
+:root,
+page {
+  font-family: '思源黑体', 'Microsoft YaHei' !important;
+  line-height: 1.2;
+  // 文字大小
+  // 解释文字、说明文字
+  --bmos-font-size-desc: 10.55rpx;
+  // 次要文字、辅助文字
+  --bmos-font-size-sub: 11.72rpx;
+  // 正文、表单文字
+  --bmos-font-size-main: 12.89rpx;
+  // 按钮、列表标题、分类文字
+  --bmos-font-size-title: 14.06rpx;
+  // 大标题、导航文字
+  --bmos-font-size-large: 15.23rpx;
+  // 加粗
+  --bmos-font-size-bold: 16.41rpx;
+  --bmos-font-weight-bold: medium;
+  // 登录、注册文字
+  --bmos-font-size-login: 18.75rpx;
+
+  // 圆角
+  --bmos-border-radius-large: 7.03rpx;
+  --bmos-border-radius-medium: 4.69rpx;
+  --bmos-border-radius-small: 3.52rpx;
+
+  // 主色调
+  // 主题加深色
+  --bmos-color-primary-dark: #2260d9;
+  // 主题色
+  --bmos-color-primary: #2871ff;
+  // 辅助色
+  --bmos-color-secondary: #5991ff;
+  // 标签色
+  --bmos-color-tag: #ebf2ff;
+  // 通用-白色
+  --bmos-color-white: #fff;
+
+  // 辅助色
+  // 严重警告
+  --bmos-color-error: #ff4c26;
+  --bmos-bg-color-error: #ffd5cc;
+  // 警告
+  --bmos-color-warning: #ff9933;
+  --bmos-bg-color-warning: #ffecd9;
+  // 提示
+  --bmos-color-info: #ffc626;
+  --bmos-bg-color-info: #fff2cc;
+  // 成功
+  --bmos-color-success: #59bf78;
+  --bmos-bg-color-success: #dcf2eb;
+
+  // 配色
+  --bmos-match-color-1: #574efa;
+  --bmos-bg-match-color-1: #efeefd;
+  --bmos-match-color-2: #3ee8f7;
+  --bmos-bg-match-color-2: #e8fcfe;
+
+  // 中性色
+  // 标题文字
+  --bmos-color-text-title: #18191a;
+  // 主要文字
+  --bmos-color-text-main: #242526;
+  // 辅助文字
+  --bmos-color-text-sub: #6c6e73;
+  // 说明文字
+  --bmos-color-text-desc: #9da0a6;
+  // 占位文字
+  --bmos-color-text-placeholder: #c2c5cc;
+  // 分割线/边框
+  --bmos-color-border: #e1e3e5;
+  // disabled
+  --bmos-color-disabled: #f0f1f2;
+  // 背景色
+  --bmos-bg-color: #f2f3f5;
+  // 表单背景色
+  --bmos-bg-form: #f7f8fa;
+  // 表头色/斑马纹
+  --bmos-bg-table: #f7f7f7;
+  // 图标深色
+  --bmos-color-icon-dark: #434c59;
+  // 图标浅色
+  --bmos-color-icon-light: #b6b9bf;
+
+  // common
+  --wot-color-theme: var(--bmos-color-primary);
+  --wot-color-danger: var(--bmos-color-error);
+
+  // InputSearch 搜索框
+  --wot-search-icon-size: 10.55rpx;
+  --wot-search-input-padding: 0 18.75rpx 0 24.61rpx;
+
+  // Input 输入框
+  --wot-input-inner-height: 36.33rpx;
+  --wot-input-fs: 12.89rpx;
+  --wot-input-color: var(--bmos-color-text-main);
+  --wot-input-icon-color: var(--bmos-color-icon-dark);
+  --wot-input-disabled-color: var(--bmos-color-text-placeholder);
+  --wot-input-placeholder-color: var(--bmos-color-icon-light);
+  --wot-input-not-empty-border-color: none;
+  --wot-input-icon-size: 14.06rpx;
+  --wot-input-icon-margin: 0;
+
+  .wd-input::after {
+    display: none;
+  }
+
+  .wd-input {
+    border: 0.59rpx solid var(--bmos-color-border);
+    border-radius: var(--bmos-border-radius-medium);
+
+    .uni-input-wrapper {
+      padding: 10.55rpx 9.38rpx;
+      box-sizing: border-box;
+    }
+
+    .uni-input-placeholder {
+      left: unset;
+    }
+
+    .uni-input-input {
+      min-height: 17.58rpx;
+    }
+  }
+
+  .wd-input__body {
+    border: none;
+  }
+
+  .wd-input.is-disabled {
+    background-color: #f7f9fa;
+
+    .wd-input__icon {
+      color: var(--bmos-color-icon-light);
+      background: #f7f9fa;
+    }
+  }
+
+  .wd-input__icon.wd-icon-scan {
+    border-left: 0.94rpx solid var(--bmos-color-border);
+    color: var(--wot-color-theme);
+  }
+
+  .wd-input__icon {
+    padding: 0 9.38rpx;
+  }
+
+  .wd-input__suffix {
+    .input-text-icon {
+      border-left: 0.94rpx solid var(--bmos-color-border);
+
+      .wd-button.is-text {
+        padding: 0 9.38rpx !important;
+        height: 15.23rpx;
+      }
+    }
+  }
+
+  // Textarea 文本域
+  --wot-textarea-cell-padding: 9.38rpx 9.38rpx 0;
+  --wot-textarea-fs: 12.89rpx;
+
+  .wd-textarea {
+    padding: 9.38rpx;
+    border-radius: 4.69rpx;
+    border: 0.59rpx solid var(--bmos-color-border);
+    box-sizing: border-box;
+
+    .wd-textarea__value {
+      padding-right: 0;
+    }
+
+    .uni-textarea-textarea {
+      line-height: 1.2;
+    }
+
+    uni-textarea {
+      height: 38.67rpx;
+    }
+  }
+
+  .wd-textarea.is-disabled {
+    background-color: #f7f9fa;
+
+    .wd-textarea__value {
+      padding-right: 0;
+      background-color: #f7f9fa;
+    }
+
+    .wd-textarea__placeholder {
+      background: #f7f9fa;
+    }
+  }
+
+  // Button 按钮
+  --wot-button-large-height: 42.19rpx;
+  --wot-button-large-padding: 13.48rpx 33.98rpx;
+  --wot-button-large-fs: 12.89rpx;
+  --wot-button-large-radius: var(--bmos-border-radius-medium);
+  --wot-button-medium-height: 35.16rpx;
+  --wot-button-medium-padding: 9.96rpx 33.98rpx;
+  --wot-button-medium-fs: 12.89rpx;
+  --wot-button-medium-radius: var(--bmos-border-radius-medium);
+  --wot-button-small-height: 28.13rpx;
+  --wot-button-small-padding: 7.03rpx 14.06rpx;
+  --wot-button-small-fs: 11.72rpx;
+  --wot-button-small-radius: var(--bmos-border-radius-small);
+  --wot-button-info-bg-color: var(--bmos-color-white);
+  --wot-button-info-color: #484a4d;
+  --wot-button-success-bg-color: var(--bmos-color-tag);
+  --wot-button-success-color: var(--wot-color-theme);
+  --wot-button-warning-bg-color: var(--bmos-color-white);
+  --wot-button-warning-color: var(--bmos-color-error);
+  --wot-button-disabled-opacity: 1;
+  --wot-button-normal-disabled-color: var(--bmos-color-text-placeholder);
+
+  .wd-button.is-round::before {
+    border-radius: unset !important;
+  }
+
+  .wd-button__icon {
+    line-height: 14.06rpx;
+    margin-right: 5.86rpx !important;
+  }
+
+  .wd-button__text {
+    font-weight: 400;
+  }
+
+  .wd-button.is-round,
+  .wd-button--active {
+    border-radius: var(--bmos-border-radius-medium) !important;
+  }
+
+  .wd-button.is-round.is-small {
+    border-radius: var(--bmos-border-radius-small) !important;
+  }
+
+  .wd-button.is-primary.is-disabled.is-round,
+  .wd-button.is-success.is-disabled.is-round {
+    color: var(--bmos-color-text-placeholder);
+    background: var(--bmos-color-disabled);
+  }
+
+  .wd-button.is-info.is-disabled.is-round {
+    color: var(--bmos-color-text-placeholder);
+    border: 0.94rpx solid var(--bmos-color-disabled);
+    background: var(--bmos-color-white);
+  }
+
+  .wd-button.is-warning.is-disabled.is-round {
+    color: var(--bmos-bg-color-error);
+    border: 0.94rpx solid var(--bmos-bg-color-error);
+  }
+
+  .wd-button.is-info {
+    border: 0.94rpx solid var(--bmos-color-icon-light);
+  }
+
+  .wd-button.is-warning {
+    border: 0.94rpx solid var(--bmos-color-error);
+  }
+
+  .wd-button.is-large {
+    .wd-button__icon {
+      font-size: 18.75rpx;
+    }
+  }
+
+  .wd-button.is-medium {
+    .wd-button__icon {
+      font-size: 14.06rpx;
+    }
+  }
+
+  .wd-button.is-small {
+    .wd-button__icon {
+      font-size: 11.72rpx;
+    }
+  }
+
+  // 文字按钮
+  .wd-button.is-text.is-medium {
+    height: 25.78rpx;
+    padding: 5.86rpx 7.03rpx;
+    font-size: 11.72rpx;
+    font-weight: 500;
+  }
+
+  // Notify 消息通知
+  --wot-notify-line-height: 1.2;
+  --wot-notify-padding: 7.03rpx 11.72rpx;
+  --wot-notify-font-size: var(--bmos-font-size-sub);
+  --wot-notify-primary-background: rgba(51, 51, 51, 0.9);
+  --wot-notify-success-background: var(--bmos-bg-color-success);
+  --wot-notify-danger-background: var(--bmos-bg-color-warning);
+  --wot-notify-warning-background: var(--bmos-bg-color-error);
+
+  .wd-popup.wd-popup--top {
+    top: calc(var(--window-top) + 64.45rpx) !important;
+    width: 292.97rpx;
+    left: calc(50% - 146.48rpx);
+    border-radius: var(--bmos-border-radius-medium);
+    min-height: 28.13rpx;
+
+    .wd-notify {
+      height: 100%;
+    }
+
+    .wd-notify.wd-notify--success {
+      color: var(--bmos-color-success);
+    }
+
+    .wd-notify.wd-notify--danger {
+      color: var(--bmos-color-warning);
+    }
+
+    .wd-notify.wd-notify--warning {
+      color: var(--bmos-color-error);
+    }
+  }
+
+  // Popup 弹出层
+  --wot-popup-close-size: 14.06rpx;
+  .wd-popup {
+    max-height: unset !important;
+    overflow: unset !important;
+  }
+
+  .tip-popup .modal-container .modal-content {
+    min-height: 44.53rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14.07rpx;
+  }
+
+  // form
+  --wot-form-item-error-message-color: var(--bmos-color-error);
+  --wot-form-item-error-message-font-size: 10.55rpx;
+
+  // Badge 徽标
+  --wot-badge-border: none;
+  --wot-badge-fs: 9.38rpx;
+  --wot-badge-padding: 1.17rpx 2.34rpx;
+
+  .wd-badge__content.is-fixed {
+    z-index: 10;
+  }
+
+  //分页
+  --wot-pagination-nav-current-color: var(--bmos-color-text-main);
+
+  .wd-pager__content {
+    .wd-button {
+      border: 1px solid var(--bmos-color-icon-light) !important;
+    }
+
+    .wd-pager__separator {
+      color: var(--bmos-color-text-desc);
+    }
+
+    .wd-pager__size {
+      color: var(--bmos-color-text-desc);
+      font-size: 12.89rpx;
+    }
+  }
+
+  //tag标签
+  --wot-tag-small-fs: 9.38rpx; //字体大小
+  --wot-tag-success-bg: var(--bmos-color-success);
+  --wot-tag-warning-bg: var(--bmos-color-warning);
+  --wot-tag-danger-bg: var(--bmos-color-error);
+  --wot-tag-primary-bg: var(--bmos-color-primary);
+  --wot-tag-info-bg: #6c6e73;
+  --wot-tag-success-color: var(--bmos-color-success);
+  --wot-tag-warning-color: var(--bmos-color-warning);
+  --wot-tag-danger-color: var(--bmos-color-error);
+  --wot-tag-primary-color: var(--bmos-color-primary);
+  --wot-tag-info-color: #6c6e73;
+
+  .wd-tag {
+    height: 16.41rpx;
+    line-height: 16.41rpx;
+    border-radius: 2.34rpx !important;
+    padding: 2.34rpx 5.86rpx !important;
+    box-sizing: border-box;
+    border: none !important;
+
+    .wd-tag__text {
+      max-width: 87.89rpx;
+      white-space: nowrap;
+      /* 确保文本不会换行 */
+      overflow: hidden;
+      /* 隐藏超出部分的文本 */
+      text-overflow: ellipsis;
+      /* 超出部分用省略号表示 */
+    }
+  }
+
+  .wd-tag.is-default.is-plain {
+    background-color: var(--bmos-color-border) !important;
+  }
+  .wd-tag.is-primary.is-plain {
+    background-color: var(--bmos-color-tag) !important;
+  }
+
+  .wd-tag.is-danger.is-plain {
+    background-color: var(--bmos-bg-color-error) !important;
+  }
+
+  .wd-tag.is-warning.is-plain {
+    background-color: var(--bmos-bg-color-warning) !important;
+  }
+
+  .wd-tag.is-success.is-plain {
+    background-color: var(--bmos-bg-color-success) !important;
+  }
+
+  .smallTag {
+    //小号tag(不加custom-class="smallTag"则默认情况为大号)
+    height: 12.89rpx;
+    line-height: 12.89rpx;
+    padding: 1.17rpx 3.52rpx !important;
+
+    .wd-tag__text {
+      max-width: 70.31rpx;
+      font-size: 7.03rpx;
+    }
+  }
+
+  // Sidebar 侧边栏
+  --wot-sidebar-bg: var(--bmos-bg-color);
+  --wot-sidebar-width: 185.16rpx;
+  --wd-sidebar-border-radius: 7.03rpx;
+  --wd-sidebar-font-size: 12.89rpx;
+  --wd-sidebar-color: var(--bmos-color-text-sub);
+  --wd-sidebar-active-border-width: 3.52rpx;
+  --wd-sidebar-active-border-height: 15.23rpx;
+  --wd-sidebar-active-border-width: 2.34rpx;
+  --wd-sidebar-item-line-height: 1.2;
+
+  .wd-sidebar-item {
+    padding: 9.96rpx 14.06rpx !important;
+    font-weight: 500 !important;
+    font-size: 12.89rpx !important;
+    justify-content: left !important;
+    .wd-sidebar-item__badge {
+      @extend .bmos-ellipsis;
+    }
+  }
+  // 分类项样式
+  .categoryItems {
+    font-size: 11.72rpx !important;
+    color: #9da0a6 !important;
+    border-radius: 0rpx !important;
+    border-bottom: 0.59rpx solid #e1e3e5;
+    padding-left: 9.38rpx !important;
+    .bmos-app-icon {
+      margin-right: 2.93rpx;
+    }
+  }
+
+  //分段器
+  --wot-segmented-item-color: var(--bmos-color-text-sub);
+
+  .wd-segmented__item {
+    line-height: 26.95rpx !important;
+  }
+
+  .wd-segmented__item-label {
+    font-size: 12.89rpx;
+  }
+
+  .wd-segmented__item.is-active {
+    font-weight: 513 !important;
+    color: var(--bmos-color-text-main);
+  }
+
+  //tab标签页
+  --wot-tabs-nav-height: 39.84rpx;
+  --wot-tabs-nav-color: var(--bmos-color-text-sub);
+
+  .wd-tabs__nav-item {
+    padding: 0px 10px;
+    font-size: 14.06rpx !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .wd-tabs__nav-item.is-active {
+    font-weight: 513 !important;
+    color: var(--bmos-color-text-main);
+  }
+
+  .wd-tabs__line {
+    border-radius: 2.34rpx !important;
+    height: 3.52rpx !important;
+    width: 37.5rpx !important;
+    bottom: 0rpx !important;
+  }
+
+  //单选
+  --wot-radio-margin: 0rpx;
+  --wot-radio-label-fs: 12.89rpx;
+  --wot-radio-size: 18.75rpx;
+  --wot-radio-button-min-width: 35.16rpx;
+  --wot-radio-button-max-width: 84.38rpx;
+
+  .wd-radio {
+    height: 38.67rpx;
+    box-sizing: border-box;
+
+    .wd-radio__label {
+      margin-right: 9.38rpx;
+      text-align: left;
+      color: var(--bmos-color-text-sub);
+      line-height: 1.2;
+      word-break: break-all;
+    }
+  }
+  .wd-radio.is-dot .wd-radio__shape {
+    min-width: 18.75rpx;
+    min-height: 18.75rpx;
+  }
+
+  .wd-radio-group.is-button {
+    padding: 0rpx !important;
+  }
+
+  .wd-radio.is-button {
+    height: 30.47rpx;
+  }
+
+  .wd-radio.is-button-radio {
+    padding: 0rpx 7.03rpx 0rpx 0rpx !important;
+  }
+
+  .wd-icon-check-bold:before {
+    // 复选框 √ 的大小
+    font-size: 12.89rpx;
+  }
+
+  .wd-radio.is-checked {
+    .wd-radio__label {
+      color: var(--bmos-color-primary);
+    }
+  }
+
+  .wd-radio.is-button.is-checked .wd-radio__label {
+    background-color: #ebf2ff !important;
+  }
+
+  // 伪元素改单选样式为复选的√
+  .wd-radio.is-dot .wd-radio__shape[data-v-2fd539cb]::before {
+    content: '';
+    position: absolute;
+    left: 4.1rpx;
+    top: 0.29rpx;
+    width: 5.86rpx;
+    height: 9.96rpx;
+    border-radius: 0rpx;
+    background: none;
+    border-right: 1.76rpx solid #fff;
+    border-bottom: 1.76rpx solid #fff;
+    transform: rotate(45deg) !important;
+  }
+
+  // 按钮式单选
+  --wot-radio-button-radius: var(--bmos-border-radius-medium);
+  --wot-radio-button-fs: 11.72rpx !important;
+
+  .wd-radio.is-button .wd-radio__label {
+    height: 30.47rpx !important;
+    line-height: 11.72rpx;
+    padding: 8.2rpx 11.72rpx !important;
+    box-sizing: border-box !important;
+  }
+
+  //复选框
+  --wot-checkbox-size: 18.75rpx;
+  --wot-checkbox-label-fs: 12.89rpx;
+  --wot-checkbox-disabled-check-bg: var(--bmos-color-disabled);
+
+  .wd-checkbox__shape {
+    border-radius: var(--bmos-border-radius-medium) !important;
+    border: 0.76rpx solid var(--wot-checkbox-border-color, #dcdcdc) !important;
+  }
+
+  .wd-checkbox.is-checked .wd-checkbox__shape {
+    border: none !important;
+  }
+
+  .wd-checkbox.is-inline {
+    vertical-align: middle;
+  }
+
+  //开关
+  --wot-switch-width: 37.5rpx;
+  --wot-switch-height: 21.09rpx;
+  --wot-switch-circle-size: 18.75rpx;
+
+  //计数器
+  --wot-input-number-btn-width: 32.81rpx;
+  --wot-input-number-height: 32.81rpx;
+  --wot-input-number-input-width: 37.5rpx;
+  --wot-input-number-fs: 12.89rpx;
+
+  .wd-input-number__action {
+    background: var(--bmos-color-disabled);
+    border-radius: var(--bmos-border-radius-medium);
+  }
+
+  .wd-input-number__action[data-v-609cd439]::after {
+    border: none;
+  }
+
+  //步骤条
+  --wot-steps-icon-size: 10.55rpx;
+  --wot-steps-icon-text-fs: 8.2rpx;
+
+  .wd-steps {
+    height: 37.5rpx;
+    padding: 4.69rpx 11.72rpx;
+    box-sizing: border-box;
+
+    .wd-icon-check-bold:before {
+      // 步骤条里复选框 √ 的大小
+      font-size: 7.62rpx;
+      color: white;
+    }
+  }
+
+  .wd-step__content {
+    margin-top: 4.1rpx !important;
+  }
+
+  .wd-step.is-finished .wd-step__title {
+    color: #73a6ff !important;
+  }
+
+  .wd-step__icon {
+    background: var(--bmos-color-border) !important;
+    border-radius: 50%;
+  }
+
+  .wd-step__title {
+    padding: 0rpx 4.69rpx;
+    font-size: 10.55rpx;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    uni-text {
+      white-space: nowrap;
+    }
+  }
+
+  .wd-step.is-finished .wd-step__icon-outer {
+    background: #73a6ff;
+    border: 2.05rpx solid #ccdfff !important;
+  }
+
+  .wd-step.is-process .wd-step__icon-outer {
+    border: 2.05rpx solid #ccdfff !important;
+  }
+
+  .wd-step.is-wait .wd-step__icon-outer {
+    background: var(--bmos-color-border);
+    border: 1.64rpx solid var(--bmos-color-border) !important;
+  }
+
+  .wd-step.is-center .wd-step__line {
+    left: 55% !important;
+  }
+
+  .wd-step__line {
+    width: 90% !important;
+  }
+
+  // Table
+  --wot-table-border-color: var(--bmos-color-border);
+
+  // Popup 弹出层
+  --wot-popup-close-color: var(--bmos-color-icon-dark);
+
+  .wd-popup__close {
+    top: 12.3rpx !important;
+    right: 11.72rpx !important;
+  }
+
+  //搜索框
+  --wot-search-input-bg: var(--bmos-bg-form);
+  --wot-search-input-fs: 11.72rpx !important;
+
+  .wd-search__clear {
+    font-size: 14.06rpx !important;
+  }
+
+  // Cell 单元格
+  --wot-cell-label-fs: var(--bmos-font-size-desc);
+  --wot-cell-title-fs: var(--bmos-font-size-sub);
+  --wot-cell-wrapper-padding: 9.38rpx;
+  --wot-cell-padding: 9.38rpx;
+  --wot-cell-label-color: var(--bmos-color-text-sub);
+  --wot-cell-required-size: 10.55rpx;
+
+  .wd-cell__label {
+    line-height: var(--bmos-font-size-main);
+    margin-top: 4.69rpx !important;
+  }
+
+  .wd-cell__title:first-child {
+    line-height: 1.2;
+  }
+
+  // tooltip 提示
+  --wot-tooltip-arrow-size: 4.1rpx;
+  --wot-tooltip-bg: var(--bmos-color-white);
+
+  // search 搜索框
+  --wot-search-icon-color: var(--bmos-color-icon-dark);
+
+  // 消除wd-row第一个元素的左margin和最后一个元素的右margin
+  .wd-row {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    .wd-col:first-child {
+      padding-left: 0 !important;
+    }
+    .wd-col:last-child {
+      padding-right: 0 !important;
+    }
+  }
+}

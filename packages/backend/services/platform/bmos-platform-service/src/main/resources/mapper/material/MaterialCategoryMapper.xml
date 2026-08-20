@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.platform.service.material.mapper.MaterialCategoryMapper">
+
+    <select id="selectIdsByKeyWord" resultType="java.lang.Long">
+        select id from bp_material_category
+        where is_deleted = 0
+        <if test="keyword != null and keyword != ''">
+            AND
+            (NAME LIKE concat('%',#{keyword},'%') OR merge_code LIKE concat('%',#{keyword},'%'))
+        </if>
+    </select>
+</mapper>

@@ -1,0 +1,145 @@
+.dc-layout .dc-layout-header {
+  padding-inline: 8px;
+}
+
+.header-tabs .dc-tabs-nav::before {
+  border-bottom: none;
+}
+
+.dc-tabs-tab:not(.dc-tabs-tab-active) .dc-tabs-tab-remove {
+  opacity: 0;
+}
+
+.dc-tabs-tab:hover .dc-tabs-tab-remove {
+  opacity: 1;
+}
+
+.operation-area {
+  display: flex;
+  align-items: center;
+  column-gap: 12px;
+}
+
+.operation-area button {
+  padding: 0;
+}
+
+.save-confirm .save-confirm-btn {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 20px;
+  column-gap: 16px;
+}
+
+.template-edit {
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  justify-content: space-between;
+  height: inherit;
+  height: 100%;
+  padding: 16px;
+}
+
+.template-edit-opeartion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+  padding: 9px 9px 16px;
+}
+
+.template-edit-opeartion .opeartion-container {
+  display: flex;
+  column-gap: 16px;
+}
+
+.template-edit-content {
+  display: flex;
+  flex: 1;
+  height: inherit;
+  height: calc(100% - 92px);
+}
+
+.dc-modal-confirm-content {
+  width: 100%;
+  max-width: 100%;
+}
+
+.dc-break-line-container {
+  width: 100%;
+  height: 0;
+}
+
+.dc-break-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 0;
+  border-bottom: 1px solid #ff5633;
+}
+
+/* 二级页面返回 */
+.config-return-modal {
+  .dc-modal-content {
+    .dc-modal-body {
+      .footer-btns {
+        justify-content: end;
+        width: 100%;
+        margin-top: 20px;
+      }
+    }
+  }
+}
+
+.common {
+  height: 100%;
+}
+
+.right-container {
+  .dc-table-placeholder {
+    height: 174px;
+  }
+}
+
+.crumb {
+  line-height: 36px;
+
+  .crumb-allow-click {
+    cursor: pointer;
+  }
+}
+
+.tab-page-header {
+  padding-top: 15px;
+}
+
+.tab-page-header .dc-tabs-nav {
+  margin-bottom: 0;
+}
+
+.tab-page-header .dc-tabs-nav-wrap {
+  padding-left: 16px;
+}
+
+.review-table {
+  padding-top: 26px;
+}
+
+.delete-btn {
+  color: var(--bmos-danger-color);
+  cursor: pointer;
+}
+
+.dc-tree-select-dropdown .dc-select-tree .dc-select-tree-checkbox {
+  margin-block-start: 0;
+}
+
+.dc-detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0;
+  padding-bottom: 8px;
+}

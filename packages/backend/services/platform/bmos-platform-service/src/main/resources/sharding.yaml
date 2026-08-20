@@ -1,0 +1,52 @@
+databaseName: bmos_platform
+dataSources:
+  ds_0:
+    dataSourceClassName: com.zaxxer.hikari.HikariDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    jdbcUrl: $${SHARDING_JDBC_JDBC_URL::}
+    username: $${SHARDING_JDBC_USERNAME::}
+    password: $${SHARDING_JDBC_PASSWORD::}
+rules:
+  - !SINGLE
+    tables:
+      - "*.*"
+  - !SHARDING
+    tables:
+      bp_operation_log:
+        actualDataNodes: ds_0.bp_operation_log_${0..4}_0${1..9}, ds_0.bp_operation_log_${0..4}_${10..12}
+        tableStrategy:
+          standard:
+            shardingColumn: create_time
+            shardingAlgorithmName: bp_operation_log_date
+      bp_signature_log:
+        actualDataNodes: ds_0.bp_signature_log_${0..4}_0${1..9}, ds_0.bp_signature_log_${0..4}_${10..12}
+        tableStrategy:
+          standard:
+            shardingColumn: create_time
+            shardingAlgorithmName: bp_signature_log_date
+      bp_login_log:
+        actualDataNodes: ds_0.bp_login_log_0${1..9}, ds_0.bp_login_log_${10..12}
+        tableStrategy:
+          standard:
+            shardingColumn: create_time
+            shardingAlgorithmName: bp_login_log_date
+    shardingAlgorithms:
+      bp_operation_log_date:
+        type: CLASS_BASED
+        props:
+          strategy: STANDARD
+          algorithmClassName: com.bmos.platform.service.config.sharding.OperationDivideShadingAlgorithm
+      bp_signature_log_date:
+        type: CLASS_BASED
+        props:
+          strategy: STANDARD
+          algorithmClassName: com.bmos.platform.service.config.sharding.SignDivideShardingAlgorithm
+      bp_login_log_date:
+        type: CLASS_BASED
+        props:
+          strategy: STANDARD
+          algorithmClassName: com.bmos.platform.service.config.sharding.LoginDivideShardingAlgorithm
+    bindingTables:
+      - bp_login_log
+props:
+  sql-show: true

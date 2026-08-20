@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.process.mapper.ProductScheduleProcedureConfigMapper">
+
+    <resultMap type="com.bmos.mes.service.process.model.ProductScheduleProcedureConfig" id="ProductScheduleProcedureConfigMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="processId" column="process_id" jdbcType="INTEGER"/>
+        <result property="procedureId" column="procedure_id" jdbcType="INTEGER"/>
+        <result property="seq" column="seq" jdbcType="INTEGER"/>
+    </resultMap>
+    <select id="selectListWithProcesName"
+            resultType="com.bmos.mes.service.query.dto.ProductScheduleProcedureConfigDTO">
+        select product_schedule_procedure_config.*,
+               bm_process.name   processName,
+               bm_procedure.name procedureName
+        from product_schedule_procedure_config
+                 left join bm_process on product_schedule_procedure_config.process_id = bm_process.id
+                 left join bm_procedure on product_schedule_procedure_config.procedure_id = bm_procedure.id
+    </select>
+
+</mapper>
+

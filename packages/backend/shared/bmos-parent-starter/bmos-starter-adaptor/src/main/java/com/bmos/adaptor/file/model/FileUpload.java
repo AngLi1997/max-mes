@@ -1,0 +1,14 @@
+package com.bmos.adaptor.file.model;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import org.springframework.web.multipart.MultipartFile;
+
+@Getter
+@Setter
+@ToString
+public class FileUpload {
+    private Boolean originalName = true;
+    private MultipartFile file;
+}

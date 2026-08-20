@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.plan.production.mapper.ProductionPlanMapper">
+
+        <select id="listPage" resultType="com.bmos.mes.service.plan.production.model.ProductionPlan">
+            SELECT
+            bm_production_plan.*,MAX(bm_production_plan_item.end_time) as plan_end_date
+            FROM
+                bm_production_plan
+            left join bm_production_plan_item on bm_production_plan_item.production_plan_id = bm_production_plan.id
+            WHERE
+            bm_production_plan.is_deleted = 0
+            <if test="planName != null and planName != ''">
+                and bm_production_plan.plan_name like concat('%',#{planName},'%')
+            </if>
+            <if test="planType != null and planType != ''">
+                and bm_production_plan.plan_type =#{planType}
+            </if>
+            <if test="planState != null and planState != ''">
+                and bm_production_plan.plan_state =#{planState}
+            </if>
+            GROUP BY
+            bm_production_plan.id
+            order by
+            bm_production_plan.plan_state desc,bm_production_plan.create_time desc
+        </select>
+
+        <select id="selectDetailById" resultType="com.bmos.mes.service.plan.production.vo.ProductionPlanDetailVO">
+            SELECT
+                t1.plan_name as planName,
+                t1.plan_type as planType,
+                t1.plan_first_date as planFirstDate,
+                t1.plan_number as planNumber,
+                t1.duration as duration,
+                t2.`name` as planTemplateName
+            FROM
+                bm_production_plan AS t1
+                JOIN bm_plan_template AS t2 ON t1.plan_template_id = t2.id
+            WHERE
+                t1.is_deleted = 0
+                AND t2.is_deleted = 0
+                AND t1.id =#{id}
+        </select>
+</mapper>

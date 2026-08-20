@@ -1,0 +1,21 @@
+package com.bmos.lims2.server.eln.record.service;
+
+
+import com.bmos.lims2.server.eln.record.entity.BatchRecordParse;
+
+import java.util.List;
+
+public interface BatchRecordParseService {
+
+
+    Boolean saveOrUpdateParse(List<BatchRecordParse> parses);
+
+
+    Boolean saveOrUpdateOne(BatchRecordParse convertToParseDo);
+
+    List<BatchRecordParse> selectByItemId(List<Long> itemIdS);
+
+    void insertBatch(List<BatchRecordParse> parseList);
+
+    void deleteParseById(Long itemId);
+}

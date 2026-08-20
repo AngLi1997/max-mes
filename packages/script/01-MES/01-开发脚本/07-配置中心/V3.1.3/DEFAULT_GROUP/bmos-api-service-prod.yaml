@@ -1,0 +1,37 @@
+db:
+  schema: bmos_api
+xxlJobExecutorPort: 60701
+hl:
+  lims:
+    ## sendInspectOrderWebServiceUrl: https://cpi-q5m20zkw.it-cpi010-rt.cpi.cn40.apps.platform.sapcloud.cn/cxf/MES001_VAC_QAS_SOAP?wsdl
+    sendInspectOrderWebServiceUrl: https://cpi-q5m20zkw.it-cpi010-rt.cpi.cn40.apps.platform.sapcloud.cn/cxf/MES001_VAC_SAT_SOAP?wsdl
+  cpi:
+    userName: sap_cpi2@hualanbacterin.com
+    password: Hlsap_cpi2
+  sap:
+    url:
+      syncWorkOrderStatus: https://cpi-q5m20zkw.it-cpi010-rt.cpi.cn40.apps.platform.sapcloud.cn/http/PP005/QAS
+      consumeMaterial: https://cpi-q5m20zkw.it-cpi010-rt.cpi.cn40.apps.platform.sapcloud.cn/http/PP002/QAS
+      reportWorkHors: https://cpi-q5m20zkw.it-cpi010-rt.cpi.cn40.apps.platform.sapcloud.cn/http/PP006/QAS			
+      queryMaterialInspectInfo: https://cpi-q5m20zkw.it-cpi010-rt.cpi.cn40.apps.platform.sapcloud.cn/http/QM005/QAS
+      moveMaterialInventory: https://cpi-q5m20zkw.it-cpi010-rt.cpi.cn40.apps.platform.sapcloud.cn/http/MM025/QAS
+    cpi:
+      userName: sb-9610ec90-e14e-4fff-9bb8-3a7d451848be!b3723|it-rt-cpi-q5m20zkw!b39
+      password: 82afecc8-3206-4ab0-b57c-3d0735e0bde7$p9f1XgQ5wMRCsx70F0pmoOzI2VASjDOxtt095PW0-jQ=
+bmos:
+  application:
+    code: bmos-${spring.application.name}
+  auth:
+    exclude-urls:
+      - ${server.servlet.context-path}/swagger-ui/**
+      - ${server.servlet.context-path}/swagger-resources/**
+      - ${server.servlet.context-path}/api-docs
+      - ${server.servlet.context-path}/v3/api-docs
+    activeUrls:
+      - ${server.servlet.context-path}/user/active
+      - ${server.servlet.context-path}/user/actived
+      - ${server.servlet.context-path}/user/mac
+      - ${server.servlet.context-path}/**
+    enable: true
+
+  

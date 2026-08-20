@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.weigh.centre.execute.mapper.IWeighExecuteWeighRecordMapper">
+
+    <select id="queryRecordResultByTaskId"
+            resultType="com.bmos.mes.service.weigh.centre.execute.vo.WeighExecuteWeighRecordResult">
+        select bm_weigh_execute_weigh_record.id,
+               bm_weigh_execute_weigh_record.storage_material_id,
+               bm_weigh_execute_weigh_record.storage_material_no,
+               bm_material.name as material_name,
+               bm_material.merge_code as material_merge_code,
+               bm_material_category.category_type,
+               bm_weigh_execute_weigh_record.storage_material_batch_no,
+               bm_weigh_execute_weigh_record.tare_weight,
+               bm_weigh_execute_weigh_record.gross_weight,
+               bm_weigh_execute_weigh_record.net_weight,
+               bm_weigh_execute_weigh_record.unit_id,
+               bm_product_plan.product_name,
+               bm_product_plan.product_merge_code,
+               bm_product_plan.batch_no,
+               bm_product_plan.process_name,
+               bm_weigh_execute_weigh_record.weigher_id,
+               bm_weigh_execute_weigh_record.re_checker_id,
+               bm_weigh_execute_weigh_record.weigh_time,
+               bm_weigh_execute_weigh_record.container_name,
+               bm_weigh_execute_weigh_record.material_position_name,
+               bm_weigh_execute_weigh_record.weigh_type,
+               bm_weigh_execute_weigh_record.sign_status
+        from bm_weigh_execute_weigh_record
+                 left join bm_weigh_task on bm_weigh_task.id = bm_weigh_execute_weigh_record.task_id and bm_weigh_task.is_deleted = 0
+                 left join bm_material on bm_material.id = bm_weigh_task.material_id and bm_material.is_deleted = 0
+                 left join bm_product_plan on bm_product_plan.id = bm_weigh_execute_weigh_record.product_plan_id and bm_product_plan.is_deleted = 0
+                 left join bm_material_category on bm_material_category.id = bm_material.material_category_id and bm_material_category.is_deleted = 0
+        where bm_weigh_execute_weigh_record.is_deleted = 0
+          and bm_weigh_execute_weigh_record.task_id = #{taskId}
+        order by weigh_time desc
+    </select>
+</mapper>

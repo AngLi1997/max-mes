@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.execute.mapper.ExecuteRecordCopyMapper">
+    <update id="discardRecordItem">
+        update bm_execute_record_copy set is_discard = true
+        where
+        product_plan_id = #{productPlanId}
+        and record_item_id = #{recordItemId}
+        and is_reuse = #{reuse}
+        and version = #{copyVersion}
+        and is_discard = false
+        <if test="!reuse">
+            and procedure_step_id = #{procedureStepId}
+        </if>
+    </update>
+
+    <select id="getMaxVersion" resultType="java.lang.Long">
+        select max(version)
+        from bm_execute_record_copy
+        where
+            product_plan_id = #{productPlanId}
+            and record_item_id = #{recordItemId}
+            and is_reuse = #{reuse}
+        <if test="!reuse">
+            and procedure_step_id = #{procedureStepId}
+        </if>
+    </select>
+    <select id="getCopyVersionList" resultType="com.bmos.mes.service.execute.vo.CopyRecordItemVO">
+        select distinct
+            version,
+            is_discard as discard,
+            procedure_change_number,
+            process_change_number
+        from bm_execute_record_copy
+        where
+        product_plan_id = #{productPlanId}
+        <if test="reuse">
+            and record_item_id = #{recordItemId}
+        </if>
+        and is_reuse = #{reuse}
+        <if test="!reuse">
+            and procedure_step_id = #{procedureStepId}
+        </if>
+        <if test="procedureChangeNumber != null and !reuse">
+            and procedure_change_number =#{procedureChangeNumber}
+        </if>
+        <if test="processChangeNumber != null and !reuse">
+            and process_change_number =#{processChangeNumber}
+        </if>
+    </select>
+
+</mapper>

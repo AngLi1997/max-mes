@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.stability.scheme.mapper.StabilitySchemeJudgmentMapper">
+
+    <select id="listByParamConfigId" resultType="com.bmos.lims2.server.stability.scheme.dto.response.StabilitySchemeJudgmentDTO">
+        SELECT
+            id,
+            scheme_id ,
+            version_id ,
+            item_config_id ,
+            parameter_config_id ,
+            data_point_config_id ,
+            parameter_id ,
+            data_point_id ,
+            judgement_config_name ,
+            point_type ,
+            judgment_type ,
+            default_result ,
+            min_value ,
+            min_operator ,
+            max_value ,
+            max_operator ,
+            standard_value ,
+            expression,
+            min_time AS minTime,
+            max_time AS maxTime
+        FROM lm_stability_scheme_judgment
+        WHERE parameter_config_id = #{parameterConfigId}
+          AND is_deleted = 0
+        ORDER BY id ASC
+    </select>
+
+</mapper>

@@ -1,0 +1,1 @@
+function n(n,r){var t=null;return function(){t&&clearTimeout(t),t=setTimeout((()=>{n.apply(this,arguments),t=null}),r)}}function r(n){if(!n)return!0;for(var r in n)return!1;return!0}export{n as d,r as i};

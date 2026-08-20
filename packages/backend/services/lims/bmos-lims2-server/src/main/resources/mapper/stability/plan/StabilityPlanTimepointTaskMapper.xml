@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.stability.plan.mapper.StabilityPlanTimepointTaskMapper">
+
+    <select id="selectBySampleId" resultType="com.bmos.lims2.server.stability.plan.entity.StabilityPlanTimepointTask">
+        SELECT *
+        FROM lm_stability_plan_timepoint_task
+        WHERE sample_id = #{sampleId}
+          AND is_deleted = 0
+        ORDER BY time_value ASC, id ASC
+    </select>
+
+    <select id="selectByPlanId" resultType="com.bmos.lims2.server.stability.plan.entity.StabilityPlanTimepointTask">
+        SELECT *
+        FROM lm_stability_plan_timepoint_task
+        WHERE plan_id = #{planId}
+          AND is_deleted = 0
+        ORDER BY batch_id ASC, scheme_plan_id ASC, time_value ASC
+    </select>
+
+    <select id="selectByPlanIdAndBatchId"
+            resultType="com.bmos.lims2.server.stability.plan.entity.StabilityPlanTimepointTask">
+        SELECT *
+        FROM lm_stability_plan_timepoint_task
+        WHERE plan_id  = #{planId}
+          AND batch_id = #{batchId}
+          AND is_deleted = 0
+        ORDER BY scheme_plan_id ASC, time_value ASC
+    </select>
+
+    <delete id="deleteByPlanId">
+        DELETE FROM lm_stability_plan_timepoint_task
+        WHERE plan_id = #{planId}
+    </delete>
+
+    <select id="selectByInspectionOrderId" resultType="com.bmos.lims2.server.stability.plan.entity.StabilityPlanTimepointTask">
+        SELECT *
+        FROM lm_stability_plan_timepoint_task
+        WHERE inspection_order_id = #{inspectionOrderId}
+          AND is_deleted = 0
+        LIMIT 1
+    </select>
+
+    <!-- 查询所有到期且所属计划为进行中的未处理时间点任务 -->
+    <select id="selectDueTasks" resultType="com.bmos.lims2.server.stability.plan.entity.StabilityPlanTimepointTask">
+        SELECT t.*
+        FROM lm_stability_plan_timepoint_task t
+        INNER JOIN lm_stability_inspect_plan p ON p.id = t.plan_id AND p.is_deleted = 0
+        WHERE t.is_deleted = 0
+          AND t.status = 'NOT_STARTED'
+          AND t.planned_date &lt;= #{today}
+          AND p.status = 'IN_PROGRESS'
+        ORDER BY t.plan_id ASC, t.batch_id ASC, t.time_value ASC
+    </select>
+
+    <!-- 查询指定计划下到期未处理的时间点任务，用于计划恢复时补触发 -->
+    <select id="selectDueTasksByPlanId" resultType="com.bmos.lims2.server.stability.plan.entity.StabilityPlanTimepointTask">
+        SELECT *
+        FROM lm_stability_plan_timepoint_task
+        WHERE is_deleted = 0
+          AND plan_id = #{planId}
+          AND status = 'NOT_STARTED'
+          AND planned_date &lt;= #{today}
+        ORDER BY batch_id ASC, time_value ASC
+    </select>
+
+
+    <!-- 分页查询 WAITING_SAMPLE 状态的时间点取样列表 -->
+    <select id="pageTimepointSamples"
+            resultType="com.bmos.lims2.server.stability.plan.dto.response.StabilityTimepointSampleDTO">
+        SELECT
+            t.id                AS timepointTaskId,
+            s.sample_no         AS sampleNo,
+            b.batch_no          AS batchNo,
+            p.code              AS planCode,
+            p.id                AS planId,
+            o.order_no          AS orderNo,
+            o.create_time       AS requestTime,
+            p.material_name     AS materialName,
+            p.material_code     AS materialCode,
+            p.material_spec     AS materialSpec,
+            t.experiment_type   AS experimentType,
+            t.storage_condition AS storageCondition,
+            t.sample_amount     AS plannedSampleAmount,
+            t.sample_unit       AS sampleUnit,
+            t.batch_id          AS batchId,
+            t.scheme_plan_id    AS schemePlanId,
+            m.unit_id           AS materialUnitId
+        FROM lm_stability_plan_timepoint_task t
+        JOIN lm_stability_inspect_plan p
+            ON p.id = t.plan_id AND p.is_deleted = 0
+        JOIN lm_stability_inspect_plan_batch b
+            ON b.id = t.batch_id AND b.is_deleted = 0
+        JOIN lm_inspection_order o
+            ON o.id = t.inspection_order_id AND o.is_deleted = 0
+        LEFT JOIN lm_sample s
+            ON s.inspection_order_id = o.id AND s.is_deleted = 0
+        LEFT JOIN lm_inspect_material m
+            ON m.id = p.material_id AND m.is_deleted = 0
+        WHERE t.is_deleted = 0
+          AND t.status = 'WAITING_SAMPLE'
+        <if test="query.sampleNo != null and query.sampleNo != ''">
+            AND s.sample_no LIKE CONCAT('%', #{query.sampleNo}, '%')
+        </if>
+        <if test="query.batchNo != null and query.batchNo != ''">
+            AND b.batch_no LIKE CONCAT('%', #{query.batchNo}, '%')
+        </if>
+        <if test="query.planCode != null and query.planCode != ''">
+            AND p.code LIKE CONCAT('%', #{query.planCode}, '%')
+        </if>
+        <if test="query.orderNo != null and query.orderNo != ''">
+            AND o.order_no LIKE CONCAT('%', #{query.orderNo}, '%')
+        </if>
+        <if test="query.requestTimeStart != null">
+            AND o.create_time &gt;= #{query.requestTimeStart}
+        </if>
+        <if test="query.requestTimeEnd != null">
+            AND o.create_time &lt;= #{query.requestTimeEnd}
+        </if>
+        ORDER BY o.create_time DESC, s.sample_no ASC
+    </select>
+
+</mapper>

@@ -1,0 +1,40 @@
+spring:
+  profiles:
+    active: prod
+  application:
+    name: bmos-mes-service
+  cloud:
+    compatibility-verifier:
+      enabled: false
+    nacos:
+      discovery:
+        server-addr: ${NACOS_HOST:172.30.1.160}:${NACOS_PORT:8848}
+        instance-enabled: ${NACOS_ENABLE_SERVICE:true}
+        register-enabled: ${NACOS_ENABLE_SERVICE:true}
+        username: nacos
+        password: nacos
+      config:
+        server-addr: ${NACOS_HOST:172.30.1.160}:${NACOS_PORT:8848}
+        shared-configs:
+          - data-id: application.yaml
+            group-id: DEFAULT_GROUP
+            refresh: true
+          - data-id: bmos-redis.yaml
+            group-id: DEFAULT_GROUP
+            refresh: true
+          - data-id: bmos-xxl-job.yaml
+            group-id: DEFAULT_GROUP
+          - data-id: ${spring.application.name}-backend-i18n-config.yaml
+            group: backend-i18n
+            refresh: true
+        file-extension: yaml
+        username: nacos
+        password: nacos
+  config:
+    import:
+      - optional:nacos:bmos-xxl-job.yaml
+      - optional:nacos:bmos-redis.yaml
+      - optional:nacos:application.yaml
+      - optional:nacos:${spring.application.name}-${spring.profiles.active}.yaml
+      - optional:nacos:log-properties.yaml
+      - optional:nacos:${spring.application.name}-backend-i18n-config.yaml #后端国际化文件

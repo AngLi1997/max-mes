@@ -1,0 +1,2 @@
+ALTER TABLE bm_product_instruction_team MODIFY COLUMN `procedure_step_time` int DEFAULT NULL COMMENT '执行时长' ;
+ALTER TABLE bm_product_instruction_team MODIFY COLUMN `procedure_step_time_unit` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '执行时长单位';

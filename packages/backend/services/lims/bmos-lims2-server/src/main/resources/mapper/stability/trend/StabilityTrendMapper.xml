@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.stability.trend.mapper.StabilityTrendMapper">
+
+    <!-- 指定检品下的稳定性方案下拉 -->
+    <select id="selectSchemeOptions"
+            resultType="com.bmos.lims2.server.stability.statistics.dto.StabilitySchemeOptionDTO">
+        SELECT ss.id, ssv.id AS versionId, ss.name, ss.code, ssv.version_no AS versionNo
+        FROM lm_stability_scheme ss
+        INNER JOIN lm_stability_scheme_version ssv
+            ON ssv.scheme_id = ss.id
+           AND ssv.is_deleted = 0
+        WHERE ss.is_deleted = 0
+          AND ss.material_id = #{materialId}
+          AND ssv.status IN ('ACTIVE', 'INACTIVE')
+        ORDER BY ss.name, ssv.version_no DESC
+    </select>
+
+    <!-- 指定方案版本下的试验类型下拉（去重） -->
+    <select id="selectExperimentTypeOptions"
+            resultType="com.bmos.lims2.server.stability.trend.dto.StabilityTrendExperimentTypeOptionDTO">
+        SELECT DISTINCT tpTask.experiment_type AS experimentType,
+                        tpTask.storage_condition AS storageCondition
+        FROM lm_stability_plan_timepoint_task tpTask
+        INNER JOIN lm_inspection_order io
+            ON tpTask.inspection_order_id = io.id AND io.is_deleted = 0
+        INNER JOIN lm_stability_scheme_version ssv
+            ON io.scheme_version_id = ssv.id AND ssv.is_deleted = 0
+        WHERE tpTask.is_deleted = 0
+          AND ssv.id = #{versionId}
+        ORDER BY tpTask.experiment_type, tpTask.storage_condition
+    </select>
+
+    <!-- 指定方案版本下的分析项下拉（去重） -->
+    <select id="selectParameterOptions"
+            resultType="com.bmos.lims2.server.stability.trend.dto.StabilityTrendParameterOptionDTO">
+        SELECT DISTINCT ip.id, ip.code, ip.name
+        FROM lm_stability_scheme_data_point ssdp
+        INNER JOIN lm_stability_scheme_version ssv
+            ON ssdp.version_id = ssv.id AND ssv.is_deleted = 0
+        INNER JOIN lm_inspect_parameter ip
+            ON ssdp.parameter_id = ip.id AND ip.is_deleted = 0
+        WHERE ssdp.is_deleted = 0
+          AND ssv.id = #{versionId}
+        ORDER BY ip.code
+    </select>
+
+    <!-- 指定方案版本+分析项下的数据点下拉 -->
+    <select id="selectDataPointOptions"
+            resultType="com.bmos.lims2.server.stability.trend.dto.StabilityTrendDataPointOptionDTO">
+        SELECT DISTINCT ssdp.id, ssdp.name
+        FROM lm_stability_scheme_data_point ssdp
+        INNER JOIN lm_stability_scheme_version ssv
+            ON ssdp.version_id = ssv.id AND ssv.is_deleted = 0
+        WHERE ssdp.is_deleted = 0
+          AND ssv.id = #{versionId}
+          AND ssdp.parameter_id = #{parameterId}
+          AND ssdp.point_type IS NOT NULL
+        ORDER BY ssdp.name
+    </select>
+
+    <!-- 指定方案版本+试验类型下的批号下拉 -->
+    <select id="selectBatchOptions"
+            resultType="com.bmos.lims2.server.stability.trend.dto.StabilityTrendBatchOptionDTO">
+        SELECT DISTINCT io.batch_no AS batchNo
+        FROM lm_inspection_order io
+        INNER JOIN lm_stability_scheme_version ssv
+            ON io.scheme_version_id = ssv.id AND ssv.is_deleted = 0
+        INNER JOIN lm_stability_plan_timepoint_task tpTask
+            ON tpTask.inspection_order_id = io.id AND tpTask.is_deleted = 0
+        WHERE io.is_deleted = 0
+          AND io.order_status = 'COMPLETED'
+          AND ssv.id = #{versionId}
+          AND tpTask.experiment_type = #{experimentType}
+          AND tpTask.storage_condition = #{storageCondition}
+        ORDER BY io.batch_no
+    </select>
+
+    <!-- 趋势查询：数据平铺行 -->
+    <select id="selectTrendData"
+            resultType="com.bmos.lims2.server.stability.trend.dto.StabilityTrendDataItemDTO">
+        SELECT
+            io.batch_no        AS batchNo,
+            tpTask.time_value  AS timeValue,
+            tpTask.time_unit   AS timeUnit,
+            ier.value_number   AS valueNumber,
+            ier.value_text     AS valueText
+        FROM lm_inspection_entry_record ier
+        INNER JOIN lm_task t
+            ON ier.task_id = t.id AND t.is_deleted = 0
+        INNER JOIN lm_inspection_order io
+            ON t.inspection_order_id = io.id AND io.is_deleted = 0
+        INNER JOIN lm_stability_scheme_version ssv
+            ON io.scheme_version_id = ssv.id AND ssv.is_deleted = 0
+        INNER JOIN lm_stability_plan_timepoint_task tpTask
+            ON tpTask.inspection_order_id = io.id AND tpTask.is_deleted = 0
+        INNER JOIN lm_stability_scheme_data_point ssdp
+            ON ier.data_point_config_id = ssdp.id AND ssdp.is_deleted = 0
+        WHERE ier.is_deleted = 0
+          AND io.order_status = 'COMPLETED'
+          AND ssv.id = #{query.versionId}
+          AND tpTask.experiment_type = #{query.experimentType}
+          AND tpTask.storage_condition = #{query.storageCondition}
+          AND ssdp.parameter_id = #{query.parameterId}
+          AND ssdp.name = #{query.dataPointName}
+        <if test="query.batchNo != null and query.batchNo != ''">
+            AND io.batch_no = #{query.batchNo}
+        </if>
+        ORDER BY io.batch_no, tpTask.time_value
+    </select>
+
+    <!-- 查询数据点基本信息（用于表头，含检品信息和分析项名称） -->
+    <select id="selectDataPointById"
+            resultType="com.bmos.lims2.server.stability.trend.dto.StabilityTrendTableHeaderDTO">
+        SELECT
+            ssdp.id             AS dataPointId,
+            ssdp.name           AS dataPointName,
+            ssdp.point_type     AS pointType,
+            ip.name             AS parameterName,
+            m.name              AS materialName,
+            m.code              AS materialCode,
+            m.specification     AS materialSpec
+        FROM lm_stability_scheme_data_point ssdp
+        INNER JOIN lm_stability_scheme_version ssv
+            ON ssdp.version_id = ssv.id AND ssv.is_deleted = 0
+        INNER JOIN lm_stability_scheme ss
+            ON ssv.scheme_id = ss.id AND ss.is_deleted = 0
+        INNER JOIN lm_inspect_material m
+            ON ss.material_id = m.id AND m.is_deleted = 0
+        INNER JOIN lm_inspect_parameter ip
+            ON ssdp.parameter_id = ip.id AND ip.is_deleted = 0
+        WHERE ssdp.is_deleted = 0
+          AND ssv.id = #{versionId}
+          AND ssdp.name = #{dataPointName}
+        LIMIT 1
+    </select>
+
+    <!-- 查询指定检验单的0月数据点记录（按数据点名称匹配，兼容不同方案版本） -->
+    <select id="selectZeroMonthEntryRecords"
+            resultType="com.bmos.lims2.server.stability.trend.dto.StabilityTrendDataItemDTO">
+        SELECT
+            #{batchNo}         AS batchNo,
+            0                  AS timeValue,
+            'MONTH'            AS timeUnit,
+            ier.value_number   AS valueNumber,
+            ier.value_text     AS valueText
+        FROM lm_inspection_entry_record ier
+        INNER JOIN lm_task t
+            ON ier.task_id = t.id AND t.is_deleted = 0
+        INNER JOIN lm_inspection_order io
+            ON t.inspection_order_id = io.id AND io.is_deleted = 0
+        INNER JOIN lm_stability_scheme_data_point ssdp
+            ON ier.data_point_config_id = ssdp.id AND ssdp.is_deleted = 0
+        WHERE ier.is_deleted = 0
+          AND io.id = #{orderId}
+          AND io.order_status = 'COMPLETED'
+          AND ssdp.name = #{dataPointName}
+    </select>
+
+    <!-- 查询方案配置的时间点列（用于表头） -->
+    <select id="selectTimepointColumns"
+            resultType="com.bmos.lims2.server.stability.trend.dto.StabilityTrendTimepointColumnDTO">
+        SELECT DISTINCT
+            sspt.time_value AS timeValue,
+            sspt.time_unit AS timeUnit
+        FROM lm_stability_scheme_plan_timepoint sspt
+        INNER JOIN lm_stability_scheme_plan ssp
+            ON sspt.plan_id = ssp.id AND ssp.is_deleted = 0
+        INNER JOIN lm_stability_scheme_version ssv
+            ON ssp.version_id = ssv.id AND ssv.is_deleted = 0
+        WHERE sspt.is_deleted = 0
+          AND ssv.id = #{versionId}
+          AND ssp.experiment_type = #{experimentType}
+          AND ssp.storage_condition = #{storageCondition}
+        ORDER BY sspt.time_value
+    </select>
+
+</mapper>

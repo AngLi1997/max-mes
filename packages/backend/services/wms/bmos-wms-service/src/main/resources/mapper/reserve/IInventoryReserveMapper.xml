@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.wms.service.reserve.mapper.IInventoryReserveMapper">
+
+    <select id="queryReserveQuantityByBatchId" resultType="java.math.BigDecimal">
+        select ifnull(sum(reserve_quantity), 0) as reserve_quantity
+        from bw_inventory_reserve where inventory_batch_id = #{batchId}
+    </select>
+</mapper>

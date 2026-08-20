@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.preparation.plan.mapper.LiquidPreparationPlanMapper">
+    <select id="selectMaxSerialNo" resultType="java.lang.Integer">
+        select MAX(serial_no)
+        from bm_liquid_preparation_plan
+        where product_plan_id = #{productPlanId}
+    </select>
+    <select id="selectUnmeasuredPreparationPlanList"
+            resultType="com.bmos.mes.service.preparation.measure.vo.UnmeasuredPreparationPlanVO">
+        SELECT
+            plan.id,
+            plan.NAME,
+            COUNT( planBatch.id ) AS batchCount,
+            COUNT( measureBatch.id ) AS measureCount
+        FROM
+            bm_liquid_preparation_plan plan
+            LEFT JOIN bm_liquid_preparation_plan_material_batch planBatch ON plan.id = planBatch.liquid_preparation_plan_id
+            AND planBatch.is_deleted = 0
+            LEFT JOIN bm_liquid_preparation_measure_batch measureBatch ON measureBatch.liquid_preparation_plan_batch_id = planBatch.id
+        WHERE
+            plan.completed = TRUE
+          AND plan.is_deleted = 0
+          AND plan.product_plan_id = #{productPlanId}
+        GROUP BY
+            plan.id
+        ORDER BY
+            plan.NAME
+    </select>
+</mapper>

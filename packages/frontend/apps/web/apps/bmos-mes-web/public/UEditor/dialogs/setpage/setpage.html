@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title></title>
+    <script type="text/javascript" src="../internal.js?20220503"></script>
+    <style type="text/css">
+
+        .section {
+            margin-top: 20px;
+        }
+
+        .wh_input_box {
+            padding: 0 10px;
+        }
+
+        #set_family_select {
+            width: calc(100% - 20px);
+            padding: 2px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wh_input_box">
+        <div class="section">
+            <span id="familyID"></span>
+            <select name="family" id="set_family_select">
+                <option value="0" id="option_1">1,2,3,...</option>
+                <option value="57" id="option_2">-1-,-2-,-3-,...</option>
+                <option value="4" id="option_3">a,b,c,...</option>
+                <option value="3" id="option_4">A,B,C,...</option>
+                <option value="2" id="option_5">i,ii,iii,...</option>
+            </select>
+        </div>
+    </div>
+    <script type="text/javascript">
+        const flag = {
+            '1,2,3,...':0,
+            '-1-,-2-,-3-,...':57,
+            'a,b,c,...':4,
+            'A,B,C,...':3,
+            'i,ii,iii,...':2,
+        }
+        if(!!flag[editor.clickwh.value]){
+            $G('set_family_select').value = flag[editor.clickwh.value]
+        }
+        dialog.onok = function () {
+            
+        };
+    </script>
+</body>
+
+</html>

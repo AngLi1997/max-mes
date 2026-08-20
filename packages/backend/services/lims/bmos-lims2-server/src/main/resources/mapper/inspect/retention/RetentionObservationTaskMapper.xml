@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.inspect.retention.mapper.RetentionObservationTaskMapper">
+
+    <!-- 分页查询留样观察任务列表 -->
+    <select id="selectObservationTaskPageList" resultType="com.bmos.lims2.server.inspect.retention.dto.RetentionObservationTaskListDTO">
+        SELECT
+            t.id,
+            t.sample_id AS sampleId,
+            t.sample_no AS sampleNo,
+            t.observation_year AS observationYear,
+            t.due_date AS observationDueDate,
+            t.completed,
+            t.observation_result AS observationResult,
+            t.observation_remark AS observationRemark,
+            t.observer_id AS observerId,
+            t.observation_time AS observationTime,
+            io.batch_no AS batchNo,
+            m.name AS materialName,
+            m.code AS materialCode,
+            m.specification AS materialSpec,
+            s.current_quantity AS quantity,
+            s.unit_id AS unitId,
+            s.receive_time AS retentionTime,
+            s.receiver_id AS retentionUserId,
+            s.retention_expiry_date AS retentionExpiryDate,
+            s.storage_location AS storageLocation,
+            -- 判断是否临期（7天内到期）
+            CASE WHEN t.due_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY) THEN 1 ELSE 0 END AS isUpcoming,
+            -- 计算距离到期天数
+            DATEDIFF(t.due_date, CURDATE()) AS daysUntilDue
+        FROM lm_retention_observation_task t
+        INNER JOIN lm_sample s ON t.sample_id = s.id
+        LEFT JOIN lm_inspection_order io ON s.inspection_order_id = io.id
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        WHERE t.is_deleted = 0
+          AND s.is_deleted = 0
+          AND s.discarded = 0
+          AND t.completed = 0
+        <if test="query.materialIds != null and query.materialIds.size() > 0">
+            AND m.id IN
+            <foreach collection="query.materialIds" item="materialId" open="(" separator="," close=")">
+                #{materialId}
+            </foreach>
+        </if>
+        <if test="query.batchNo != null and query.batchNo != ''">
+            AND io.batch_no LIKE CONCAT('%', #{query.batchNo}, '%')
+        </if>
+        <if test="query.sampleNo != null and query.sampleNo != ''">
+            AND t.sample_no LIKE CONCAT('%', #{query.sampleNo}, '%')
+        </if>
+        <choose>
+            <!-- 临期任务：一周内到期 -->
+            <when test="query.queryType == 'upcoming'">
+                AND t.due_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY)
+                ORDER BY t.due_date ASC, t.sample_no ASC
+            </when>
+            <!-- 全部任务 -->
+            <otherwise>
+                ORDER BY t.due_date ASC, t.sample_no ASC
+            </otherwise>
+        </choose>
+    </select>
+
+    <!-- 查询样品的所有未完成的早于指定任务的观察任务 -->
+    <select id="selectEarlierUncompletedTasks" resultType="com.bmos.lims2.server.inspect.retention.entity.RetentionObservationTask">
+        SELECT *
+        FROM lm_retention_observation_task
+        WHERE sample_id = #{sampleId}
+          AND id != #{taskId}
+          AND completed = 0
+          AND is_deleted = 0
+          AND due_date &lt; (
+              SELECT due_date
+              FROM lm_retention_observation_task
+              WHERE id = #{taskId}
+          )
+        ORDER BY due_date ASC
+    </select>
+
+    <!-- 查询临期任务数量（指定天数内到期且未完成的任务） -->
+    <select id="countUpcomingTasks" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM lm_retention_observation_task t
+        INNER JOIN lm_sample s ON t.sample_id = s.id
+        WHERE t.is_deleted = 0
+          AND s.is_deleted = 0
+          AND s.discarded = 0
+          AND s.destroyed = 0
+          AND t.completed = 0
+          AND t.due_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL #{days} DAY)
+    </select>
+
+</mapper>

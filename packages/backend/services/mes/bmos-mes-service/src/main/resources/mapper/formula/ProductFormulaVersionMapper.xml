@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.mes.service.formula.mapper.ProductFormulaVersionMapper">
+
+    <select id="selectPageList" resultType="com.bmos.mes.service.formula.vo.ProductFormulaVersionPageVO">
+        SELECT
+            id,
+            version_no,
+            description,
+            STATUS,
+            enable,
+            process_instance_id
+        FROM bm_product_formula_version
+        WHERE
+        is_deleted = 0
+        <if test="id != null">
+            AND product_formula_id = #{id}
+        </if>
+        order by create_time desc
+    </select>
+    <select id="selectAuditBusinessIds" resultType="java.lang.Long">
+        select v.id from bm_product_formula_version v
+        join bm_product_formula f on v.product_formula_id = f.id
+        where v.is_deleted = 0
+        <if test="productName != null and productName != ''">
+            and f.product_name like concat('%',#{productName},'%')
+        </if>
+        <if test="formulaName != null and formulaName != ''">
+            and f.name like concat('%',#{formulaName},'%')
+        </if>
+    </select>
+    <select id="selectByProcessInstanceIds"
+            resultType="com.bmos.mes.service.formula.vo.ProductFormulaVersionAuditVO">
+        select v.id,f.product_name,f.product_merge_code,f.name,v.version_no,v.description,v.process_instance_id,v.unit_id
+        from bm_product_formula_version v
+        join bm_product_formula f on v.product_formula_id = f.id
+        where v.is_deleted = 0
+        <if test="ids != null and ids.size() > 0">
+            and v.process_instance_id in
+            <foreach collection="ids" separator="," open="(" close=")" item="processInstanceId">
+                #{processInstanceId}
+            </foreach>
+        </if>
+    </select>
+    <select id="selectDetailById" resultType="com.bmos.mes.service.formula.vo.ProductFormulaVersionDetailVO">
+        select v.id,f.product_name,f.product_id,f.product_merge_code,f.name,v.version_no,v.description,v.process_instance_id,v.batch_quantity,v.unit_id
+        from bm_product_formula_version v
+                 join bm_product_formula f on v.product_formula_id = f.id
+        where v.is_deleted = 0
+        and v.id = #{versionId}
+    </select>
+</mapper>

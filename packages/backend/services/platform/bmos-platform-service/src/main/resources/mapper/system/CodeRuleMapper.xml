@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.platform.service.system.code.mapper.CodeRuleMapper">
+    <select id="page" resultType="com.bmos.platform.service.system.code.vo.CodeRulePageVO">
+        select
+            t1.id,
+            t1.code,
+            t1.name,
+            t2.version
+        from bp_code_rule t1
+        left join bp_code_rule_version t2 on t1.code = t2.rule_code AND t2.STATUS = 1 AND t2.is_deleted = 0
+        where t1.is_deleted = 0
+        <if test="code != null and code != ''">
+            and t1.code like concat('%',#{code},'%')
+        </if>
+        <if test="name != null and name != ''">
+            and t1.name like concat('%',#{name},'%')
+        </if>
+        <if test="deptIds != null and deptIds.size() > 0">
+            and t1.id in
+            (select code_rule_id from bp_code_rule_dept where dept_id in
+            <foreach collection="deptIds" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>)
+        </if>
+        order by t1.create_time desc
+    </select>
+
+    <select id="detail" resultType="com.bmos.platform.service.system.code.vo.DetailCodeRuleVersionDetailVO">
+        select
+            t1.id,
+            t2.id as versionId,
+            t1.code,
+            t1.name,
+            t2.dict_id,
+            t2.version,
+            t2.description,
+            t2.reset_rule
+        from bp_code_rule t1
+        inner join bp_code_rule_version t2 on t1.code = t2.rule_code
+        where t2.id = #{versionId}
+    </select>
+
+    <select id="list" resultType="com.bmos.platform.service.system.code.vo.CodeRulePageVO">
+        select
+            t1.id,
+            t1.code,
+            t1.name,
+            t2.version
+        from bp_code_rule t1
+        left join bp_code_rule_version t2 on t1.code = t2.rule_code
+        where t1.is_deleted = 0 AND t2.is_deleted = 0
+        <if test="code != null and code != ''">
+            and t1.code like concat('%', #{code},'%')
+        </if>
+        <if test="status != null">
+            and t2.status = #{status}
+        </if>
+    </select>
+</mapper>

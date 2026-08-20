@@ -1,0 +1,1 @@
+alter table bm_procedure_task_instance_history change instance_id process_instance_id varchar(60) not null comment '发起流程后工作流程实例id';

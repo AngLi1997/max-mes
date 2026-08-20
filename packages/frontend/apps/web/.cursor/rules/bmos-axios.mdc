@@ -1,0 +1,115 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# BMOS Axios 请求库使用指南
+
+## 目录结构
+
+```
+packages/axios/
+├── src/
+│   ├── api/            # API 接口定义
+│   ├── types/          # 类型定义
+│   ├── utils/          # 工具函数
+│   ├── common/         # 通用配置
+│   ├── axios.ts        # Axios 实例配置
+│   ├── Features.ts     # 功能特性定义
+│   └── type.d.ts       # 全局类型声明
+```
+
+## 核心功能
+
+### 1. Axios 实例配置
+- 请求拦截器
+- 响应拦截器
+- 错误处理
+- 超时设置
+- Token 管理
+
+### 2. API 接口定义
+```typescript
+// 标准接口定义格式
+export const apiName = (params: TypeName): Promise<ResponseType> => {
+  return request({
+    url: '/api/path',
+    method: 'POST',
+    data: params
+  });
+};
+```
+
+### 3. 类型定义
+```typescript
+// 请求参数类型
+interface RequestParams {
+  // ...
+}
+
+// 响应数据类型
+interface ResponseData<T> {
+  code: number;
+  data: T;
+  message: string;
+}
+```
+
+## 使用规范
+
+### 1. API 调用
+```typescript
+import { apiName } from '@bmos/axios';
+
+// 使用 async/await
+try {
+  const res = await apiName(params);
+  // 处理响应
+} catch (error) {
+  // 错误处理
+}
+```
+
+### 2. 错误处理
+- 统一错误处理机制
+- 错误信息国际化
+- 错误码管理
+
+### 3. 请求配置
+- 超时设置
+- 重试机制
+- 并发控制
+
+## 最佳实践
+
+1. API 定义
+   - 按模块组织
+   - 使用 TypeScript 类型
+   - 文档注释完整
+
+2. 错误处理
+   - 统一处理机制
+   - 错误信息友好
+   - 支持自定义处理
+
+3. 性能优化
+   - 请求缓存
+   - 并发控制
+   - 取消机制
+
+## 注意事项
+
+1. Token 管理
+   - 自动刷新
+   - 失效处理
+   - 安全存储
+
+2. 安全考虑
+   - HTTPS
+   - XSS 防护
+   - CSRF 防护
+
+3. 调试支持
+   - 日志记录
+   - 请求追踪
+   - 性能监控

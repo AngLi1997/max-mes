@@ -1,0 +1,2 @@
+-- 新增称具协议类型字段
+INSERT INTO bmos_platform.bp_equipment_tag_property (id, code, name, embed, property_type, required, tag_id, create_by, update_by, create_time, update_time, is_deleted) VALUES (43, 'WEIGHING_PROTOCOL_TYPE_012', '称量协议类型', 1, 2, 1, 20, '1', '1', '2024-06-18 13:52:01', '2024-06-18 13:52:01', 0);

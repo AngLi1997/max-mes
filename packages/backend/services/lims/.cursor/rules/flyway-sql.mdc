@@ -1,0 +1,199 @@
+---
+description:
+globs:*.sql
+alwaysApply:true
+---
+# Flyway规范
+
+## 目录结构
+```
+src/main/resources/
+└── init/
+    └── db/
+        ├── V1.0.0_0.0.1__bmos_lims_db_init.sql
+        ├── V1.0.0_0.0.2__add_some_tables.sql
+        └── V1.0.0_0.0.3__modify_some_fields.sql
+```
+
+## 命名规范
+- 格式：`V<主版本号>.<子版本号>_<修订号>__<描述>.sql`
+- 示例：`V1.0.0_0.0.1__bmos_lims_db_init.sql`
+- 版本号必须递增
+- 描述使用下划线分隔
+- 回滚脚本：`U<主版本号>.<子版本号>_<修订号>__<描述>.sql`
+
+## SQL脚本规范
+
+### 脚本头部注释
+```sql
+/*
+ * 描述: 初始化数据库表结构
+ * 作者: yigaohui
+ * 日期: 2024-02-26
+ * 环境: dev/test/prod
+ * 变更内容:
+ * 1. 创建用户表
+ * 2. 创建角色表
+ * 3. 创建权限表
+ */
+```
+
+### 建表规范
+```sql
+CREATE TABLE IF NOT EXISTS `lm_inspect_material` (
+    `id` bigint(20) NOT NULL COMMENT '主键ID',
+    `name` varchar(100) NOT NULL COMMENT '物料名称',
+    `code` varchar(50) NOT NULL COMMENT '物料编码',
+    `specification` varchar(200) DEFAULT NULL COMMENT '规格',
+    `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT '状态：0-禁用 1-启用',
+    `create_time` datetime NOT NULL COMMENT '创建时间',
+    `update_time` datetime NOT NULL COMMENT '更新时间',
+    `create_by` varchar(50) NOT NULL COMMENT '创建人',
+    `update_by` varchar(50) NOT NULL COMMENT '更新人',
+    `is_deleted` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否删除',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_code` (`code`),
+    KEY `idx_name` (`name`),
+    KEY `idx_create_time` (`create_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='检品信息表';
+```
+
+### 字段规范
+- 必须包含基础字段：
+  - id：主键
+  - create_time：创建时间
+  - update_time：更新时间
+  - create_by：创建人
+  - update_by：更新人
+  - is_deleted：逻辑删除
+
+- 字段命名：
+  - 全小写，下划线分隔
+  - 见名知意
+  - 统一命名规则
+
+- 字段类型：
+  - 字符串：varchar
+  - 大文本：text
+  - 整数：int/bigint
+  - 小数：decimal
+  - 日期时间：datetime
+  - 布尔：tinyint(1)
+
+### 索引规范
+- 主键：PRIMARY KEY
+- 唯一索引：UNIQUE KEY
+- 普通索引：KEY
+- 联合索引：考虑字段顺序
+- 索引命名：
+  - 主键：pk_表名
+  - 唯一索引：uk_字段名
+  - 普通索引：idx_字段名
+
+### 数据变更规范
+```sql
+-- 新增字段
+ALTER TABLE `table_name`
+ADD COLUMN `new_column` varchar(100) DEFAULT NULL COMMENT '新字段' AFTER `existing_column`;
+
+-- 修改字段
+ALTER TABLE `table_name`
+MODIFY COLUMN `column_name` varchar(200) DEFAULT NULL COMMENT '修改后的字段';
+
+-- 删除字段
+ALTER TABLE `table_name`
+DROP COLUMN `column_name`;
+
+-- 新增索引
+ALTER TABLE `table_name`
+ADD INDEX `idx_column_name` (`column_name`);
+```
+
+## 版本控制规范
+
+### 版本号管理
+- 主版本号：重大架构变更
+- 子版本号：功能模块变更
+- 修订号：小功能或bug修复
+
+### 分支管理
+- 分支命名：`release/<主版本号>.<子版本号>.<修订号>`
+- 示例：`release/1.0.0`
+- 脚本版本号必须与分支版本号匹配
+
+### 自动化版本号
+```shell
+# 获取当前分支版本号
+GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+VERSION=$(echo $GIT_BRANCH | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+SCRIPT_NAME="V${VERSION}_0.0.1__desc.sql"
+```
+
+## 执行规范
+
+### 环境配置
+```yaml
+spring:
+  flyway:
+    enabled: true
+    locations: classpath:init/db
+    baseline-on-migrate: true
+    baseline-version: 1.0.0
+    encoding: UTF-8
+    validate-on-migrate: true
+```
+
+### 执行流程
+1. 开发环境验证
+2. 代码评审
+3. 测试环境验证
+4. 预发环境验证
+5. 生产环境执行
+
+### 回滚策略
+- 编写回滚脚本
+- 验证回滚可行性
+- 准备回滚方案
+- 设置回滚点
+
+## 安全规范
+
+### 数据安全
+- 禁止提交敏感数据
+- 加密存储敏感信息
+- 控制数据访问权限
+- 记录数据变更日志
+
+### 执行安全
+- 限制执行权限
+- 备份重要数据
+- 分环境执行
+- 审计执行记录
+
+## 最佳实践
+
+### 开发建议
+- 保持脚本幂等性
+- 合理使用事务
+- 控制单个脚本大小
+- 添加必要的注释
+
+### 性能优化
+- 合理创建索引
+- 控制索引数量
+- 优化表结构
+- 分批处理大数据
+
+### 维护建议
+- 定期清理历史数据
+- 监控数据库性能
+- 优化慢查询
+- 及时更新文档
+
+
+
+
+- 合并分支时，需确保目标分支的 Flyway 脚本大版本号与分支名同步，避免版本冲突。
+
+
+

@@ -1,0 +1,18 @@
+i18n:
+  locations:
+    - data-id: bsms_exception_zh_CN.properties
+      group: backend-i18n
+    - data-id: bsms_exception_en_US.properties
+      group: backend-i18n
+    - data-id: bsms_enum_zh_CN.properties
+      group: backend-i18n
+    - data-id: bsms_enum_en_US.properties
+      group: backend-i18n 
+    - data-id: bsms_excel_zh_CN.properties
+      group: backend-i18n
+    - data-id: bsms_excel_en_US.properties
+      group: backend-i18n
+    - data-id: bsms_message_zh_CN.properties
+      group: backend-i18n
+    - data-id: bsms_message_en_US.properties
+      group: backend-i18n

@@ -1,0 +1,32 @@
+
+
+			.mark-box-class {
+				display: flex;
+				position: fixed;
+				top: 20px;
+				right: 20px;
+			}
+
+			.copy-class {
+				color: #2871FF;
+				border: 2px solid #2871FF;
+				padding: 8px 16px 8px 16px;
+				border-radius: 8px;
+				margin-left: 16px;
+				font-size: 26px;
+				font-weight: 500;
+			}
+
+			.obsolete-class {
+				color: #FF4C26;
+				border: 2px solid #FF4C26;
+				padding: 8px 16px 8px 16px;
+				border-radius: 8px;
+				font-size: 26px;
+				font-weight: 500;
+			}
+
+            .image-icon {
+                width: 24px;
+                height: 24px;
+            }

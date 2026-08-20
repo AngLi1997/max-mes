@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.inspect.retention.mapper.RetentionObservationLedgerMapper">
+
+    <select id="selectObservationLedgerPageList"
+            resultType="com.bmos.lims2.server.inspect.retention.dto.RetentionObservationLedgerListDTO">
+        SELECT
+            l.sample_no AS sampleNo,
+            l.batch_no AS batchNo,
+            l.material_name AS materialName,
+            l.material_code AS materialCode,
+            l.material_spec AS materialSpec,
+            l.quantity,
+            l.unit_id AS unitId,
+            l.observation_result AS observationResult,
+            l.observation_remark AS observationRemark,
+            l.observer_id AS observerId,
+            l.observation_time AS observationTime
+        FROM lm_retention_observation_ledger l
+        WHERE 1=1
+        <if test="materialIds != null and materialIds.size() > 0">
+            AND l.material_id IN
+            <foreach collection="materialIds" item="materialId" open="(" separator="," close=")">
+                #{materialId}
+            </foreach>
+        </if>
+        <if test="batchNo != null and batchNo != ''">
+            AND l.batch_no LIKE CONCAT('%', #{batchNo}, '%')
+        </if>
+        <if test="sampleNo != null and sampleNo != ''">
+            AND l.sample_no LIKE CONCAT('%', #{sampleNo}, '%')
+        </if>
+        <if test="observationStartDate != null">
+            AND l.observation_time >= CONCAT(#{observationStartDate}, ' 00:00:00')
+        </if>
+        <if test="observationEndDate != null">
+            AND l.observation_time &lt;= CONCAT(#{observationEndDate}, ' 23:59:59')
+        </if>
+        ORDER BY l.observation_time DESC
+    </select>
+
+</mapper>

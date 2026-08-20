@@ -1,0 +1,1 @@
+import{aG as e,r as t}from"./index-eacb5835.js";const a=e("liquidMeasure",(()=>{const e=t(null),a=t(null);return{selectedLiquidMeasureSheet:e,selectedMaterialBatch:a,setSelectedLiquidMeasureSheet:t=>{e.value=t},setSelectedMaterialBatch:e=>{a.value=e}}}));export{a as u};

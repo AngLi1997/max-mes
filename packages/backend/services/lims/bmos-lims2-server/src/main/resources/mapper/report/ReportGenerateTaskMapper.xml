@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bmos.lims2.server.report.mapper.ReportGenerateTaskMapper">
+
+    <resultMap id="BaseResultMap" type="com.bmos.lims2.server.report.entity.ReportGenerateTask">
+        <id column="id" property="id"/>
+        <result column="template_version_id" property="templateVersionId"/>
+        <result column="inspection_order_id" property="inspectionOrderId"/>
+        <result column="scheme_version_id" property="schemeVersionId"/>
+        <result column="report_no" property="reportNo"/>
+        <result column="status" property="status"/>
+        <result column="message" property="message"/>
+        <result column="lifecycle_status" property="lifecycleStatus"/>
+        <result column="report_approval_process_instance_id" property="reportApprovalProcessInstanceId"/>
+        <result column="report_approved" property="reportApproved"/>
+        <result column="report_approval_time" property="reportApprovalTime"/>
+        <result column="start_time" property="startTime"/>
+        <result column="end_time" property="endTime"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="is_deleted" property="deleted"/>
+    </resultMap>
+    <select id="selectGeneratedPage" resultType="com.bmos.lims2.server.report.dto.ReportGeneratedDTO">
+        SELECT
+            t.id                     AS taskId,
+            t.report_no              AS reportNo,
+            t.status                 AS status,
+            t.message                AS reportRemark,
+            t.lifecycle_status       AS lifecycleStatus,
+            t.inspection_order_id    AS inspectionOrderId,
+            io.order_no              AS orderNo,
+            io.order_status          AS orderStatus,
+            io.batch_no              AS batchNo,
+            io.production_date       AS productionDate,
+            io.material_id           AS materialId,
+            m.name                   AS materialName,
+            m.code                   AS materialCode,
+            m.specification          AS materialSpec,
+            m.unit_id                AS unitId,
+            io.scheme_version_id     AS schemeVersionId,
+            s.name                   AS schemeName,
+            sv.version_no            AS schemeVersionNo,
+            io.remark                AS orderRemark,
+            io.finished              AS orderFinished,
+            io.finished_time         AS orderFinishedTime,
+            io.create_by             AS createBy,
+            io.create_time           AS createTime,
+            io.create_by             AS requestUserId,
+            io.create_time           AS requestTime,
+            io.template_id           AS orderTemplateId,
+            dc.name                  AS orderTemplateName,
+            io.terminate_reason      AS terminateReason,
+            io.terminate_time        AS terminateTime,
+            t.template_version_id    AS templateVersionId,
+            v.template_id            AS templateId,
+            v.version_no             AS templateVersionNo,
+            t.path                   AS path,
+            t.end_time               AS endTime,
+            t.report_approved        AS reportApproved,
+            t.report_approval_time   AS reportApprovalTime,
+            t.create_by              AS generatedBy
+        FROM lm_report_generate_task t
+        LEFT JOIN lm_inspection_order io ON io.id = t.inspection_order_id
+        LEFT JOIN lm_report_template_version v ON v.id = t.template_version_id
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        LEFT JOIN lm_inspection_scheme_version sv ON io.scheme_version_id = sv.id
+        LEFT JOIN lm_inspection_scheme s ON sv.scheme_id = s.id
+        LEFT JOIN lm_document_config dc ON io.template_id = dc.id
+        <where>
+            t.is_deleted = 0
+            AND t.status = 'SUCCESS'
+            <if test="query.templateId != null">
+                AND v.template_id = #{query.templateId}
+            </if>
+            <if test="query.inspectionOrderId != null">
+                AND t.inspection_order_id = #{query.inspectionOrderId}
+            </if>
+        </where>
+        ORDER BY t.end_time DESC, t.id DESC
+    </select>
+
+    <!-- 不分页：查询某检验单的已生成报告列表（成功），可按模板过滤，按生成时间倒序 -->
+    <select id="selectGeneratedList" resultType="com.bmos.lims2.server.report.dto.ReportGeneratedItemDTO">
+        SELECT
+            t.id                   AS taskId,
+            t.report_no            AS reportNo,
+            t.status               AS status,
+            t.message              AS reportRemark,
+            t.lifecycle_status     AS lifecycleStatus,
+            t.report_approval_process_instance_id AS processInstanceId,
+            v.template_id          AS templateId,
+            t.template_version_id  AS templateVersionId,
+            v.version_no           AS templateVersionNo,
+            rt.name                AS templateName,
+            t.path                 AS path,
+            t.end_time             AS endTime,
+            t.report_approved      AS reportApproved,
+            t.report_approval_time AS reportApprovalTime,
+            t.create_by            AS generatedBy
+        FROM lm_report_generate_task t
+        LEFT JOIN lm_report_template_version v ON v.id = t.template_version_id
+        LEFT JOIN lm_report_template rt ON rt.id = v.template_id
+        <where>
+            t.is_deleted = 0
+            AND t.status = 'SUCCESS'
+            AND t.inspection_order_id = #{orderId}
+            AND v.template_id = #{templateId}
+        </where>
+        ORDER BY t.end_time DESC, t.id DESC
+    </select>
+
+    <select id="selectByOrderId" resultType="com.bmos.lims2.server.report.entity.ReportGenerateTask">
+        SELECT * FROM lm_report_generate_task
+        WHERE is_deleted = 0 AND inspection_order_id = #{orderId}
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 不分页：查询某检验单的已生成报告列表（成功），按生成时间倒序 -->
+    <select id="selectGeneratedListByOrderId" resultType="com.bmos.lims2.server.report.dto.ReportGeneratedItemDTO">
+        SELECT
+            t.id                   AS taskId,
+            t.report_no            AS reportNo,
+            t.status               AS status,
+            t.message              AS reportRemark,
+            t.lifecycle_status     AS lifecycleStatus,
+            t.report_approval_process_instance_id AS processInstanceId,
+            v.template_id          AS templateId,
+            t.template_version_id  AS templateVersionId,
+            v.version_no           AS templateVersionNo,
+            rt.name                AS templateName,
+            t.path                 AS path,
+            t.end_time             AS endTime,
+            t.report_approved      AS reportApproved,
+            t.report_approval_time AS reportApprovalTime,
+            t.create_by            AS generatedBy
+        FROM lm_report_generate_task t
+        LEFT JOIN lm_report_template_version v ON v.id = t.template_version_id
+        LEFT JOIN lm_report_template rt ON rt.id = v.template_id
+        WHERE t.is_deleted = 0
+          AND t.status = 'SUCCESS'
+          AND t.inspection_order_id = #{orderId}
+        ORDER BY t.end_time DESC, t.id DESC
+    </select>
+
+    <!-- 查询检验单基本信息，用于组装返回 -->
+    <select id="selectOrderInfo" resultType="com.bmos.lims2.server.report.dto.ReportOrderInfoDTO">
+        SELECT
+            io.id                 AS id,
+            io.order_no           AS orderNo,
+            io.order_status       AS orderStatus,
+            io.batch_no           AS batchNo,
+            io.production_date    AS productionDate,
+            io.material_id        AS materialId,
+            m.name                AS materialName,
+            m.code                AS materialCode,
+            m.specification       AS materialSpec,
+            m.unit_id             AS unitId,
+            io.scheme_version_id  AS schemeVersionId,
+            s.name                AS schemeName,
+            sv.version_no         AS schemeVersionNo,
+            io.remark             AS orderRemark,
+            io.finished           AS orderFinished,
+            io.finished_time      AS orderFinishedTime,
+            io.create_by          AS createBy,
+            io.create_time        AS createTime,
+            io.create_by          AS requestUserId,
+            io.create_time        AS requestTime,
+            io.template_id        AS orderTemplateId,
+            dc.name               AS orderTemplateName,
+            io.terminate_reason   AS terminateReason,
+            io.terminate_time     AS terminateTime
+        FROM lm_inspection_order io
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        LEFT JOIN lm_inspection_scheme_version sv ON io.scheme_version_id = sv.id
+        LEFT JOIN lm_inspection_scheme s ON sv.scheme_id = s.id
+        LEFT JOIN lm_document_config dc ON io.template_id = dc.id
+        WHERE io.is_deleted = 0 AND io.id = #{orderId}
+    </select>
+
+    <!-- 将同一检验单下、相同模板的已生效报告置为作废（排除当前任务） -->
+    <update id="voidEffectiveByOrderAndTemplate">
+        UPDATE lm_report_generate_task t
+        SET t.lifecycle_status = 'VOIDED', t.update_time = NOW()
+        WHERE t.is_deleted = 0
+          AND t.inspection_order_id = #{orderId}
+          AND t.lifecycle_status = 'EFFECTIVE'
+          AND (#{excludeTaskId} IS NULL OR t.id &lt;&gt; #{excludeTaskId})
+          AND t.template_version_id IN (
+            SELECT v.id FROM lm_report_template_version v WHERE v.template_id = #{templateId}
+          )
+    </update>
+
+    <!-- 查询业务上待审批的报告生成任务：
+         1) 生成成功
+         2) 已经发起过报告审批流程
+         3) 未审批通过
+    -->
+    <select id="selectPendingApprovalTasks" resultType="com.bmos.lims2.server.report.dto.ReportApprovalPendingItemDTO">
+        SELECT
+            t.id           AS taskId,
+            t.inspection_order_id AS orderId,
+            io.order_no    AS orderNo,
+            io.material_id AS materialId,
+            m.name         AS materialName,
+            m.code         AS materialCode,
+            m.specification AS materialSpec,
+            io.batch_no    AS batchNo,
+            io.create_time AS createTime,
+            io.create_by   AS createBy,
+            io.remark      AS remark,
+            -- 报告相关补充
+            t.report_no    AS reportNo,
+            t.end_time     AS generateTime,
+            t.template_version_id AS templateVersionId,
+            v.template_id  AS templateId,
+            rt.name        AS templateName,
+            t.path         AS path,
+            t.scheme_version_id   AS schemeVersionId,
+            t.report_approval_process_instance_id AS reportApprovalProcessInstanceId,
+            -- 订单/检品补充
+            io.create_time AS inspectionRequestTime
+        FROM lm_report_generate_task t
+        LEFT JOIN lm_inspection_order io ON io.id = t.inspection_order_id
+        LEFT JOIN lm_inspect_material m ON io.material_id = m.id
+        LEFT JOIN lm_report_template_version v ON v.id = t.template_version_id
+        LEFT JOIN lm_report_template rt ON rt.id = v.template_id
+        <where>
+            t.is_deleted = 0
+            AND t.status = 'SUCCESS'
+            AND t.report_approval_process_instance_id IS NOT NULL
+            AND (t.report_approved IS NULL OR t.report_approved = 0)
+            <if test="query.orderNo != null and query.orderNo != ''">
+                AND io.order_no LIKE CONCAT('%', #{query.orderNo}, '%')
+            </if>
+            <if test="query.materialName != null and query.materialName != ''">
+                AND m.name LIKE CONCAT('%', #{query.materialName}, '%')
+            </if>
+            <if test="query.materialCode != null and query.materialCode != ''">
+                AND m.code LIKE CONCAT('%', #{query.materialCode}, '%')
+            </if>
+            <if test="query.batchNo != null and query.batchNo != ''">
+                AND io.batch_no LIKE CONCAT('%', #{query.batchNo}, '%')
+            </if>
+            <if test="query.inspectionRequestTimeStart != null">
+                AND io.create_time &gt;= #{query.inspectionRequestTimeStart}
+            </if>
+            <if test="query.inspectionRequestTimeEnd != null">
+                AND io.create_time &lt;= #{query.inspectionRequestTimeEnd}
+            </if>
+            <if test="query.materialIds != null and query.materialIds.size() > 0">
+                AND io.material_id IN
+                <foreach collection="query.materialIds" item="mid" open="(" separator="," close=")">
+                    #{mid}
+                </foreach>
+            </if>
+        </where>
+        ORDER BY t.end_time DESC, t.id DESC
+    </select>
+
+</mapper>
+
+

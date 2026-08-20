@@ -1,0 +1,76 @@
+spring:
+  datasource:
+    driver-class-name: org.apache.shardingsphere.driver.ShardingSphereDriver
+    url: jdbc:shardingsphere:classpath:sharding.yaml
+db:
+  schema: bmos_mes
+xxlJobExecutorPort: 19200
+# Mybatis配置
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true # 虽然默认为 true ，但是还是显示去指定下。
+    default-enum-type-handler: com.baomidou.mybatisplus.core.handlers.MybatisEnumTypeHandler
+  global-config:
+    db-config:
+      logic-delete-value: true # 逻辑已删除值(默认为 true)
+      logic-not-delete-value: false # 逻辑未删除值(默认为 false)
+  mapper-locations: classpath*:mapper/**/*.xml
+  type-handlers-package: com.bmos.mybatis.handler
+
+parameter:
+  product:
+    plan:
+      discard:
+        code: mes.schedule.plan-invalid
+  record:
+    error-data: mes.record.error-data
+    empty-data: mes.record.empty-data
+    schedule-confirm: mes.schedule.confirm.isRequired
+  release:
+    over-level-data: mes.release.over-level-data
+
+logging:
+  config: classpath:log4j2.xml
+
+bmos:
+  application:
+    code: bmos-${spring.application.name}
+  auth:
+    exclude-urls:
+      - ${server.servlet.context-path}/user/login
+      - ${server.servlet.context-path}/swagger-ui/**
+      - ${server.servlet.context-path}/swagger-resources/**
+      - ${server.servlet.context-path}/api-docs
+      - ${server.servlet.context-path}/v3/api-docs
+      - ${server.servlet.context-path}/procedure/expression/condition/update
+      - ${server.servlet.context-path}/log/esToMysql
+      - ${server.servlet.context-path}/storage/log/esToMysql
+      - ${server.servlet.context-path}/material/log/esToMysql
+      - ${server.servlet.context-path}/feign/inspect/reject
+      - ${server.servlet.context-path}/feign/inspect/callback
+    activeUrls:
+      - ${server.servlet.context-path}/user/active
+      - ${server.servlet.context-path}/user/actived
+      - ${server.servlet.context-path}/user/mac
+    ignoreAuthUrls:
+      - ${server.servlet.context-path}/flow/todoPage/fresh
+      - ${server.servlet.context-path}/plan/info/wait/task/count
+    enable: true
+
+minio:
+  endpoint: http://127.0.0.1:9000
+  appDownloadUrl: http://172.30.1.160:9000
+  accessKey: minio
+  secretKey: Bmos1018
+  buckets:
+    archive: bmos-mes-archive
+    record: bmos-mes-record
+    sop: bmos-mes-sop
+    product: bmos-product
+    lotRelease: bmos-lot-release
+    batchRecordTemplate: bmos-batch-template
+    sign: bmos-platform-sign
+inspect:
+  lims:
+    control: false
