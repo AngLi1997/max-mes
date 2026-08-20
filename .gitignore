@@ -1,0 +1,30 @@
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Local assistant/editor settings
+**/.claude/settings.local.json
+**/.idea/
+*.iml
+
+# Maven-generated files
+**/.flattened-pom.xml
+
+# Frontend and Android build output
+packages/frontend/apps/**/build/
+packages/frontend/apps/**/.gradle/
+**/local.properties
+
+# Local signing material
+*.keystore
+*.jks
+
+# App-local VS Code settings; shared web workspace settings remain tracked.
+packages/frontend/apps/app-build-template/.vscode/settings.json
+packages/frontend/apps/lims-app-build-template/.vscode/settings.json
+packages/frontend/apps/lims-app/.vscode/settings.json
+packages/frontend/apps/mes-app/.vscode/settings.json
+
+# Locally distributed Haikang video plugin installers
+packages/frontend/apps/web/apps/bmos-dc-web/public/haikang/VideoWebPlugin.exe
+packages/frontend/apps/web/apps/bmos-platform-web/public/haikang/VideoWebPlugin.exe

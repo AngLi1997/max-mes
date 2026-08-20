@@ -1,7 +1,0 @@
-#Thu Jan 04 14:16:59 CST 2024
-base.1=C\:\\Users\\bmos\\Desktop\\app-build\\HBuilder-Integrate-AS\\simpleDemo\\build\\intermediates\\dex\\debugAndroidTest\\mergeProjectDexDebugAndroidTest\\4\\classes.dex
-path.1=4/classes.dex
-base.0=C\:\\Users\\bmos\\Desktop\\app-build\\HBuilder-Integrate-AS\\simpleDemo\\build\\intermediates\\dex\\debugAndroidTest\\mergeProjectDexDebugAndroidTest\\0\\classes.dex
-renamed.1=classes2.dex
-renamed.0=classes.dex
-path.0=0/classes.dex
