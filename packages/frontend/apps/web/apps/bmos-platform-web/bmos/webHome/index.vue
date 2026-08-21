@@ -280,7 +280,7 @@
   const type = ref<string>('1');
   const lockScreenRef = ref();
   const changeLanguageRef = ref();
-  const shortcutKey = ref(); //快捷键
+  const shortcutKey = ref<string[]>(['Ctrl', 'L']); //快捷键
 
   const activedApiEnum = {
     // 各个系统对应的激活接口枚举
@@ -352,7 +352,7 @@
 
   const getOutsideIpByCode = async (code: string) => {
     try {
-      const { data } = await getParameter('platform.sys.outside_url	');
+      const { data } = await getParameter('platform.sys.outside_url');
       const outsideJson: any = JSON.parse(data?.value || '{}');
       if (code && outsideJson?.[code]) {
         return Promise.resolve(outsideJson?.[code]);
@@ -588,20 +588,26 @@
   };
   // 获取锁屏时间
   const getLockScreenTime = async () => {
-    const res: any = await getParameter('platform.sys.web-lock-screen-time');
-    lockTime.value = res.data.value * 60 * 1000; //多久不操作会锁屏 转成毫秒
-    // 如果设置的时长为0,则永不锁屏
-    if (lockTime.value == 0) {
-      return;
-    }
-    const lock = LockScreen(() => lockScreen(), lockTime.value);
-    Object.assign(LOCK, lock);
-    const status = getLockStatus(userInfo.value?.userId);
-    // 若锁屏状态为true
-    if (status) {
-      lockScreenRef.value.showModal();
-    } else {
-      LOCK.start();
+    try {
+      const res: any = await getParameter('platform.sys.web-lock-screen-time');
+      lockTime.value = Number(res?.data?.value || 0) * 60 * 1000; //多久不操作会锁屏 转成毫秒
+      // 如果设置的时长为0,则永不锁屏
+      if (lockTime.value == 0) {
+        return;
+      }
+      const lock = LockScreen(() => lockScreen(), lockTime.value);
+      Object.assign(LOCK, lock);
+      const status = getLockStatus(userInfo.value?.userId);
+      // 若锁屏状态为true
+      if (status) {
+        lockScreenRef.value?.showModal();
+      } else {
+        LOCK.start();
+      }
+    } catch (error) {
+      // 锁屏参数属于可选配置，缺失时按不自动锁屏处理。
+      lockTime.value = 0;
+      console.log(error);
     }
   };
 
@@ -609,7 +615,11 @@
   const getLockScreenShortcutKey = async () => {
     try {
       const res: any = await getParameter('platform.sys.web-lock-screen-hotkey');
-      shortcutKey.value = JSON.parse(res.data.value); //["Ctrl","Q"]
+      const value = res?.data?.value;
+      const parsed = value ? JSON.parse(value) : null;
+      if (Array.isArray(parsed) && parsed.length >= 2) {
+        shortcutKey.value = parsed; //["Ctrl","Q"]
+      }
     } catch (error) {
       console.log(error);
     }
@@ -733,7 +743,8 @@
   const getAIChatUrl = async () => {
     try {
       const res = await getParameter('platform.sys.AI-url');
-      AIChatUrl.value = res.data.value;
+      // AI 服务属于可选配置，未配置时接口会返回 data: null。
+      AIChatUrl.value = res?.data?.value || '';
     } catch (error) {
       console.log(error);
     }

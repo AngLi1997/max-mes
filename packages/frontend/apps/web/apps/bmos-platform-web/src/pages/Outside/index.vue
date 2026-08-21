@@ -25,7 +25,7 @@
 
   const getOutsideIp = async () => {
     try {
-      const { data } = await getParameter('platform.sys.outside_url	');
+      const { data } = await getParameter('platform.sys.outside_url');
       const outsideJson: any = JSON.parse(data?.value || '{}');
       if (route.meta?.id && outsideJson?.[route.meta?.id as string]) {
         return Promise.resolve(outsideJson?.[route.meta?.id as string]);

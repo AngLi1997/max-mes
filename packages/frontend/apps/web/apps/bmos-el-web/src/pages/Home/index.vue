@@ -82,7 +82,7 @@
   const outsideList = ref<OutsideType[] | []>([]);
   onMounted(async () => {
     try {
-      const { data: json } = await getParameter('platform.sys.outside_url	');
+      const { data: json } = await getParameter('platform.sys.outside_url');
       outsideJson.value = JSON.parse(json?.value || '{}');
       const { data } = await getPermissionMenuList({ rootMenuCode: 220, containsFunc: true });
       for (let item of data) {

@@ -9,7 +9,22 @@
     <artifactId>bmos-mes-service</artifactId>
     <name>bmos-mes-service</name>
 
+    <properties>
+        <local.libs.dir>${project.basedir}/../../../libs</local.libs.dir>
+    </properties>
+
     <dependencies>
+        <!-- 强制与 MES 根工程一致，避免 LIMS 旧版 POM 将 bmos 组件提升到 1.15.2-SNAPSHOT。 -->
+        <dependency>
+            <groupId>com.bmos</groupId>
+            <artifactId>bmos-starter-common</artifactId>
+            <version>1.15.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.bmos</groupId>
+            <artifactId>bmos-starter-adaptor</artifactId>
+            <version>1.15.0-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>com.bmos.lims</groupId>
             <artifactId>bmos-lims2-feign</artifactId>
@@ -108,10 +123,30 @@
         <dependency>
             <groupId>com.bmos.orchestrator.engine</groupId>
             <artifactId>bmos-orchestrator-starter</artifactId>
+            <version>0.0.5-SNAPSHOT</version>
+            <scope>system</scope>
+            <systemPath>${local.libs.dir}/bmos-orchestrator-starter-0.0.5-SNAPSHOT.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.bmos.orchestrator.engine</groupId>
+            <artifactId>bmos-orchestrator-core</artifactId>
+            <version>0.0.5-SNAPSHOT</version>
+            <scope>system</scope>
+            <systemPath>${local.libs.dir}/bmos-orchestrator-core-0.0.5-SNAPSHOT.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.bmos.audit.engine</groupId>
             <artifactId>bmos-audit-engine-starter</artifactId>
+            <version>0.0.3-SNAPSHOT</version>
+            <scope>system</scope>
+            <systemPath>${local.libs.dir}/bmos-audit-engine-starter-0.0.3-SNAPSHOT.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.bmos.audit.engine</groupId>
+            <artifactId>bmos-audit-engine-core</artifactId>
+            <version>0.0.3-SNAPSHOT</version>
+            <scope>system</scope>
+            <systemPath>${local.libs.dir}/bmos-audit-engine-core-0.0.3-SNAPSHOT.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -245,6 +280,8 @@
             <groupId>com.bmos.api</groupId>
             <artifactId>bmos-api-feign</artifactId>
             <version>1.0-SNAPSHOT</version>
+            <scope>system</scope>
+            <systemPath>${local.libs.dir}/bmos-api-feign-1.0-SNAPSHOT.jar</systemPath>
         </dependency>
     </dependencies>
 

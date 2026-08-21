@@ -6,7 +6,9 @@ Thumbs.db
 **/.claude/settings.local.json
 **/.idea/
 *.iml
-
+**/target/
+*.log
+*.log.gz
 # Maven-generated files
 **/.flattened-pom.xml
 

@@ -84,6 +84,42 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           ws: true,
         },
+        // 本地开发时，平台门户通过同源路径加载 MES 前端。
+        '/app/bmos-mes': {
+          target: 'http://127.0.0.1:8085',
+          changeOrigin: true,
+          ws: true,
+        },
+        '/app/bmos-audit': {
+          target: 'http://127.0.0.1:8086',
+          changeOrigin: true,
+          ws: true,
+        },
+        '/app/bmos-lims': {
+          target: 'http://127.0.0.1:8087',
+          changeOrigin: true,
+          ws: true,
+        },
+        '/app/bmos-wms': {
+          target: 'http://127.0.0.1:8084',
+          changeOrigin: true,
+          ws: true,
+        },
+        '/app/bmos-ems': {
+          target: 'http://127.0.0.1:8092',
+          changeOrigin: true,
+          ws: true,
+        },
+        '/app/bmos-dc': {
+          target: 'http://127.0.0.1:8089',
+          changeOrigin: true,
+          ws: true,
+        },
+        '/app/bmos-el': {
+          target: 'http://127.0.0.1:8090',
+          changeOrigin: true,
+          ws: true,
+        },
       },
     },
     base: '/app/bmos-platform/',
